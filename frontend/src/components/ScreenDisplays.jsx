@@ -495,16 +495,19 @@ export default function ScreenDisplays({ onSelectAgent, agents = [] }) {
   const naraTexture = useMemo(() => createBrowserTexture('nara'), [])
   const teamTexture = useMemo(() => createBrowserTexture('team'), [])
 
-  // Create glowing emissive materials
+  // Create glowing emissive materials with polygonOffset to guarantee visibility in front of monitor mesh
   const velociaMat = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
         map: velociaTexture,
         emissiveMap: velociaTexture,
         emissive: new THREE.Color('#ffffff'),
-        emissiveIntensity: 0.7,
+        emissiveIntensity: 0.85,
         roughness: 0.15,
-        metalness: 0.05
+        metalness: 0.05,
+        polygonOffset: true,
+        polygonOffsetFactor: -4,
+        polygonOffsetUnits: -4
       }),
     [velociaTexture]
   )
@@ -515,9 +518,12 @@ export default function ScreenDisplays({ onSelectAgent, agents = [] }) {
         map: scoutTexture,
         emissiveMap: scoutTexture,
         emissive: new THREE.Color('#ffffff'),
-        emissiveIntensity: 0.7,
+        emissiveIntensity: 0.85,
         roughness: 0.15,
-        metalness: 0.05
+        metalness: 0.05,
+        polygonOffset: true,
+        polygonOffsetFactor: -4,
+        polygonOffsetUnits: -4
       }),
     [scoutTexture]
   )
@@ -528,9 +534,12 @@ export default function ScreenDisplays({ onSelectAgent, agents = [] }) {
         map: naraTexture,
         emissiveMap: naraTexture,
         emissive: new THREE.Color('#ffffff'),
-        emissiveIntensity: 0.7,
+        emissiveIntensity: 0.85,
         roughness: 0.15,
-        metalness: 0.05
+        metalness: 0.05,
+        polygonOffset: true,
+        polygonOffsetFactor: -4,
+        polygonOffsetUnits: -4
       }),
     [naraTexture]
   )
@@ -543,14 +552,17 @@ export default function ScreenDisplays({ onSelectAgent, agents = [] }) {
         roughness: 0.88,
         metalness: 0.12,
         emissive: new THREE.Color('#000000'),
-        emissiveIntensity: 0
+        emissiveIntensity: 0,
+        polygonOffset: true,
+        polygonOffsetFactor: -4,
+        polygonOffsetUnits: -4
       }),
     []
   )
 
   // Gentle, subtle emissive screen glow oscillation to make the active screens feel alive
   useFrame((state) => {
-    const pulse = 0.7 + Math.sin(state.clock.elapsedTime * 2.5) * 0.06
+    const pulse = 0.85 + Math.sin(state.clock.elapsedTime * 2.5) * 0.06
     if (velociaMat) velociaMat.emissiveIntensity = pulse
     if (scoutMat) scoutMat.emissiveIntensity = pulse
     if (naraMat) naraMat.emissiveIntensity = pulse
@@ -561,20 +573,19 @@ export default function ScreenDisplays({ onSelectAgent, agents = [] }) {
   const scoutAgent = agents.find((a) => a.id === 'scout')
   const naraAgent = agents.find((a) => a.id === 'nara')
 
-  // Exact monitor screen surface coordinates attached directly flush onto monitor glass face
-  // Monitor glass face is at local Z = -0.041, Y = +0.306 relative to PC base.
-  // Desk 1 (Velocia): PC at [1.588, 0.504, -3.212], rot [0, Math.PI, 0] -> screen at [1.580, 0.810, -3.175]
-  // Desk 2 (Scout):   PC at [3.359, 0.504, -3.212], rot [0, Math.PI, 0] -> screen at [3.351, 0.810, -3.175]
-  // Desk 3 (Nara):    PC at [1.070, 0.504, -2.370], rot [0, 0, 0]       -> screen at [1.078, 0.810, -2.407]
-  // Desk 4 (Empty):   PC at [2.840, 0.504, -2.370], rot [0, 0, 0]       -> screen at [2.848, 0.810, -2.407]
-  const screenWidth = 0.42
-  const screenHeight = 0.26
+  // Exact monitor screen surface coordinates attached cleanly onto monitor glass face
+  // Desk 1 (Velocia): PC at [1.588, 0.504, -3.212], rot [0, Math.PI, 0] -> screen at [1.580, 0.805, -3.210]
+  // Desk 2 (Scout):   PC at [3.359, 0.504, -3.212], rot [0, Math.PI, 0] -> screen at [3.351, 0.805, -3.210]
+  // Desk 3 (Nara):    PC at [1.070, 0.504, -2.370], rot [0, 0, 0]       -> screen at [1.078, 0.805, -2.370]
+  // Desk 4 (Empty):   PC at [2.840, 0.504, -2.370], rot [0, 0, 0]       -> screen at [2.848, 0.805, -2.370]
+  const screenWidth = 0.38
+  const screenHeight = 0.25
 
   return (
     <group ref={groupRef}>
       {/* 1. Velocia's Screen (Desk 1) - Flush on monitor glass face */}
       <mesh
-        position={[1.580, 0.810, -3.175]}
+        position={[1.580, 0.805, -3.210]}
         rotation={[0, Math.PI, 0]}
         material={velociaMat}
         onClick={(e) => {
@@ -587,7 +598,7 @@ export default function ScreenDisplays({ onSelectAgent, agents = [] }) {
 
       {/* 2. Scout's Screen (Desk 2) - Flush on monitor glass face */}
       <mesh
-        position={[3.351, 0.810, -3.175]}
+        position={[3.351, 0.805, -3.210]}
         rotation={[0, Math.PI, 0]}
         material={scoutMat}
         onClick={(e) => {
@@ -600,7 +611,7 @@ export default function ScreenDisplays({ onSelectAgent, agents = [] }) {
 
       {/* 3. Nara's Screen (Desk 3) - Flush on monitor glass face */}
       <mesh
-        position={[1.078, 0.810, -2.407]}
+        position={[1.078, 0.805, -2.370]}
         rotation={[0, 0, 0]}
         material={naraMat}
         onClick={(e) => {
@@ -613,7 +624,7 @@ export default function ScreenDisplays({ onSelectAgent, agents = [] }) {
 
       {/* 4. Empty Desk Screen (Desk 4, opposite Scout) - Powered Off / Blank */}
       <mesh
-        position={[2.848, 0.810, -2.407]}
+        position={[2.848, 0.805, -2.370]}
         rotation={[0, 0, 0]}
         material={emptyDeskMat}
       >

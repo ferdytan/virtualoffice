@@ -181,7 +181,7 @@ export default function Sidebar({
 
         {/* --- 3D AVATAR MODEL CUSTOMIZER CARD --- */}
         <div className="mt-3.5 p-3.5 bg-slate-50 border border-slate-200/90 rounded-2xl">
-          <div className="flex items-center justify-between mb-1.5">
+          <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <Box className="w-4 h-4 text-purple-600" />
               <span className="text-xs font-bold text-slate-800">
@@ -189,11 +189,13 @@ export default function Sidebar({
               </span>
             </div>
             {agent.custom_model_url || agent.customModelUrl ? (
-              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-200">
-                Custom Model
+              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-200 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-600" />
+                Model Kustom Aktif
               </span>
             ) : (
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-600">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 Default Chibi
               </span>
             )}
@@ -201,11 +203,11 @@ export default function Sidebar({
 
           <p className="text-[11px] text-slate-500 mb-3 leading-relaxed">
             {agent.custom_model_url || agent.customModelUrl
-              ? `Model kustom: ${agent.custom_model_name || 'model_kustom.glb'}. Auto-scaling & rigging aktif.`
-              : `Gunakan avatar bawaan atau upload file .glb Anda sendiri untuk ${agent.name}.`}
+              ? `Sedang menggunakan: ${agent.custom_model_name || 'custom_model.glb'}. Klik tombol "Kembalikan ke Default" jika ingin kembali ke bentuk semula.`
+              : `Sedang menggunakan karakter bawaan (The Delegation Chibi). Anda bisa mengunggah file .glb kustom untuk ${agent.name}.`}
           </p>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-2">
             <input
               type="file"
               ref={fileInputRef}
@@ -213,26 +215,39 @@ export default function Sidebar({
               accept=".glb,.gltf"
               className="hidden"
             />
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploadLoading}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 bg-purple-600 hover:bg-purple-700 active:scale-[0.98] text-white font-bold text-xs rounded-xl shadow-sm transition-all cursor-pointer disabled:opacity-50"
-            >
-              <Upload className="w-3.5 h-3.5" />
-              {uploadLoading ? 'Memproses...' : 'Upload GLB Karakter'}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadLoading}
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 bg-purple-600 hover:bg-purple-700 active:scale-[0.98] text-white font-bold text-xs rounded-xl shadow-sm transition-all cursor-pointer disabled:opacity-50"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                {uploadLoading
+                  ? 'Memproses...'
+                  : agent.custom_model_url || agent.customModelUrl
+                  ? 'Ganti Model .glb Lain'
+                  : 'Upload GLB Karakter'}
+              </button>
 
-            {(agent.custom_model_url || agent.customModelUrl) && (
               <button
                 onClick={handleResetModel}
-                disabled={uploadLoading}
-                className="flex items-center justify-center gap-1 py-2 px-3 bg-slate-200 hover:bg-slate-300 active:scale-[0.98] text-slate-700 font-bold text-xs rounded-xl transition-all cursor-pointer"
-                title="Kembalikan ke avatar default"
+                disabled={uploadLoading || (!agent.custom_model_url && !agent.customModelUrl)}
+                className={`flex items-center justify-center gap-1.5 py-2 px-3 font-bold text-xs rounded-xl transition-all cursor-pointer ${
+                  agent.custom_model_url || agent.customModelUrl
+                    ? 'bg-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 border border-slate-300 text-slate-800 active:scale-[0.98]'
+                    : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
+                }`}
+                title="Kembalikan ke avatar default The Delegation"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                Reset
+                Kembalikan ke Default
               </button>
-            )}
+            </div>
+
+            <div className="text-[10px] text-slate-400 flex items-center gap-1">
+              <span>💡</span>
+              <span>Anda bebas mengganti atau mereset ke bentuk default kapan saja.</span>
+            </div>
           </div>
 
           {uploadMessage && (
