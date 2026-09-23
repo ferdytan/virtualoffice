@@ -28,6 +28,7 @@ export default function Sidebar({
   onOpenCall,
   onSendBrief,
   onUpdateAgentModel,
+  onSelectAvatarType,
   chatHistory = [],
   isLoading = false
 }) {
@@ -97,6 +98,17 @@ export default function Sidebar({
     }
   }
 
+  const handleSelectPreset = (type) => {
+    if (onSelectAvatarType) {
+      onSelectAvatarType(agent.id, type)
+    }
+    setUploadMessage({
+      type: 'success',
+      text: type === 'boxhead' ? 'Karakter BoxHead Chibi aktif!' : 'Karakter Chibi Klasik aktif!'
+    })
+    setTimeout(() => setUploadMessage(null), 3000)
+  }
+
   const handleResetModel = async () => {
     setUploadLoading(true)
     try {
@@ -107,8 +119,11 @@ export default function Sidebar({
     if (onUpdateAgentModel) {
       onUpdateAgentModel(agent.id, null, null)
     }
+    if (onSelectAvatarType) {
+      onSelectAvatarType(agent.id, 'default')
+    }
     setUploadLoading(false)
-    setUploadMessage({ type: 'success', text: 'Avatar berhasil dikembalikan ke default!' })
+    setUploadMessage({ type: 'success', text: 'Avatar dikembalikan ke Chibi Klasik bawaan!' })
     setTimeout(() => setUploadMessage(null), 3000)
   }
 
@@ -185,10 +200,15 @@ export default function Sidebar({
             <div className="flex items-center gap-2">
               <Box className="w-4 h-4 text-purple-600" />
               <span className="text-xs font-bold text-slate-800">
-                Model Karakter 3D (.glb)
+                Pilihan Karakter 3D
               </span>
             </div>
-            {agent.custom_model_url || agent.customModelUrl ? (
+            {agent.avatar_type === 'boxhead' ? (
+              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-sky-100 text-sky-700 border border-sky-200 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
+                BoxHead Aktif
+              </span>
+            ) : (agent.custom_model_url || agent.customModelUrl) && agent.avatar_type === 'custom' ? (
               <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-200 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-purple-600" />
                 Model Kustom Aktif
@@ -196,16 +216,69 @@ export default function Sidebar({
             ) : (
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                Default Chibi
+                Chibi Klasik
               </span>
             )}
           </div>
 
-          <p className="text-[11px] text-slate-500 mb-3 leading-relaxed">
-            {agent.custom_model_url || agent.customModelUrl
-              ? `Sedang menggunakan: ${agent.custom_model_name || 'custom_model.glb'}. Klik tombol "Kembalikan ke Default" jika ingin kembali ke bentuk semula.`
-              : `Sedang menggunakan karakter bawaan (The Delegation Chibi). Anda bisa mengunggah file .glb kustom untuk ${agent.name}.`}
+          <p className="text-[11px] text-slate-500 mb-2.5 leading-relaxed">
+            Pilih opsi karakter avatar built-in tanpa upload, atau unggah file 3D .glb Anda sendiri:
           </p>
+
+          {/* Preset Character Selection Buttons */}
+          <div className="grid grid-cols-2 gap-2 mb-2.5">
+            {/* 1. Chibi Klasik (Default) */}
+            <button
+              type="button"
+              onClick={() => handleSelectPreset('default')}
+              className={`p-2 rounded-xl border text-left flex flex-col transition-all cursor-pointer ${
+                agent.avatar_type !== 'boxhead' && (!agent.custom_model_url || agent.avatar_type !== 'custom')
+                  ? 'border-emerald-500 bg-emerald-50/80 shadow-sm ring-2 ring-emerald-500/20'
+                  : 'border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-100/60'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-0.5">
+                <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
+                  Chibi Klasik
+                </span>
+                {agent.avatar_type !== 'boxhead' && (!agent.custom_model_url || agent.avatar_type !== 'custom') && (
+                  <span className="text-[8px] font-extrabold text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded-full">
+                    Aktif
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] text-slate-500">Avatar bawaan The Delegation</span>
+            </button>
+
+            {/* 2. BoxHead Chibi (New built-in option) */}
+            <button
+              type="button"
+              onClick={() => handleSelectPreset('boxhead')}
+              className={`p-2 rounded-xl border text-left flex flex-col transition-all cursor-pointer ${
+                agent.avatar_type === 'boxhead'
+                  ? 'border-sky-500 bg-sky-50/80 shadow-sm ring-2 ring-sky-500/20'
+                  : 'border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-100/60'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-0.5">
+                <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-sm bg-sky-500 inline-block" />
+                  BoxHead Chibi
+                </span>
+                {agent.avatar_type === 'boxhead' ? (
+                  <span className="text-[8px] font-extrabold text-sky-700 bg-sky-100 px-1.5 py-0.2 rounded-full">
+                    Aktif
+                  </span>
+                ) : (
+                  <span className="text-[8px] font-extrabold text-amber-700 bg-amber-100 px-1.5 py-0.2 rounded-full">
+                    Baru
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] text-slate-500">CubeBot chibi ekspresif</span>
+            </button>
+          </div>
 
           <div className="flex flex-col gap-2">
             <input
@@ -222,31 +295,27 @@ export default function Sidebar({
                 className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 bg-purple-600 hover:bg-purple-700 active:scale-[0.98] text-white font-bold text-xs rounded-xl shadow-sm transition-all cursor-pointer disabled:opacity-50"
               >
                 <Upload className="w-3.5 h-3.5" />
-                {uploadLoading
-                  ? 'Memproses...'
-                  : agent.custom_model_url || agent.customModelUrl
-                  ? 'Ganti Model .glb Lain'
-                  : 'Upload GLB Karakter'}
+                {uploadLoading ? 'Memproses...' : 'Upload GLB Kustom'}
               </button>
 
               <button
                 onClick={handleResetModel}
-                disabled={uploadLoading || (!agent.custom_model_url && !agent.customModelUrl)}
+                disabled={uploadLoading || (agent.avatar_type === 'default' && !agent.custom_model_url && !agent.customModelUrl)}
                 className={`flex items-center justify-center gap-1.5 py-2 px-3 font-bold text-xs rounded-xl transition-all cursor-pointer ${
-                  agent.custom_model_url || agent.customModelUrl
+                  agent.avatar_type === 'boxhead' || agent.custom_model_url || agent.customModelUrl
                     ? 'bg-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 border border-slate-300 text-slate-800 active:scale-[0.98]'
                     : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
                 }`}
-                title="Kembalikan ke avatar default The Delegation"
+                title="Kembalikan ke avatar default Chibi Klasik"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                Kembalikan ke Default
+                Reset Default
               </button>
             </div>
 
             <div className="text-[10px] text-slate-400 flex items-center gap-1">
               <span>💡</span>
-              <span>Anda bebas mengganti atau mereset ke bentuk default kapan saja.</span>
+              <span>Pilih karakter preset atau upload model 3D kapan saja.</span>
             </div>
           </div>
 

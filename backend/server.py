@@ -102,6 +102,10 @@ class TaskUpdateRequest(BaseModel):
     status: str = Field(..., description="SCHEDULED, ON HOLD, IN PROGRESS, or DONE")
 
 
+class AvatarTypeRequest(BaseModel):
+    avatar_type: str = Field(..., description="Avatar type: 'default', 'boxhead', or 'custom'")
+
+
 @app.get("/")
 def read_root():
     return {
@@ -126,16 +130,42 @@ def health_check():
 
 @app.get("/api/agents")
 def get_agents():
-    """Returns detailed profiles of Nara, Velocia, and Scout including any custom 3D models."""
+    """Returns detailed profiles of Nara, Velocia, and Scout including avatar type and any custom 3D models."""
     agents = []
     for k, v in AGENTS_METADATA.items():
         agent_data = dict(v)
+        agent_data["avatar_type"] = AGENTS_METADATA[k].get("avatar_type", "default")
         model_path = os.path.join(UPLOAD_DIR, f"{k}.glb")
         if os.path.exists(model_path):
             agent_data["custom_model_url"] = f"/uploads/models/{k}.glb?t={int(os.path.getmtime(model_path))}"
+            agent_data["has_custom_model"] = True
+        else:
+            agent_data["has_custom_model"] = False
         agents.append(agent_data)
     return {
         "agents": agents
+    }
+
+
+@app.post("/api/agents/{agent_id}/avatar-type")
+def set_agent_avatar_type(agent_id: str, req: AvatarTypeRequest):
+    """Sets the avatar type for an agent ('default', 'boxhead', or 'custom')."""
+    aid = agent_id.lower()
+    if aid not in AGENTS_METADATA:
+        raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found.")
+    
+    valid_types = {"default", "boxhead", "custom"}
+    if req.avatar_type not in valid_types:
+        raise HTTPException(status_code=400, detail=f"Tipe avatar tidak valid: {req.avatar_type}. Pilih salah satu dari: {valid_types}")
+    
+    AGENTS_METADATA[aid]["avatar_type"] = req.avatar_type
+    logger.info(f"Avatar type for agent {aid} updated to: {req.avatar_type}")
+    
+    return {
+        "status": "success",
+        "agent_id": aid,
+        "avatar_type": req.avatar_type,
+        "message": f"Tipe avatar untuk {AGENTS_METADATA[aid]['name']} berhasil diubah ke {req.avatar_type}."
     }
 
 

@@ -186,6 +186,7 @@ export default function App() {
         a.id === agentId
           ? {
               ...a,
+              avatar_type: modelUrl ? 'custom' : 'default',
               custom_model_url: modelUrl,
               customModelUrl: modelUrl,
               custom_model_name: modelName
@@ -197,12 +198,39 @@ export default function App() {
       prev && prev.id === agentId
         ? {
             ...prev,
+            avatar_type: modelUrl ? 'custom' : 'default',
             custom_model_url: modelUrl,
             customModelUrl: modelUrl,
             custom_model_name: modelName
           }
         : prev
     )
+  }
+
+  // Handle switching avatar preset type ('default' | 'boxhead' | 'custom')
+  const handleSelectAvatarType = async (agentId, avatarType) => {
+    setAgents((prev) =>
+      prev.map((a) =>
+        a.id === agentId
+          ? { ...a, avatar_type: avatarType }
+          : a
+      )
+    )
+    setSelectedAgent((prev) =>
+      prev && prev.id === agentId
+        ? { ...prev, avatar_type: avatarType }
+        : prev
+    )
+
+    try {
+      await fetch(`/api/agents/${agentId}/avatar-type`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ avatar_type: avatarType })
+      })
+    } catch (err) {
+      console.warn('Failed to persist avatar_type to backend:', err)
+    }
   }
 
   // Active displayed agent in top-left panel
@@ -402,6 +430,7 @@ export default function App() {
           onOpenCall={handleOpenCall}
           onSendBrief={handleSendBrief}
           onUpdateAgentModel={handleUpdateAgentModel}
+          onSelectAvatarType={handleSelectAvatarType}
           chatHistory={chatHistory[selectedAgent.id] || []}
           isLoading={isLoadingBrief}
         />

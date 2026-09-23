@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useMemo, useState, Suspense, Component } from 'react'
 import { useGLTF, useAnimations, Html } from '@react-three/drei'
+import { RoundedBoxGeometry } from 'three-stdlib'
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js'
 import * as THREE from 'three'
 
@@ -27,11 +28,15 @@ class ModelErrorBoundary extends Component {
 }
 
 /**
- * Inner component that loads and renders the 3D model (default character or custom GLB).
+ * Inner component that loads and renders the 3D model.
+ * Supports:
+ * 1. 'default': Authentic spherical claymorphic chibi avatar from The Delegation
+ * 2. 'boxhead': Rounded-cube chibi character matching user reference photos (#94beea pastel head, determined face, #446889 slate body)
+ * 3. 'custom': User-uploaded .glb file with auto-scaling and bounding-box fit
  */
 function CharacterModel({
   modelUrl,
-  isCustom = false,
+  avatarType = 'default',
   agent,
   hovered,
   isSelected,
@@ -42,11 +47,91 @@ function CharacterModel({
   const clone = useMemo(() => SkeletonUtils.clone(scene), [scene])
   const { actions } = useAnimations(animations, groupRef)
 
-  // Configure materials & scaling
+  // Configure materials, accessories, and BoxHead head attachment
   useEffect(() => {
     if (!clone) return
 
-    if (!isCustom) {
+    if (avatarType === 'custom') {
+      // Custom Uploaded 3D Model: auto-scale and center to fit the chair
+      const bbox = new THREE.Box3().setFromObject(clone)
+      const height = bbox.max.y - bbox.min.y
+      if (height > 0) {
+        const targetHeight = 1.1 // standard sitting chibi height
+        const scale = targetHeight / height
+        clone.scale.set(scale, scale, scale)
+        clone.position.y = -bbox.min.y * scale
+      }
+
+      clone.traverse((child) => {
+        if (child.isMesh) {
+          child.castShadow = true
+          child.receiveShadow = true
+        }
+      })
+    } else if (avatarType === 'boxhead') {
+      // BoxHead Chibi Character (from user photos):
+      // 1. Body: Darker slate blue (#446889) or agent color
+      const bodyColor = new THREE.Color('#446889')
+      clone.traverse((child) => {
+        if (child.isMesh) {
+          child.castShadow = true
+          child.receiveShadow = true
+
+          if (child.name === 'body') {
+            child.material = new THREE.MeshStandardMaterial({
+              color: bodyColor,
+              roughness: 0.32,
+              metalness: 0.05
+            })
+          } else if (child.name === 'eyes' || child.name === 'mouth' || child.name === 'cap' || child.name === 'headphones') {
+            child.visible = false
+          }
+        }
+      })
+
+      // 2. Attach RoundedBox Head directly to the skeleton 'head' bone
+      const headBone = clone.getObjectByName('head')
+      if (headBone) {
+        // Remove any previous instance of boxhead_group
+        const existing = headBone.getObjectByName('boxhead_group')
+        if (existing) headBone.remove(existing)
+
+        const boxGroup = new THREE.Group()
+        boxGroup.name = 'boxhead_group'
+
+        // 3D Rounded Box Head (soft chamfered cube)
+        // args: width, height, depth, segments, radius
+        const headGeom = new RoundedBoxGeometry(0.45, 0.44, 0.46, 8, 0.085)
+        const headMat = new THREE.MeshStandardMaterial({
+          color: new THREE.Color('#94beea'),
+          roughness: 0.35,
+          metalness: 0.04
+        })
+        const headMesh = new THREE.Mesh(headGeom, headMat)
+        headMesh.castShadow = true
+        headMesh.receiveShadow = true
+        headMesh.position.set(0, 0.22, 0.02)
+        boxGroup.add(headMesh)
+
+        // Front Face plate with determined eyebrows, anime eyes with white catchlight speculars, and inverted-V mouth
+        const faceTex = new THREE.TextureLoader().load('/textures/boxhead_face_features.png')
+        faceTex.colorSpace = THREE.SRGBColorSpace
+        const faceGeom = new THREE.PlaneGeometry(0.38, 0.38)
+        const faceMat = new THREE.MeshStandardMaterial({
+          map: faceTex,
+          transparent: true,
+          alphaTest: 0.02,
+          roughness: 0.35,
+          polygonOffset: true,
+          polygonOffsetFactor: -1
+        })
+        const faceMesh = new THREE.Mesh(faceGeom, faceMat)
+        faceMesh.position.set(0, 0.22, 0.252)
+        boxGroup.add(faceMesh)
+
+        headBone.add(boxGroup)
+      }
+    } else {
       // Default Chibi Avatar: clean claymorphic finish, hidden accessories
       const agentColor = new THREE.Color(agent.color || '#ef4444')
       clone.traverse((child) => {
@@ -61,40 +146,35 @@ function CharacterModel({
               metalness: 0.05
             })
           } else if (child.name === 'eyes' || child.name === 'mouth') {
+            child.visible = true
             child.renderOrder = 2
           } else if (child.name === 'cap' || child.name === 'headphones') {
             child.visible = false
           }
         }
       })
-    } else {
-      // Custom Uploaded 3D Model: auto-scale and center to fit the chair
-      const bbox = new THREE.Box3().setFromObject(clone)
-      const height = bbox.max.y - bbox.min.y
-      if (height > 0) {
-        // Target standard avatar height is ~1.1m (chibi height sitting at desk)
-        const targetHeight = 1.1
-        const scale = targetHeight / height
-        clone.scale.set(scale, scale, scale)
-        // Center vertically so base rests at Y=0
-        clone.position.y = -bbox.min.y * scale
+
+      // Ensure no leftover boxhead on default
+      const headBone = clone.getObjectByName('head')
+      if (headBone) {
+        const existing = headBone.getObjectByName('boxhead_group')
+        if (existing) headBone.remove(existing)
       }
-
-      clone.traverse((child) => {
-        if (child.isMesh) {
-          child.castShadow = true
-          child.receiveShadow = true
-        }
-      })
     }
-  }, [clone, isCustom, agent.color])
 
-  // Play skeletal animations if available
+    return () => {
+      const hb = clone?.getObjectByName('head')
+      const existing = hb?.getObjectByName('boxhead_group')
+      if (existing && hb) hb.remove(existing)
+    }
+  }, [clone, avatarType, agent.color])
+
+  // Play skeletal animations
   useEffect(() => {
     if (!actions || Object.keys(actions).length === 0) return
 
-    if (!isCustom) {
-      // Default character animations: Sit_Work typing by default, Wave on hover/select
+    if (avatarType !== 'custom') {
+      // Default and BoxHead use character.glb animations: Sit_Work typing by default, Wave on hover/select
       const defaultAnim = actions[initialAnimation] || actions['Sit_Work'] || actions['Idle']
       const waveAnim = actions['Wave']
 
@@ -131,7 +211,7 @@ function CharacterModel({
         targetAnim.reset().fadeIn(0.3).play()
       }
     }
-  }, [actions, isCustom, hovered, isSelected, initialAnimation])
+  }, [actions, avatarType, hovered, isSelected, initialAnimation])
 
   return (
     <group ref={groupRef}>
@@ -142,7 +222,10 @@ function CharacterModel({
 
 /**
  * AgentAvatar Component
- * Supports both the authentic default rigged chibi character and custom uploaded .glb models.
+ * Supports:
+ * - 'default': Classic spherical chibi avatar
+ * - 'boxhead': Rounded-cube chibi avatar (user's photos)
+ * - 'custom': User-uploaded GLB model
  */
 export default function AgentAvatar({
   agent,
@@ -156,7 +239,11 @@ export default function AgentAvatar({
   const agentColor = agent.color || '#38bdf8'
 
   const customModelUrl = agent.custom_model_url || agent.customModelUrl
-  const hasCustomModel = Boolean(customModelUrl)
+  const avatarType = agent.avatar_type || (customModelUrl ? 'custom' : 'default')
+
+  const effectiveModelUrl = avatarType === 'custom' && customModelUrl
+    ? customModelUrl
+    : '/models/character.glb'
 
   return (
     <group
@@ -204,7 +291,13 @@ export default function AgentAvatar({
               {agent.name}
             </span>
 
-            {hasCustomModel && (
+            {avatarType === 'boxhead' && (
+              <span className="text-[9px] bg-sky-600 font-bold px-1.5 py-0.5 rounded text-white uppercase tracking-wider">
+                BoxHead
+              </span>
+            )}
+
+            {avatarType === 'custom' && (
               <span className="text-[9px] bg-purple-600/80 font-bold px-1.5 py-0.5 rounded text-white uppercase tracking-wider">
                 Custom GLB
               </span>
@@ -228,7 +321,7 @@ export default function AgentAvatar({
         fallback={
           <CharacterModel
             modelUrl="/models/character.glb"
-            isCustom={false}
+            avatarType="default"
             agent={agent}
             hovered={hovered}
             isSelected={isSelected}
@@ -238,9 +331,9 @@ export default function AgentAvatar({
       >
         <Suspense fallback={null}>
           <CharacterModel
-            key={customModelUrl || 'default'}
-            modelUrl={customModelUrl || '/models/character.glb'}
-            isCustom={hasCustomModel}
+            key={`${avatarType}_${effectiveModelUrl}`}
+            modelUrl={effectiveModelUrl}
+            avatarType={avatarType}
             agent={agent}
             hovered={hovered}
             isSelected={isSelected}
