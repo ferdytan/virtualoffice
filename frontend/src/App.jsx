@@ -8,7 +8,7 @@ import {
   RotateCcw
 } from 'lucide-react'
 
-// Agent configurations matching authentic office.glb workstations
+// Agent configurations matching 2x2 face-to-face collaborative office pod
 const INITIAL_AGENTS = [
   {
     id: 'nara',
@@ -17,8 +17,8 @@ const INITIAL_AGENTS = [
     role_badge: 'REMINDER CS',
     color: '#38bdf8',
     color_name: 'Sky Blue',
-    position: [1.10, 0, -1.24],
-    rotation: [0, Math.PI / 2, 0],
+    position: [1.22, 0, -1.89],
+    rotation: [0, Math.PI, 0], // Facing South (-Z), directly face-to-face with Velocia
     model: 'gpt-4o-mini',
     description: 'Bertanggung jawab memantau dan memberi notifikasi unit offline secara real-time.',
     quick_prompts: [
@@ -34,8 +34,8 @@ const INITIAL_AGENTS = [
     role_badge: 'MARKETING STRATEGIST',
     color: '#ef4444',
     color_name: 'Solid Red',
-    position: [1.58, 0, -3.67],
-    rotation: [0, 0, 0],
+    position: [1.58, 0, -3.69],
+    rotation: [0, 0, 0], // Facing North (+Z), directly face-to-face with Nara
     model: 'gpt-4o-mini',
     description: 'Bertanggung jawab merancang strategi kampanye dan mendelegasikan riset.',
     quick_prompts: [
@@ -51,8 +51,8 @@ const INITIAL_AGENTS = [
     role_badge: 'RESEARCHER',
     color: '#22c55e',
     color_name: 'Solid Green',
-    position: [3.35, 0, -3.67],
-    rotation: [0, 0, 0],
+    position: [3.35, 0, -3.69],
+    rotation: [0, 0, 0], // Facing North (+Z) alongside Velocia
     model: 'gpt-4o-mini',
     description: 'Bertanggung jawab meriset tren industri dan menulis draf artikel/blog.',
     quick_prompts: [

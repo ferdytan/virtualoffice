@@ -9,8 +9,8 @@ import AgentAvatar from './AgentAvatar'
  */
 function CameraRig({ selectedAgent }) {
   const controlsRef = useRef()
-  // Default workspace center in The Delegation office
-  const defaultTarget = React.useMemo(() => new THREE.Vector3(2.2, 0.6, -2.4), [])
+  // Default workspace center in the 4-desk pod
+  const defaultTarget = React.useMemo(() => new THREE.Vector3(2.28, 0.6, -2.79), [])
 
   useFrame(() => {
     if (!controlsRef.current) return
@@ -42,13 +42,17 @@ function CameraRig({ selectedAgent }) {
 }
 
 /**
- * Loads and renders the authentic office environment from The Delegation (office.glb).
+ * Loads and renders the office environment from The Delegation (office.glb).
+ * Symmetrically aligns the 4 workstation desks into a neat 2x2 face-to-face team pod:
+ * - South Row (Desk 1 & 2): Velocia & Scout facing North (+Z)
+ * - North Row (Desk 3 & 4): Nara & Team Desk facing South (-Z), perfectly face-to-face!
  */
 function DelegationOffice() {
   const { scene } = useGLTF('/models/office.glb', '/draco/')
 
   useEffect(() => {
     if (!scene) return
+
     scene.traverse((child) => {
       if (child.isMesh) {
         child.castShadow = true
@@ -65,6 +69,54 @@ function DelegationOffice() {
         }
       }
     })
+
+    // --- ALIGN DESK 3 & 4 TO FACE-TO-FACE WITH DESK 1 & 2 ---
+    // Desk 1: [1.40, 0, -3.16], Desk 2: [3.17, 0, -3.16]
+    // Desk 3 & 4 are placed back-to-back at Z = -2.42, facing Z = 0 (South)
+
+    // Desk 3 (opposite Desk 1 / Velocia)
+    const desk3 = scene.getObjectByName('static-work-desk.003')
+    if (desk3) {
+      desk3.position.set(1.40, 0, -2.42)
+      desk3.rotation.set(0, 0, 0)
+    }
+    const chair3 = scene.getObjectByName('static-work-chair.003')
+    if (chair3) {
+      chair3.position.set(1.22, 0, -1.89)
+      chair3.rotation.set(0, 0, 0)
+    }
+    const pc3 = scene.getObjectByName('static-pc')
+    if (pc3) {
+      pc3.position.set(1.21, 0.5, -2.37)
+      pc3.rotation.set(0, 0, 0)
+    }
+    const flexo3 = scene.getObjectByName('static-flexo')
+    if (flexo3) {
+      flexo3.position.set(1.91, 0.5, -2.51)
+      flexo3.rotation.set(0, 0, 0)
+    }
+
+    // Desk 4 (opposite Desk 2 / Scout)
+    const desk4 = scene.getObjectByName('static-work-desk.004')
+    if (desk4) {
+      desk4.position.set(3.17, 0, -2.42)
+      desk4.rotation.set(0, 0, 0)
+    }
+    const chair4 = scene.getObjectByName('static-work-chair.004')
+    if (chair4) {
+      chair4.position.set(2.99, 0, -1.89)
+      chair4.rotation.set(0, 0, 0)
+    }
+    const pc4 = scene.getObjectByName('static-pc.003')
+    if (pc4) {
+      pc4.position.set(2.98, 0.5, -2.37)
+      pc4.rotation.set(0, 0, 0)
+    }
+    const flexo4 = scene.getObjectByName('static-flexo.003')
+    if (flexo4) {
+      flexo4.position.set(3.68, 0.5, -2.51)
+      flexo4.rotation.set(0, 0, 0)
+    }
   }, [scene])
 
   return <primitive object={scene} />
@@ -114,7 +166,7 @@ export default function OfficeScene({
         <directionalLight position={[-8, 12, -8]} intensity={0.35} color="#bae6fd" />
 
         <Suspense fallback={null}>
-          {/* Authentic Office Environment */}
+          {/* Authentic Office Environment with neat 2x2 face-to-face pod */}
           <DelegationOffice />
 
           {/* 3D Agent Avatars sitting at designated clean workstations */}

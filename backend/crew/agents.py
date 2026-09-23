@@ -4,7 +4,7 @@ from typing import Dict, Any, Optional
 
 logger = logging.getLogger("virtual_office.crew")
 
-# Metadata profile for the three agents matching authentic office.glb layout
+# Metadata profile for the three agents matching 2x2 face-to-face team pod
 AGENTS_METADATA = {
     "nara": {
         "id": "nara",
@@ -13,8 +13,8 @@ AGENTS_METADATA = {
         "role_badge": "REMINDER CS",
         "color": "#38bdf8",
         "color_name": "Sky Blue",
-        "position": [1.10, 0, -1.24],
-        "rotation": [0, 1.5707963, 0],
+        "position": [1.22, 0, -1.89],
+        "rotation": [0, 3.14159265, 0],
         "model": os.getenv("OPENAI_MODEL_NAME", "gpt-4o-mini"),
         "description": "Bertanggung jawab memantau dan memberi notifikasi unit offline secara real-time.",
         "goal": "Memantau status perangkat dan unit sistem, mendeteksi unit yang mengalami kendala/offline, serta mengirimkan notifikasi eskalasi cepat dan ramah.",
@@ -36,7 +36,7 @@ AGENTS_METADATA = {
         "role_badge": "MARKETING STRATEGIST",
         "color": "#ef4444",
         "color_name": "Solid Red",
-        "position": [1.58, 0, -3.67],
+        "position": [1.58, 0, -3.69],
         "rotation": [0, 0, 0],
         "model": os.getenv("OPENAI_MODEL_NAME", "gpt-4o-mini"),
         "description": "Bertanggung jawab merancang strategi kampanye dan mendelegasikan riset.",
@@ -58,7 +58,7 @@ AGENTS_METADATA = {
         "role_badge": "RESEARCHER",
         "color": "#22c55e",
         "color_name": "Solid Green",
-        "position": [3.35, 0, -3.67],
+        "position": [3.35, 0, -3.69],
         "rotation": [0, 0, 0],
         "model": os.getenv("OPENAI_MODEL_NAME", "gpt-4o-mini"),
         "description": "Bertanggung jawab meriset tren industri dan menulis draf artikel/blog.",
