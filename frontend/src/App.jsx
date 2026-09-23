@@ -17,7 +17,7 @@ const INITIAL_AGENTS = [
     role_badge: 'REMINDER CS',
     color: '#38bdf8',
     color_name: 'Sky Blue',
-    position: [1.22, 0, -1.89],
+    position: [1.08, 0, -1.89],
     rotation: [0, Math.PI, 0], // Facing South (-Z), directly face-to-face with Velocia
     model: 'gpt-4o-mini',
     description: 'Bertanggung jawab memantau dan memberi notifikasi unit offline secara real-time.',
@@ -128,7 +128,12 @@ export default function App() {
           if (agentsRes.ok) {
             const agentsData = await agentsRes.json()
             if (agentsData.agents && agentsData.agents.length > 0) {
-              setAgents(agentsData.agents)
+              setAgents((prev) =>
+                prev.map((a) => {
+                  const fresh = agentsData.agents.find((fa) => fa.id === a.id)
+                  return fresh ? { ...a, ...fresh } : a
+                })
+              )
             }
           }
 
@@ -172,6 +177,32 @@ export default function App() {
     const currentIndex = agents.findIndex((a) => a.id === selectedAgent?.id)
     const nextIndex = (currentIndex + 1) % agents.length
     handleSelectAgent(agents[nextIndex])
+  }
+
+  // Handle updating agent 3D model (custom GLB upload or reset to default)
+  const handleUpdateAgentModel = (agentId, modelUrl, modelName) => {
+    setAgents((prev) =>
+      prev.map((a) =>
+        a.id === agentId
+          ? {
+              ...a,
+              custom_model_url: modelUrl,
+              customModelUrl: modelUrl,
+              custom_model_name: modelName
+            }
+          : a
+      )
+    )
+    setSelectedAgent((prev) =>
+      prev && prev.id === agentId
+        ? {
+            ...prev,
+            custom_model_url: modelUrl,
+            customModelUrl: modelUrl,
+            custom_model_name: modelName
+          }
+        : prev
+    )
   }
 
   // Active displayed agent in top-left panel
@@ -370,6 +401,7 @@ export default function App() {
           }}
           onOpenCall={handleOpenCall}
           onSendBrief={handleSendBrief}
+          onUpdateAgentModel={handleUpdateAgentModel}
           chatHistory={chatHistory[selectedAgent.id] || []}
           isLoading={isLoadingBrief}
         />

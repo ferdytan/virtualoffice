@@ -3,8 +3,9 @@ import time
 import uuid
 import logging
 from typing import Dict, Any, List, Optional
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 
@@ -18,11 +19,18 @@ from crew.tasks import run_agent_task
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("virtual_office.server")
 
+# Directory for custom user-uploaded 3D GLB character models
+UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads", "models")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
 app = FastAPI(
     title="Virtual Office AI Backend",
     description="FastAPI + CrewAI backend for 3D Virtual Office multi-agent workspace.",
     version="1.0.0"
 )
+
+# Mount uploads directory for serving custom GLB models
+app.mount("/uploads", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "uploads")), name="uploads")
 
 # Configure CORS
 origins_str = os.getenv("CORS_ORIGINS", "*")
@@ -118,9 +126,73 @@ def health_check():
 
 @app.get("/api/agents")
 def get_agents():
-    """Returns detailed profiles of Nara, Velocia, and Scout."""
+    """Returns detailed profiles of Nara, Velocia, and Scout including any custom 3D models."""
+    agents = []
+    for k, v in AGENTS_METADATA.items():
+        agent_data = dict(v)
+        model_path = os.path.join(UPLOAD_DIR, f"{k}.glb")
+        if os.path.exists(model_path):
+            agent_data["custom_model_url"] = f"/uploads/models/{k}.glb?t={int(os.path.getmtime(model_path))}"
+        agents.append(agent_data)
     return {
-        "agents": list(AGENTS_METADATA.values())
+        "agents": agents
+    }
+
+
+@app.post("/api/agents/{agent_id}/model")
+async def upload_agent_model(agent_id: str, file: UploadFile = File(...)):
+    """Uploads a custom .glb or .gltf 3D character model for an agent."""
+    aid = agent_id.lower()
+    if aid not in AGENTS_METADATA:
+        raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found.")
+    
+    filename = file.filename or ""
+    if not (filename.lower().endswith(".glb") or filename.lower().endswith(".gltf")):
+        raise HTTPException(status_code=400, detail="Hanya file 3D berekstensi .glb atau .gltf yang didukung.")
+    
+    dest_path = os.path.join(UPLOAD_DIR, f"{aid}.glb")
+    content = await file.read()
+    with open(dest_path, "wb") as f:
+        f.write(content)
+    
+    timestamp = int(time.time())
+    url = f"/uploads/models/{aid}.glb?t={timestamp}"
+    AGENTS_METADATA[aid]["custom_model_url"] = url
+    AGENTS_METADATA[aid]["custom_model_name"] = filename
+    logger.info(f"Custom 3D model uploaded for agent {aid}: {filename} ({len(content)} bytes)")
+    
+    return {
+        "status": "success",
+        "agent_id": aid,
+        "custom_model_url": url,
+        "custom_model_name": filename,
+        "message": f"Model 3D {filename} berhasil diunggah untuk agen {AGENTS_METADATA[aid]['name']}."
+    }
+
+
+@app.delete("/api/agents/{agent_id}/model")
+def delete_agent_model(agent_id: str):
+    """Resets the agent's 3D model back to the authentic default avatar."""
+    aid = agent_id.lower()
+    if aid not in AGENTS_METADATA:
+        raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found.")
+    
+    dest_path = os.path.join(UPLOAD_DIR, f"{aid}.glb")
+    if os.path.exists(dest_path):
+        try:
+            os.remove(dest_path)
+        except Exception as e:
+            logger.error(f"Error removing model file: {e}")
+    
+    AGENTS_METADATA[aid].pop("custom_model_url", None)
+    AGENTS_METADATA[aid].pop("custom_model_name", None)
+    logger.info(f"Custom model deleted for agent {aid}, reverted to default avatar")
+    
+    return {
+        "status": "success",
+        "agent_id": aid,
+        "default_model": "/models/character.glb",
+        "message": f"Karakter {AGENTS_METADATA[aid]['name']} berhasil dikembalikan ke avatar default."
     }
 
 

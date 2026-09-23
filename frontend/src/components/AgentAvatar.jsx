@@ -1,18 +1,148 @@
-import React, { useRef, useEffect, useMemo, useState } from 'react'
+import React, { useRef, useEffect, useMemo, useState, Suspense, Component } from 'react'
 import { useGLTF, useAnimations, Html } from '@react-three/drei'
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js'
 import * as THREE from 'three'
 
 /**
+ * Error boundary component to catch GLB loading or parsing errors,
+ * gracefully falling back to the default avatar so the 3D scene never crashes.
+ */
+class ModelErrorBoundary extends Component {
+  constructor(props) {
+    super(props)
+    this.state = { hasError: false }
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true }
+  }
+  componentDidCatch(error) {
+    console.warn('[AgentAvatar] Custom GLB failed to load, falling back to default:', error)
+  }
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || null
+    }
+    return this.props.children
+  }
+}
+
+/**
+ * Inner component that loads and renders the 3D model (default character or custom GLB).
+ */
+function CharacterModel({
+  modelUrl,
+  isCustom = false,
+  agent,
+  hovered,
+  isSelected,
+  initialAnimation = 'Sit_Work'
+}) {
+  const groupRef = useRef()
+  const { scene, animations } = useGLTF(modelUrl, '/draco/')
+  const clone = useMemo(() => SkeletonUtils.clone(scene), [scene])
+  const { actions } = useAnimations(animations, groupRef)
+
+  // Configure materials & scaling
+  useEffect(() => {
+    if (!clone) return
+
+    if (!isCustom) {
+      // Default Chibi Avatar: clean claymorphic finish, hidden accessories
+      const agentColor = new THREE.Color(agent.color || '#ef4444')
+      clone.traverse((child) => {
+        if (child.isMesh) {
+          child.castShadow = true
+          child.receiveShadow = true
+
+          if (child.name === 'body') {
+            child.material = new THREE.MeshStandardMaterial({
+              color: agentColor,
+              roughness: 0.32,
+              metalness: 0.05
+            })
+          } else if (child.name === 'eyes' || child.name === 'mouth') {
+            child.renderOrder = 2
+          } else if (child.name === 'cap' || child.name === 'headphones') {
+            child.visible = false
+          }
+        }
+      })
+    } else {
+      // Custom Uploaded 3D Model: auto-scale and center to fit the chair
+      const bbox = new THREE.Box3().setFromObject(clone)
+      const height = bbox.max.y - bbox.min.y
+      if (height > 0) {
+        // Target standard avatar height is ~1.1m (chibi height sitting at desk)
+        const targetHeight = 1.1
+        const scale = targetHeight / height
+        clone.scale.set(scale, scale, scale)
+        // Center vertically so base rests at Y=0
+        clone.position.y = -bbox.min.y * scale
+      }
+
+      clone.traverse((child) => {
+        if (child.isMesh) {
+          child.castShadow = true
+          child.receiveShadow = true
+        }
+      })
+    }
+  }, [clone, isCustom, agent.color])
+
+  // Play skeletal animations if available
+  useEffect(() => {
+    if (!actions || Object.keys(actions).length === 0) return
+
+    if (!isCustom) {
+      // Default character animations: Sit_Work typing by default, Wave on hover/select
+      const defaultAnim = actions[initialAnimation] || actions['Sit_Work'] || actions['Idle']
+      const waveAnim = actions['Wave']
+
+      if (hovered || isSelected) {
+        if (waveAnim) {
+          waveAnim.reset().fadeIn(0.2).play()
+          if (defaultAnim && defaultAnim !== waveAnim) {
+            defaultAnim.fadeOut(0.2)
+          }
+        }
+      } else {
+        if (defaultAnim) {
+          defaultAnim.reset().fadeIn(0.25).play()
+        }
+        if (waveAnim && waveAnim !== defaultAnim) {
+          waveAnim.fadeOut(0.25)
+        }
+      }
+    } else {
+      // Custom model animations: find Sit, Work, Idle, or default to the first animation
+      const animNames = Object.keys(actions)
+      let targetAnim = null
+      for (const name of animNames) {
+        const lower = name.toLowerCase()
+        if (lower.includes('sit') || lower.includes('work') || lower.includes('idle')) {
+          targetAnim = actions[name]
+          break
+        }
+      }
+      if (!targetAnim && animNames.length > 0) {
+        targetAnim = actions[animNames[0]]
+      }
+      if (targetAnim) {
+        targetAnim.reset().fadeIn(0.3).play()
+      }
+    }
+  }, [actions, isCustom, hovered, isSelected, initialAnimation])
+
+  return (
+    <group ref={groupRef}>
+      <primitive object={clone} />
+    </group>
+  )
+}
+
+/**
  * AgentAvatar Component
- * Uses the authentic rigged 3D character model from The Delegation (character.glb).
- * 
- * - Pure, clean, accessory-free glossy chibi character (no clunky hats or headphones)
- * - Authentic expressive textured eyes and mouth
- * - Vibrant solid colors (#38bdf8 for Nara, #ef4444 for Velocia, #22c55e for Scout)
- * - Skeletal animations: Sit_Work typing at desk by default, smoothly crossfading to Wave on hover/select
- * - Floating badge: Sleek black pill badge with blinking red dot and role title above head
- * - Floor selection glow ring
+ * Supports both the authentic default rigged chibi character and custom uploaded .glb models.
  */
 export default function AgentAvatar({
   agent,
@@ -22,70 +152,14 @@ export default function AgentAvatar({
   rotation = [0, 0, 0],
   initialAnimation = 'Sit_Work'
 }) {
-  const groupRef = useRef()
   const [hovered, setHovered] = useState(false)
-
-  // Load character.glb with local draco decoders
-  const { scene, animations } = useGLTF('/models/character.glb', '/draco/')
-  const clone = useMemo(() => SkeletonUtils.clone(scene), [scene])
-  const { actions } = useAnimations(animations, groupRef)
-
-  // Configure materials: clean glossy finish, NO ACCESSORIES
-  useEffect(() => {
-    if (!clone) return
-    const agentColor = new THREE.Color(agent.color || '#ef4444')
-
-    clone.traverse((child) => {
-      if (child.isMesh) {
-        child.castShadow = true
-        child.receiveShadow = true
-
-        if (child.name === 'body') {
-          // Clean, smooth, vibrant solid claymorphic finish
-          child.material = new THREE.MeshStandardMaterial({
-            color: agentColor,
-            roughness: 0.32,
-            metalness: 0.05
-          })
-        } else if (child.name === 'eyes' || child.name === 'mouth') {
-          // Keep authentic textured expressive face features
-          child.renderOrder = 2
-        } else if (child.name === 'cap' || child.name === 'headphones') {
-          // Completely hide all accessories for clean, iconic chibi look
-          child.visible = false
-        }
-      }
-    })
-  }, [clone, agent.color])
-
-  // Play animation: Sit_Work typing by default, Wave on hover/select
-  useEffect(() => {
-    if (!actions) return
-    const defaultAnim = actions[initialAnimation] || actions['Sit_Work'] || actions['Idle']
-    const waveAnim = actions['Wave']
-
-    if (hovered || isSelected) {
-      if (waveAnim) {
-        waveAnim.reset().fadeIn(0.2).play()
-        if (defaultAnim && defaultAnim !== waveAnim) {
-          defaultAnim.fadeOut(0.2)
-        }
-      }
-    } else {
-      if (defaultAnim) {
-        defaultAnim.reset().fadeIn(0.25).play()
-      }
-      if (waveAnim && waveAnim !== defaultAnim) {
-        waveAnim.fadeOut(0.25)
-      }
-    }
-  }, [actions, hovered, isSelected, initialAnimation])
-
   const agentColor = agent.color || '#38bdf8'
+
+  const customModelUrl = agent.custom_model_url || agent.customModelUrl
+  const hasCustomModel = Boolean(customModelUrl)
 
   return (
     <group
-      ref={groupRef}
       position={position}
       rotation={rotation}
       onClick={(e) => {
@@ -111,7 +185,7 @@ export default function AgentAvatar({
           style={{ pointerEvents: 'none' }}
         >
           <div className="flex items-center gap-2 bg-slate-950/92 text-white px-3.5 py-1.5 rounded-full shadow-2xl border border-slate-700/80 backdrop-blur-md whitespace-nowrap animate-in fade-in zoom-in duration-150">
-            {/* Blinking Red Dot */}
+            {/* Blinking Dot */}
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600"></span>
@@ -129,6 +203,12 @@ export default function AgentAvatar({
             >
               {agent.name}
             </span>
+
+            {hasCustomModel && (
+              <span className="text-[9px] bg-purple-600/80 font-bold px-1.5 py-0.5 rounded text-white uppercase tracking-wider">
+                Custom GLB
+              </span>
+            )}
           </div>
         </Html>
       )}
@@ -143,8 +223,31 @@ export default function AgentAvatar({
         />
       </mesh>
 
-      {/* --- Cloned 3D Rigged Model Primitive --- */}
-      <primitive object={clone} />
+      {/* --- 3D Character Renderer with Error Boundary & Suspense --- */}
+      <ModelErrorBoundary
+        fallback={
+          <CharacterModel
+            modelUrl="/models/character.glb"
+            isCustom={false}
+            agent={agent}
+            hovered={hovered}
+            isSelected={isSelected}
+            initialAnimation={initialAnimation}
+          />
+        }
+      >
+        <Suspense fallback={null}>
+          <CharacterModel
+            key={customModelUrl || 'default'}
+            modelUrl={customModelUrl || '/models/character.glb'}
+            isCustom={hasCustomModel}
+            agent={agent}
+            hovered={hovered}
+            isSelected={isSelected}
+            initialAnimation={initialAnimation}
+          />
+        </Suspense>
+      </ModelErrorBoundary>
     </group>
   )
 }

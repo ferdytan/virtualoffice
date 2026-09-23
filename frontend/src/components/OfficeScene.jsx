@@ -11,7 +11,7 @@ import ScreenDisplays from './ScreenDisplays'
 function CameraRig({ selectedAgent }) {
   const controlsRef = useRef()
   // Default workspace center in the 4-desk pod
-  const defaultTarget = React.useMemo(() => new THREE.Vector3(2.28, 0.6, -2.79), [])
+  const defaultTarget = React.useMemo(() => new THREE.Vector3(2.21, 0.6, -2.79), [])
 
   useFrame(() => {
     if (!controlsRef.current) return
@@ -124,29 +124,29 @@ function DelegationOffice() {
 
     // Desk 3 & accessories (opposite Desk 1 / Velocia)
     const desk3 = findSceneNode(scene, 'static-work-desk.003', 'static-work-desk003', 'Cube.017')
-    repositionNode(desk3, 1.40, 0, -2.42, 0, 0, 0)
+    repositionNode(desk3, 1.258, 0, -2.42, 0, 0, 0)
 
     const chair3 = findSceneNode(scene, 'static-work-chair.003', 'static-work-chair003', 'Cube.019')
-    repositionNode(chair3, 1.22, 0, -1.89, 0, 0, 0)
+    repositionNode(chair3, 1.08, 0, -1.89, 0, 0, 0)
 
     const pc3 = findSceneNode(scene, 'static-pc', 'Cube.016')
-    repositionNode(pc3, 1.21, 0.504, -2.37, 0, 0, 0)
+    repositionNode(pc3, 1.07, 0.504, -2.37, 0, 0, 0)
 
     const flexo3 = findSceneNode(scene, 'static-flexo', 'Cube.018')
-    repositionNode(flexo3, 1.91, 0.504, -2.51, 0, 0, 0)
+    repositionNode(flexo3, 1.77, 0.504, -2.51, 0, 0, 0)
 
     // Desk 4 & accessories (opposite Desk 2 / Scout)
     const desk4 = findSceneNode(scene, 'static-work-desk.004', 'static-work-desk004', 'Cube.020')
-    repositionNode(desk4, 3.17, 0, -2.42, 0, 0, 0)
+    repositionNode(desk4, 3.029, 0, -2.42, 0, 0, 0)
 
     const chair4 = findSceneNode(scene, 'static-work-chair.004', 'static-work-chair004', 'Cube.022')
-    repositionNode(chair4, 2.99, 0, -1.89, 0, 0, 0)
+    repositionNode(chair4, 2.85, 0, -1.89, 0, 0, 0)
 
     const pc4 = findSceneNode(scene, 'static-pc.003', 'static-pc003', 'Cube.015')
-    repositionNode(pc4, 2.98, 0.504, -2.37, 0, 0, 0)
+    repositionNode(pc4, 2.84, 0.504, -2.37, 0, 0, 0)
 
     const flexo4 = findSceneNode(scene, 'static-flexo.003', 'static-flexo003', 'Cube.021')
-    repositionNode(flexo4, 3.68, 0.504, -2.51, 0, 0, 0)
+    repositionNode(flexo4, 3.54, 0.504, -2.51, 0, 0, 0)
   }, [scene])
 
   return <primitive object={scene} />
@@ -196,8 +196,8 @@ export default function OfficeScene({
         <directionalLight position={[-8, 12, -8]} intensity={0.35} color="#bae6fd" />
 
         {/* Warm Desk Lamp Ambient Accents over the 4-desk pod */}
-        <pointLight position={[1.91, 1.15, -2.51]} color="#ffeedd" intensity={0.6} distance={2.5} />
-        <pointLight position={[3.68, 1.15, -2.51]} color="#ffeedd" intensity={0.6} distance={2.5} />
+        <pointLight position={[1.77, 1.15, -2.51]} color="#ffeedd" intensity={0.6} distance={2.5} />
+        <pointLight position={[3.54, 1.15, -2.51]} color="#ffeedd" intensity={0.6} distance={2.5} />
         <pointLight position={[0.89, 1.15, -3.07]} color="#ffeedd" intensity={0.6} distance={2.5} />
         <pointLight position={[2.66, 1.15, -3.07]} color="#ffeedd" intensity={0.6} distance={2.5} />
 

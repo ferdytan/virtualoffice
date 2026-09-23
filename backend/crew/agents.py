@@ -13,7 +13,7 @@ AGENTS_METADATA = {
         "role_badge": "REMINDER CS",
         "color": "#38bdf8",
         "color_name": "Sky Blue",
-        "position": [1.22, 0, -1.89],
+        "position": [1.08, 0, -1.89],
         "rotation": [0, 3.14159265, 0],
         "model": os.getenv("OPENAI_MODEL_NAME", "gpt-4o-mini"),
         "description": "Bertanggung jawab memantau dan memberi notifikasi unit offline secara real-time.",

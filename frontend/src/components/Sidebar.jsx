@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import {
   X,
   Phone,
@@ -8,24 +8,33 @@ import {
   CheckCircle2,
   Clock,
   ChevronRight,
-  Bot
+  Bot,
+  Upload,
+  RotateCcw,
+  Box,
+  Check,
+  AlertCircle
 } from 'lucide-react'
 import AgentCloseUpAvatar from './AgentCloseUpAvatar'
 
 /**
  * Sidebar Component
  * Displays agent details, task brief form, response history,
- * and the prominent "📞 Call Agent" button.
+ * 3D GLB model customizer, and the prominent "📞 Call Agent" button.
  */
 export default function Sidebar({
   agent,
   onClose,
   onOpenCall,
   onSendBrief,
+  onUpdateAgentModel,
   chatHistory = [],
   isLoading = false
 }) {
   const [briefInput, setBriefInput] = useState('')
+  const fileInputRef = useRef(null)
+  const [uploadLoading, setUploadLoading] = useState(false)
+  const [uploadMessage, setUploadMessage] = useState(null)
 
   if (!agent) return null
 
@@ -40,6 +49,67 @@ export default function Sidebar({
 
   const handleQuickPrompt = (prompt) => {
     setBriefInput(prompt)
+  }
+
+  const handleModelUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const filename = file.name.toLowerCase()
+    if (!filename.endsWith('.glb') && !filename.endsWith('.gltf')) {
+      setUploadMessage({ type: 'error', text: 'Format tidak didukung. Harap pilih file .glb atau .gltf' })
+      setTimeout(() => setUploadMessage(null), 3500)
+      return
+    }
+
+    setUploadLoading(true)
+    setUploadMessage({ type: 'info', text: 'Menerapkan model 3D...' })
+
+    // Instant local preview via Blob URL
+    const localBlobUrl = URL.createObjectURL(file)
+    if (onUpdateAgentModel) {
+      onUpdateAgentModel(agent.id, localBlobUrl, file.name)
+    }
+
+    // Persist to backend server
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      const res = await fetch(`/api/agents/${agent.id}/model`, {
+        method: 'POST',
+        body: formData
+      })
+      if (res.ok) {
+        const data = await res.json()
+        if (onUpdateAgentModel) {
+          onUpdateAgentModel(agent.id, data.custom_model_url, data.custom_model_name)
+        }
+        setUploadMessage({ type: 'success', text: `Model ${file.name} berhasil diterapkan!` })
+      } else {
+        setUploadMessage({ type: 'success', text: `Model ${file.name} aktif di sesi ini.` })
+      }
+    } catch (err) {
+      setUploadMessage({ type: 'success', text: `Model ${file.name} aktif di sesi ini.` })
+    } finally {
+      setUploadLoading(false)
+      setTimeout(() => setUploadMessage(null), 4000)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
+
+  const handleResetModel = async () => {
+    setUploadLoading(true)
+    try {
+      await fetch(`/api/agents/${agent.id}/model`, { method: 'DELETE' })
+    } catch (e) {
+      // ignore
+    }
+    if (onUpdateAgentModel) {
+      onUpdateAgentModel(agent.id, null, null)
+    }
+    setUploadLoading(false)
+    setUploadMessage({ type: 'success', text: 'Avatar berhasil dikembalikan ke default!' })
+    setTimeout(() => setUploadMessage(null), 3000)
   }
 
   return (
@@ -108,6 +178,80 @@ export default function Sidebar({
         <p className="mt-3.5 text-xs text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
           {agent.description}
         </p>
+
+        {/* --- 3D AVATAR MODEL CUSTOMIZER CARD --- */}
+        <div className="mt-3.5 p-3.5 bg-slate-50 border border-slate-200/90 rounded-2xl">
+          <div className="flex items-center justify-between mb-1.5">
+            <div className="flex items-center gap-2">
+              <Box className="w-4 h-4 text-purple-600" />
+              <span className="text-xs font-bold text-slate-800">
+                Model Karakter 3D (.glb)
+              </span>
+            </div>
+            {agent.custom_model_url || agent.customModelUrl ? (
+              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-200">
+                Custom Model
+              </span>
+            ) : (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-600">
+                Default Chibi
+              </span>
+            )}
+          </div>
+
+          <p className="text-[11px] text-slate-500 mb-3 leading-relaxed">
+            {agent.custom_model_url || agent.customModelUrl
+              ? `Model kustom: ${agent.custom_model_name || 'model_kustom.glb'}. Auto-scaling & rigging aktif.`
+              : `Gunakan avatar bawaan atau upload file .glb Anda sendiri untuk ${agent.name}.`}
+          </p>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleModelUpload}
+              accept=".glb,.gltf"
+              className="hidden"
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadLoading}
+              className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 bg-purple-600 hover:bg-purple-700 active:scale-[0.98] text-white font-bold text-xs rounded-xl shadow-sm transition-all cursor-pointer disabled:opacity-50"
+            >
+              <Upload className="w-3.5 h-3.5" />
+              {uploadLoading ? 'Memproses...' : 'Upload GLB Karakter'}
+            </button>
+
+            {(agent.custom_model_url || agent.customModelUrl) && (
+              <button
+                onClick={handleResetModel}
+                disabled={uploadLoading}
+                className="flex items-center justify-center gap-1 py-2 px-3 bg-slate-200 hover:bg-slate-300 active:scale-[0.98] text-slate-700 font-bold text-xs rounded-xl transition-all cursor-pointer"
+                title="Kembalikan ke avatar default"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                Reset
+              </button>
+            )}
+          </div>
+
+          {uploadMessage && (
+            <div
+              className={`mt-2.5 p-2 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 animate-in fade-in ${
+                uploadMessage.type === 'error'
+                  ? 'bg-red-50 text-red-700 border border-red-200'
+                  : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+              }`}
+            >
+              {uploadMessage.type === 'error' ? (
+                <AlertCircle className="w-3.5 h-3.5 text-red-500" />
+              ) : (
+                <Check className="w-3.5 h-3.5 text-emerald-600" />
+              )}
+              {uploadMessage.text}
+            </div>
+          )}
+        </div>
 
         {/* --- PROMINENT CALL BUTTON --- */}
         <div className="mt-4">

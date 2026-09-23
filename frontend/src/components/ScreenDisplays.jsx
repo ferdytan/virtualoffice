@@ -535,26 +535,25 @@ export default function ScreenDisplays({ onSelectAgent, agents = [] }) {
     [naraTexture]
   )
 
-  const teamMat = useMemo(
+  // Powered-off / blank monitor material for the empty workstation (Desk 4)
+  const emptyDeskMat = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        map: teamTexture,
-        emissiveMap: teamTexture,
-        emissive: new THREE.Color('#ffffff'),
-        emissiveIntensity: 0.7,
-        roughness: 0.15,
-        metalness: 0.05
+        color: new THREE.Color('#0a0c10'),
+        roughness: 0.88,
+        metalness: 0.12,
+        emissive: new THREE.Color('#000000'),
+        emissiveIntensity: 0
       }),
-    [teamTexture]
+    []
   )
 
-  // Gentle, subtle emissive screen glow oscillation to make the screens feel alive
+  // Gentle, subtle emissive screen glow oscillation to make the active screens feel alive
   useFrame((state) => {
     const pulse = 0.7 + Math.sin(state.clock.elapsedTime * 2.5) * 0.06
     if (velociaMat) velociaMat.emissiveIntensity = pulse
     if (scoutMat) scoutMat.emissiveIntensity = pulse
     if (naraMat) naraMat.emissiveIntensity = pulse
-    if (teamMat) teamMat.emissiveIntensity = pulse
   })
 
   // Quick lookup helper for selecting agents on screen click
@@ -562,19 +561,20 @@ export default function ScreenDisplays({ onSelectAgent, agents = [] }) {
   const scoutAgent = agents.find((a) => a.id === 'scout')
   const naraAgent = agents.find((a) => a.id === 'nara')
 
-  // Exact monitor screen surface coordinates
-  // Desk 1 (Velocia): PC at [1.59, 0.50, -3.21], rotation [0, Math.PI, 0] -> screen faces -Z
-  // Desk 2 (Scout):   PC at [3.36, 0.50, -3.21], rotation [0, Math.PI, 0] -> screen faces -Z
-  // Desk 3 (Nara):    PC at [1.21, 0.50, -2.37], rotation [0, 0, 0]       -> screen faces +Z
-  // Desk 4 (Team):    PC at [2.98, 0.50, -2.37], rotation [0, 0, 0]       -> screen faces +Z
+  // Exact monitor screen surface coordinates attached directly flush onto monitor glass face
+  // Monitor glass face is at local Z = -0.041, Y = +0.306 relative to PC base.
+  // Desk 1 (Velocia): PC at [1.588, 0.504, -3.212], rot [0, Math.PI, 0] -> screen at [1.580, 0.810, -3.175]
+  // Desk 2 (Scout):   PC at [3.359, 0.504, -3.212], rot [0, Math.PI, 0] -> screen at [3.351, 0.810, -3.175]
+  // Desk 3 (Nara):    PC at [1.070, 0.504, -2.370], rot [0, 0, 0]       -> screen at [1.078, 0.810, -2.407]
+  // Desk 4 (Empty):   PC at [2.840, 0.504, -2.370], rot [0, 0, 0]       -> screen at [2.848, 0.810, -2.407]
   const screenWidth = 0.42
-  const screenHeight = 0.25
+  const screenHeight = 0.26
 
   return (
     <group ref={groupRef}>
-      {/* 1. Velocia's Screen (Desk 1) */}
+      {/* 1. Velocia's Screen (Desk 1) - Flush on monitor glass face */}
       <mesh
-        position={[1.588, 0.735, -3.32]}
+        position={[1.580, 0.810, -3.175]}
         rotation={[0, Math.PI, 0]}
         material={velociaMat}
         onClick={(e) => {
@@ -585,9 +585,9 @@ export default function ScreenDisplays({ onSelectAgent, agents = [] }) {
         <planeGeometry args={[screenWidth, screenHeight]} />
       </mesh>
 
-      {/* 2. Scout's Screen (Desk 2) */}
+      {/* 2. Scout's Screen (Desk 2) - Flush on monitor glass face */}
       <mesh
-        position={[3.359, 0.735, -3.32]}
+        position={[3.351, 0.810, -3.175]}
         rotation={[0, Math.PI, 0]}
         material={scoutMat}
         onClick={(e) => {
@@ -598,9 +598,9 @@ export default function ScreenDisplays({ onSelectAgent, agents = [] }) {
         <planeGeometry args={[screenWidth, screenHeight]} />
       </mesh>
 
-      {/* 3. Nara's Screen (Desk 3) */}
+      {/* 3. Nara's Screen (Desk 3) - Flush on monitor glass face */}
       <mesh
-        position={[1.207, 0.735, -2.26]}
+        position={[1.078, 0.810, -2.407]}
         rotation={[0, 0, 0]}
         material={naraMat}
         onClick={(e) => {
@@ -611,11 +611,11 @@ export default function ScreenDisplays({ onSelectAgent, agents = [] }) {
         <planeGeometry args={[screenWidth, screenHeight]} />
       </mesh>
 
-      {/* 4. Team Sandbox Screen (Desk 4, opposite Scout) */}
+      {/* 4. Empty Desk Screen (Desk 4, opposite Scout) - Powered Off / Blank */}
       <mesh
-        position={[2.977, 0.735, -2.26]}
+        position={[2.848, 0.810, -2.407]}
         rotation={[0, 0, 0]}
-        material={teamMat}
+        material={emptyDeskMat}
       >
         <planeGeometry args={[screenWidth, screenHeight]} />
       </mesh>
