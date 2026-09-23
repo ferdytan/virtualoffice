@@ -1,0 +1,25 @@
+{
+  "name": "virtual-office-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Virtual Office 3D with CrewAI Backend Integration",
+  "scripts": {
+    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"cyan,magenta\" \"python -m uvicorn server:app --reload --port 8000 --app-dir backend\" \"npm run dev --prefix frontend\"",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:backend": "python -m uvicorn server:app --reload --port 8000 --app-dir backend",
+    "install:all": "npm install && npm install --prefix frontend",
+    "build": "npm run build --prefix frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "virtual-office",
+    "crewai",
+    "threejs",
+    "react-three-fiber",
+    "fastapi"
+  ],
+  "author": "",
+  "license": "MIT"
+}
