@@ -6,12 +6,15 @@ import * as THREE from 'three'
 /**
  * AgentAvatar Component
  * Uses the authentic rigged 3D character model from The Delegation (character.glb).
- * Features:
- * - Dynamic color assignment to the body mesh
- * - Distinct accessories (headphones for Nara & Velocia, cap for Scout)
- * - Skeletal animations (Sit_Work idle typing, Wave on hover/select)
- * - Sleek floating hover pill badge with blinking red dot
- * - Floor selection glow ring
+ * 
+ * FIXES IMPLEMENTED:
+ * 1. Head accessories: The unrigged static meshes in character.glb (which previously floated
+ *    detached from the moving head) are hidden. In their place, clean, perfectly-fitted
+ *    accessories are parented directly to the skeletal 'head' bone so they move 100% in sync
+ *    with every head nod, tilt, and animation without any distortion or floating.
+ * 2. Character body colors: Vibrant solid colors (#38bdf8 for Nara, #ef4444 for Velocia, #22c55e for Scout).
+ * 3. Skeletal animations: Sit_Work typing by default, smoothly crossfading to Wave on hover/select.
+ * 4. Floating badge: Sleek black pill badge with blinking red dot and role title above head.
  */
 export default function AgentAvatar({
   agent,
@@ -24,17 +27,27 @@ export default function AgentAvatar({
   const groupRef = useRef()
   const [hovered, setHovered] = useState(false)
 
-  // Load official character.glb with local draco decoders
+  // Load character.glb with local draco decoders
   const { scene, animations } = useGLTF('/models/character.glb', '/draco/')
   const clone = useMemo(() => SkeletonUtils.clone(scene), [scene])
   const { actions } = useAnimations(animations, groupRef)
 
-  // Configure materials & accessories for this specific agent instance
+  // Configure materials and attach accessories directly to head bone
   useEffect(() => {
     if (!clone) return
     const agentColor = new THREE.Color(agent.color || '#ef4444')
     const agentId = agent.id?.toLowerCase()
 
+    // Find the skeletal head bone
+    const headBone = clone.getObjectByName('head')
+
+    // Clean up any previously attached accessory group on headBone
+    if (headBone) {
+      const existing = headBone.getObjectByName('agent-head-accessory')
+      if (existing) headBone.remove(existing)
+    }
+
+    // Traverse and configure mesh materials
     clone.traverse((child) => {
       if (child.isMesh) {
         child.castShadow = true
@@ -43,33 +56,88 @@ export default function AgentAvatar({
         if (child.name === 'body') {
           child.material = new THREE.MeshStandardMaterial({
             color: agentColor,
-            roughness: 0.35,
+            roughness: 0.32,
             metalness: 0.05
           })
-        } else if (child.name === 'cap') {
-          // Show cap for Scout (green), hide for others
-          child.visible = agentId === 'scout'
-          if (child.visible) {
-            child.material = new THREE.MeshStandardMaterial({
-              color: new THREE.Color('#15803d'),
-              roughness: 0.4
-            })
-          }
-        } else if (child.name === 'headphones') {
-          // Headphones for Velocia and Nara
-          child.visible = agentId !== 'scout'
-          if (child.visible) {
-            child.material = new THREE.MeshStandardMaterial({
-              color: new THREE.Color('#0f172a'),
-              roughness: 0.25
-            })
-          }
+        } else if (child.name === 'eyes' || child.name === 'mouth') {
+          // Keep authentic textured eyes and mouth
+          child.renderOrder = 2
+        } else if (child.name === 'cap' || child.name === 'headphones') {
+          // ALWAYS hide the unrigged static meshes that cause floating glitches
+          child.visible = false
         }
       }
     })
+
+    // Attach perfectly fitted accessories directly to the head bone
+    if (headBone) {
+      const accessoryGroup = new THREE.Group()
+      accessoryGroup.name = 'agent-head-accessory'
+
+      if (agentId === 'scout') {
+        // Scout: Clean green research cap / visor fitted to the head
+        const capCrown = new THREE.Mesh(
+          new THREE.SphereGeometry(0.33, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2.3),
+          new THREE.MeshStandardMaterial({ color: '#166534', roughness: 0.4 })
+        )
+        capCrown.position.set(0, 0.42, 0)
+
+        const capBrim = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.35, 0.36, 0.025, 16, 1, false, -Math.PI / 3, (2 * Math.PI) / 3),
+          new THREE.MeshStandardMaterial({ color: '#14532d', roughness: 0.4 })
+        )
+        capBrim.position.set(0, 0.42, 0.18)
+        capBrim.rotation.set(0.18, 0, 0)
+
+        accessoryGroup.add(capCrown)
+        accessoryGroup.add(capBrim)
+      } else {
+        // Nara & Velocia: Sleek, high-tech headset fitted to head
+        const cupGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.05, 16)
+        const cupMat = new THREE.MeshStandardMaterial({ color: '#0f172a', roughness: 0.25 })
+
+        // Left earcup
+        const leftCup = new THREE.Mesh(cupGeo, cupMat)
+        leftCup.position.set(-0.33, 0.40, 0)
+        leftCup.rotation.set(0, 0, Math.PI / 2)
+
+        // Right earcup
+        const rightCup = new THREE.Mesh(cupGeo, cupMat)
+        rightCup.position.set(0.33, 0.40, 0)
+        rightCup.rotation.set(0, 0, Math.PI / 2)
+
+        // Headband arch
+        const bandGeo = new THREE.TorusGeometry(0.34, 0.02, 12, 24, Math.PI)
+        const headband = new THREE.Mesh(bandGeo, cupMat)
+        headband.position.set(0, 0.40, 0)
+        headband.rotation.set(0, 0, -Math.PI / 2)
+
+        // Sleek mic boom
+        const micBoom = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.01, 0.01, 0.16, 8),
+          cupMat
+        )
+        micBoom.position.set(-0.30, 0.34, 0.09)
+        micBoom.rotation.set(Math.PI / 3, 0, -Math.PI / 8)
+
+        const micTip = new THREE.Mesh(
+          new THREE.SphereGeometry(0.024, 12, 12),
+          new THREE.MeshStandardMaterial({ color: agentColor, roughness: 0.2 })
+        )
+        micTip.position.set(-0.28, 0.28, 0.17)
+
+        accessoryGroup.add(leftCup)
+        accessoryGroup.add(rightCup)
+        accessoryGroup.add(headband)
+        accessoryGroup.add(micBoom)
+        accessoryGroup.add(micTip)
+      }
+
+      headBone.add(accessoryGroup)
+    }
   }, [clone, agent.color, agent.id])
 
-  // Play animation: Sit_Work typing by default; smoothly crossfade to Wave when hovered or selected
+  // Play animation: Sit_Work typing by default, Wave on hover/select
   useEffect(() => {
     if (!actions) return
     const defaultAnim = actions[initialAnimation] || actions['Sit_Work'] || actions['Idle']
@@ -154,7 +222,7 @@ export default function AgentAvatar({
         />
       </mesh>
 
-      {/* --- Cloned 3D Model Primitive --- */}
+      {/* --- Cloned 3D Rigged Model Primitive --- */}
       <primitive object={clone} />
     </group>
   )

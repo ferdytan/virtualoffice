@@ -5,14 +5,10 @@ import KanbanBar from './components/KanbanBar'
 import CallModal from './components/CallModal'
 import AgentCloseUpAvatar from './components/AgentCloseUpAvatar'
 import {
-  Wifi,
-  WifiOff,
-  RotateCcw,
-  Sparkles,
-  Users
+  RotateCcw
 } from 'lucide-react'
 
-// Default fallback agent configuration matching The Delegation office layout
+// Default fallback agent configuration matching spacious executive workstation pods
 const INITIAL_AGENTS = [
   {
     id: 'nara',
@@ -21,8 +17,8 @@ const INITIAL_AGENTS = [
     role_badge: 'REMINDER CS',
     color: '#38bdf8',
     color_name: 'Sky Blue',
-    position: [1.10, 0, -1.24],
-    rotation: [0, Math.PI / 2, 0],
+    position: [-3.8, 0, -0.5],
+    rotation: [0, 0.35, 0],
     model: 'gpt-4o-mini',
     description: 'Bertanggung jawab memantau dan memberi notifikasi unit offline secara real-time.',
     quick_prompts: [
@@ -38,7 +34,7 @@ const INITIAL_AGENTS = [
     role_badge: 'MARKETING STRATEGIST',
     color: '#ef4444',
     color_name: 'Solid Red',
-    position: [1.58, 0, -3.67],
+    position: [0.0, 0, 1.0],
     rotation: [0, 0, 0],
     model: 'gpt-4o-mini',
     description: 'Bertanggung jawab merancang strategi kampanye dan mendelegasikan riset.',
@@ -55,8 +51,8 @@ const INITIAL_AGENTS = [
     role_badge: 'RESEARCHER',
     color: '#22c55e',
     color_name: 'Solid Green',
-    position: [3.09, 0, -1.27],
-    rotation: [0, -Math.PI / 2, 0],
+    position: [3.8, 0, -0.5],
+    rotation: [0, -0.35, 0],
     model: 'gpt-4o-mini',
     description: 'Bertanggung jawab meriset tren industri dan menulis draf artikel/blog.',
     quick_prompts: [
@@ -178,14 +174,13 @@ export default function App() {
     handleSelectAgent(agents[nextIndex])
   }
 
-  // Active displayed agent in top-left panel (selectedAgent or default Velocia)
+  // Active displayed agent in top-left panel
   const displayedAgent = selectedAgent || agents.find((a) => a.id === 'velocia') || agents[0]
 
   // Handle task brief submission
   const handleSendBrief = async (agentId, message) => {
     setIsLoadingBrief(true)
 
-    // Optimistically add task to Kanban 'IN PROGRESS'
     const tempTaskId = `task-${Date.now()}`
     const tempTask = {
       id: tempTaskId,
@@ -214,7 +209,6 @@ export default function App() {
           ]
         }))
 
-        // Move task to 'DONE'
         setTasks((prev) =>
           prev.map((t) =>
             t.id === tempTaskId ? { ...t, status: 'DONE', updated_at: 'Selesai' } : t
@@ -224,7 +218,6 @@ export default function App() {
         throw new Error('Chat API returned error')
       }
     } catch (err) {
-      // Local fallback simulation
       setTimeout(() => {
         let fallbackResponse = ''
         if (agentId === 'nara') {
@@ -254,7 +247,6 @@ export default function App() {
     }
   }
 
-  // Open call modal
   const handleOpenCall = (agent) => {
     setSelectedAgent(agent)
     setIsCallModalOpen(true)
@@ -266,7 +258,6 @@ export default function App() {
       <header className="fixed top-0 left-0 right-0 z-30 pointer-events-none p-4 sm:p-6 flex items-center justify-between">
         {/* Top-Left Panel with Large Close-Up Avatar */}
         <div className="pointer-events-auto flex items-center gap-3.5 bg-white/95 backdrop-blur-xl p-2.5 pr-5 rounded-2xl shadow-xl border border-slate-200/80 hover:shadow-2xl transition-all">
-          {/* Large Close-up Avatar Icon (The Delegation Style) */}
           <AgentCloseUpAvatar
             agent={displayedAgent}
             size={52}
