@@ -2,7 +2,6 @@ import React from 'react'
 import {
   X,
   Palette,
-  Sun,
   Bot,
   Coffee,
   Check,
@@ -38,7 +37,6 @@ export default function ScenerySettingsModal({
   const handleReset = () => {
     onUpdateScenerySettings({
       theme: 'colorful',
-      showLightBeams: true,
       showNPC: true,
       showCoffeeCorner: true
     })
@@ -163,40 +161,7 @@ export default function ScenerySettingsModal({
               Elemen Interaktif & Aksesoris Tambahan
             </label>
 
-            {/* Toggle 1: Lamp Light Beams */}
-            <div
-              onClick={() => handleToggle('showLightBeams')}
-              className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/90 flex items-center justify-between cursor-pointer hover:bg-slate-100/70 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-amber-100 text-amber-700">
-                  <Sun className="w-4 h-4" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-black text-slate-900">
-                    Sinar Lampu Meja (Light Beams & Desk Glow)
-                  </h4>
-                  <p className="text-[11px] text-slate-500">
-                    Sorotan berkas sinar hangat yang menyinari permukaan meja kerja 4-desk pod
-                  </p>
-                </div>
-              </div>
-
-              {/* Toggle Switch */}
-              <div
-                className={`w-11 h-6 rounded-full transition-colors flex items-center p-0.5 cursor-pointer ${
-                  scenerySettings.showLightBeams ? 'bg-slate-900' : 'bg-slate-300'
-                }`}
-              >
-                <div
-                  className={`w-5 h-5 rounded-full bg-white shadow-sm transform transition-transform ${
-                    scenerySettings.showLightBeams ? 'translate-x-5' : 'translate-x-0'
-                  }`}
-                />
-              </div>
-            </div>
-
-            {/* Toggle 2: NPC Cleaning & Delivery Robot */}
+            {/* Toggle 1: NPC Cleaning & Delivery Robot */}
             <div
               onClick={() => handleToggle('showNPC')}
               className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/90 flex items-center justify-between cursor-pointer hover:bg-slate-100/70 transition-colors"

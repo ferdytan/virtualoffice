@@ -119,7 +119,6 @@ export default function App() {
     }
     return {
       theme: 'colorful', // 'colorful' | 'minimalist'
-      showLightBeams: true,
       showNPC: true,
       showCoffeeCorner: true
     }

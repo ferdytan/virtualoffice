@@ -4,7 +4,6 @@ import { OrbitControls, useGLTF, ContactShadows } from '@react-three/drei'
 import * as THREE from 'three'
 import AgentAvatar from './AgentAvatar'
 import ScreenDisplays from './ScreenDisplays'
-import LightBeams from './LightBeams'
 import CoffeeCorner from './CoffeeCorner'
 import OfficeNPC from './OfficeNPC'
 
@@ -264,7 +263,6 @@ export default function OfficeScene({
   hideTooltip = false,
   scenerySettings = {
     theme: 'colorful',
-    showLightBeams: true,
     showNPC: true,
     showCoffeeCorner: true
   }
@@ -308,23 +306,12 @@ export default function OfficeScene({
         {/* Subtle Accent Fill Light */}
         <directionalLight position={[-8, 12, -8]} intensity={0.35} color="#bae6fd" />
 
-        {/* Warm Desk Lamp Ambient Accents over the 4-desk pod */}
-        <pointLight position={[1.77, 1.15, -2.51]} color="#ffeedd" intensity={0.65} distance={2.5} />
-        <pointLight position={[3.54, 1.15, -2.51]} color="#ffeedd" intensity={0.65} distance={2.5} />
-        <pointLight position={[0.89, 1.15, -3.07]} color="#ffeedd" intensity={0.65} distance={2.5} />
-        <pointLight position={[2.66, 1.15, -3.07]} color="#ffeedd" intensity={0.65} distance={2.5} />
-
         <Suspense fallback={null}>
           {/* Authentic Office Environment with dynamic theme styling */}
           <DelegationOffice theme={scenerySettings?.theme || 'colorful'} />
 
           {/* 4 Active Glowing & Colorful Browser Displays mounted on workstation monitors */}
           <ScreenDisplays agents={agents} onSelectAgent={onSelectAgent} />
-
-          {/* Visible Lamp Beams & Desk Glows */}
-          {scenerySettings?.showLightBeams && (
-            <LightBeams isColorful={isColorful} />
-          )}
 
           {/* Espresso Coffee Corner & Lounge Bar */}
           {scenerySettings?.showCoffeeCorner && (
