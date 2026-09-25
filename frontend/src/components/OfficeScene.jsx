@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, Suspense } from 'react'
+import React, { useRef, useEffect, useMemo, Suspense } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, useGLTF, ContactShadows } from '@react-three/drei'
 import * as THREE from 'three'
@@ -6,6 +6,109 @@ import AgentAvatar from './AgentAvatar'
 import ScreenDisplays from './ScreenDisplays'
 import CoffeeCorner from './CoffeeCorner'
 import OfficeNPC from './OfficeNPC'
+import DeskAccessories from './DeskAccessories'
+
+/**
+ * Procedurally generates realistic tile and plank textures for the office floor:
+ * - 'parquet': Warm Scandinavian oak wood parquet planks with natural grain
+ * - 'granite': Polished charcoal/slate granite stone tiles with mineral flecks
+ * - 'white': Clean studio white tile grid with crisp grout lines
+ */
+function createFloorTexture(type = 'parquet') {
+  if (typeof document === 'undefined') return null
+  const canvas = document.createElement('canvas')
+  canvas.width = 512
+  canvas.height = 512
+  const ctx = canvas.getContext('2d')
+
+  if (type === 'granite') {
+    // Elegant Polished Charcoal / Slate Granite Tiles
+    ctx.fillStyle = '#2d3748'
+    ctx.fillRect(0, 0, 512, 512)
+
+    const tileSize = 128
+    const tileColors = ['#283142', '#334155', '#242e3d', '#3a4a61']
+
+    for (let y = 0; y < 512; y += tileSize) {
+      for (let x = 0; x < 512; x += tileSize) {
+        const cIdx = Math.floor((x / tileSize + y / tileSize) % tileColors.length)
+        ctx.fillStyle = tileColors[cIdx]
+        ctx.fillRect(x, y, tileSize, tileSize)
+
+        // Granite speckles / mineral flecks
+        for (let s = 0; s < 50; s++) {
+          const sx = x + Math.random() * tileSize
+          const sy = y + Math.random() * tileSize
+          ctx.fillStyle = Math.random() > 0.4 ? 'rgba(255,255,255,0.22)' : 'rgba(15,23,42,0.45)'
+          ctx.beginPath()
+          ctx.arc(sx, sy, Math.random() * 2 + 0.5, 0, Math.PI * 2)
+          ctx.fill()
+        }
+
+        // Grout line
+        ctx.strokeStyle = '#1a202c'
+        ctx.lineWidth = 2
+        ctx.strokeRect(x, y, tileSize, tileSize)
+      }
+    }
+  } else if (type === 'white') {
+    // Studio White Tile Grid
+    ctx.fillStyle = '#f8fafc'
+    ctx.fillRect(0, 0, 512, 512)
+
+    const tileSize = 128
+    for (let y = 0; y < 512; y += tileSize) {
+      for (let x = 0; x < 512; x += tileSize) {
+        ctx.fillStyle = ((x / tileSize) + (y / tileSize)) % 2 === 0 ? '#f8fafc' : '#f1f5f9'
+        ctx.fillRect(x, y, tileSize, tileSize)
+
+        ctx.strokeStyle = '#e2e8f0'
+        ctx.lineWidth = 1.5
+        ctx.strokeRect(x, y, tileSize, tileSize)
+      }
+    }
+  } else {
+    // 'parquet' - Warm Scandinavian Oak Wood Parquet Planks
+    ctx.fillStyle = '#b88c56'
+    ctx.fillRect(0, 0, 512, 512)
+
+    const plankHeight = 32
+    const plankWidth = 128
+    const woodColors = [
+      '#bf935d', '#b5864e', '#c49963', '#ad7e46', '#c99f69', '#ba8c53'
+    ]
+
+    for (let y = 0; y < 512; y += plankHeight) {
+      const rowOffset = (y / plankHeight) % 2 === 0 ? 0 : plankWidth / 2
+      for (let x = -plankWidth; x < 512 + plankWidth; x += plankWidth) {
+        const posX = x + rowOffset
+        const seed = Math.abs(Math.sin(posX * 12.9898 + y * 78.233))
+        const colorIdx = Math.floor(seed * woodColors.length) % woodColors.length
+        ctx.fillStyle = woodColors[colorIdx]
+        ctx.fillRect(posX, y, plankWidth, plankHeight)
+
+        // Wood grain streaks
+        ctx.fillStyle = 'rgba(70, 40, 15, 0.08)'
+        for (let g = 0; g < 4; g++) {
+          const gy = y + 4 + g * 7
+          ctx.fillRect(posX + 2, gy, plankWidth - 4, 1.5)
+        }
+
+        // Dark plank seams
+        ctx.strokeStyle = '#6d4822'
+        ctx.lineWidth = 1.2
+        ctx.strokeRect(posX, y, plankWidth, plankHeight)
+      }
+    }
+  }
+
+  const texture = new THREE.CanvasTexture(canvas)
+  texture.wrapS = THREE.RepeatWrapping
+  texture.wrapT = THREE.RepeatWrapping
+  texture.repeat.set(type === 'parquet' ? 8 : 6, type === 'parquet' ? 8 : 6)
+  texture.needsUpdate = true
+  return texture
+}
 
 /**
  * Camera controller that smoothly transitions focus when an agent is selected.
@@ -98,9 +201,13 @@ function repositionNode(node, x, y, z, rx = 0, ry = 0, rz = 0) {
  * - North Row (Desk 3 & 4): Nara & Team Desk facing South (-Z), perfectly face-to-face!
  * Supports dynamic scenery theme: 'colorful' (warm wood, colored seats, cozy accents) vs 'minimalist' (pure white).
  */
-function DelegationOffice({ theme = 'colorful' }) {
+function DelegationOffice({ scenerySettings }) {
   const { scene } = useGLTF('/models/office.glb', '/draco/')
+  const theme = scenerySettings?.theme || 'colorful'
+  const floorType = scenerySettings?.floorType || 'parquet'
   const isColorful = theme === 'colorful'
+
+  const floorTex = useMemo(() => createFloorTexture(floorType), [floorType])
 
   useEffect(() => {
     if (!scene) return
@@ -117,10 +224,52 @@ function DelegationOffice({ theme = 'colorful' }) {
           return
         }
 
+        // --- 1. FLOOR TEXTURE (PARQUET / GRANITE / WHITE) ---
+        if (name.includes('floor') || parentName.includes('floor') || name === 'plane.001') {
+          if (floorTex) {
+            child.material = new THREE.MeshStandardMaterial({
+              map: floorTex,
+              roughness: floorType === 'granite' ? 0.2 : floorType === 'parquet' ? 0.38 : 0.45,
+              metalness: floorType === 'granite' ? 0.08 : 0.02
+            })
+          }
+          return
+        }
+
         if (isColorful) {
-          // --- VIBRANT MODERN THEME (Aksen Kayu Hangat & Sentuhan Warna) ---
-          // Work desks: Warm light oak wood top
+          // --- 2. WORK CHAIRS: SLEEK DARK GRAPHITE / CHARCOAL (ABU2 / HITAM) ---
           if (
+            name.includes('work-chair') ||
+            parentName.includes('work-chair') ||
+            name === 'cube.010' ||
+            name === 'cube.014' ||
+            name === 'cube.019' ||
+            name === 'cube.022' ||
+            name === 'cube.003'
+          ) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: new THREE.Color('#252b33'), // Dark charcoal/graphite ergonomic office chair
+              roughness: 0.45,
+              metalness: 0.08
+            })
+          }
+          // --- 3. COFFEE TABLE CHAIRS: WARM RICH COGNAC / SADDLE BROWN (COKLAT) ---
+          else if (
+            name === 'static-chair' ||
+            name === 'static-chair.001' ||
+            parentName === 'static-chair' ||
+            parentName === 'static-chair.001' ||
+            name === 'circle.001' ||
+            name === 'circle.003'
+          ) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: new THREE.Color('#783818'), // Warm rich saddle brown / cognac
+              roughness: 0.52,
+              metalness: 0.05
+            })
+          }
+          // --- 4. WORK DESKS: WARM SCANDINAVIAN OAK TOP ---
+          else if (
             name.includes('work-desk') ||
             parentName.includes('work-desk') ||
             name === 'cube.008' ||
@@ -130,57 +279,73 @@ function DelegationOffice({ theme = 'colorful' }) {
           ) {
             child.material = new THREE.MeshStandardMaterial({
               color: new THREE.Color('#d4bf9c'), // Warm Scandinavian oak
-              roughness: 0.38,
+              roughness: 0.36,
               metalness: 0.04
             })
           }
-          // Work Chairs: Designer color fabric cushions
-          else if (name.includes('chair.001') || parentName.includes('chair.001') || name === 'cube.010') {
-            // Velocia's chair: Coral
-            child.material = new THREE.MeshStandardMaterial({
-              color: new THREE.Color('#f87171'),
-              roughness: 0.55
-            })
-          } else if (name.includes('chair.002') || parentName.includes('chair.002') || name === 'cube.014') {
-            // Scout's chair: Mint / Emerald
-            child.material = new THREE.MeshStandardMaterial({
-              color: new THREE.Color('#34d399'),
-              roughness: 0.55
-            })
-          } else if (name.includes('chair.003') || parentName.includes('chair.003') || name === 'cube.019') {
-            // Nara's chair: Sky Blue
-            child.material = new THREE.MeshStandardMaterial({
-              color: new THREE.Color('#60a5fa'),
-              roughness: 0.55
-            })
-          } else if (name.includes('chair.004') || parentName.includes('chair.004') || name === 'cube.022') {
-            // Team chair: Lavender
-            child.material = new THREE.MeshStandardMaterial({
-              color: new THREE.Color('#a78bfa'),
-              roughness: 0.55
-            })
-          }
-          // Lounge Sofa: Cozy warm amber / terracotta
-          else if (name.includes('sofa') || parentName.includes('sofa') || name === 'cube.006') {
-            child.material = new THREE.MeshStandardMaterial({
-              color: new THREE.Color('#d97706'),
-              roughness: 0.65
-            })
-          }
-          // Counter & Cafe Table: Warm rich walnut
+          // --- 5. COFFEE TABLE: WARM HONEY WALNUT ---
           else if (
-            name.includes('counter') ||
-            parentName.includes('counter') ||
             name.includes('cafe-table') ||
-            parentName.includes('cafe-table')
+            parentName.includes('cafe-table') ||
+            name === 'cube.001'
           ) {
             child.material = new THREE.MeshStandardMaterial({
-              color: new THREE.Color('#946b45'),
-              roughness: 0.42,
+              color: new THREE.Color('#9e6b42'), // Warm honey walnut
+              roughness: 0.38,
               metalness: 0.05
             })
           }
-          // Plants: Fresh vibrant leafy green
+          // --- 6. STORAGE CABINET CREDENZA: MODERN DEEP SLATE GRAY ---
+          else if (
+            name.includes('cabinet') ||
+            parentName.includes('cabinet') ||
+            name === 'cube.002'
+          ) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: new THREE.Color('#475569'), // Slate gray credenza
+              roughness: 0.42,
+              metalness: 0.1
+            })
+          }
+          // --- 7. BARISTA COUNTER: WARM MAHOGANY BAR ---
+          else if (
+            name.includes('counter') ||
+            parentName.includes('counter') ||
+            name === 'cube'
+          ) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: new THREE.Color('#6b4226'), // Rich mahogany barista counter
+              roughness: 0.36,
+              metalness: 0.06
+            })
+          }
+          // --- 8. LOUNGE SOFA: WARM AMBER / TERRACOTTA ---
+          else if (
+            name.includes('sofa') ||
+            parentName.includes('sofa') ||
+            name === 'cube.006'
+          ) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: new THREE.Color('#b45309'),
+              roughness: 0.65
+            })
+          }
+          // --- 9. DESK LAMPS: ARCHITECTURAL MATTE DARK SLATE ---
+          else if (
+            name.includes('flexo') ||
+            parentName.includes('flexo') ||
+            name === 'cube.009' ||
+            name === 'cube.013' ||
+            name === 'cube.018' ||
+            name === 'cube.021'
+          ) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: new THREE.Color('#334155'), // Architectural matte dark slate
+              roughness: 0.32,
+              metalness: 0.25
+            })
+          }
+          // --- 10. PLANTS: FRESH VIBRANT MONSTERA GREEN ---
           else if (
             name.includes('plant') ||
             parentName.includes('plant') ||
@@ -188,11 +353,18 @@ function DelegationOffice({ theme = 'colorful' }) {
             name === 'circle.004'
           ) {
             child.material = new THREE.MeshStandardMaterial({
-              color: new THREE.Color('#16a34a'),
+              color: new THREE.Color('#15803d'),
               roughness: 0.3
             })
           }
-          // Border glow line
+          // --- 11. PRESENTATION / KANBAN BOARD ---
+          else if (name.includes('board') || parentName.includes('board') || name === 'cube.005') {
+            child.material = new THREE.MeshStandardMaterial({
+              color: new THREE.Color('#0284c7'),
+              roughness: 0.4
+            })
+          }
+          // --- 12. BORDER GLOW LINE ---
           else if (name.startsWith('colored') || parentName.startsWith('colored')) {
             child.material = new THREE.MeshStandardMaterial({
               color: new THREE.Color('#0284c7'),
@@ -246,7 +418,7 @@ function DelegationOffice({ theme = 'colorful' }) {
 
     const flexo4 = findSceneNode(scene, 'static-flexo.003', 'static-flexo003', 'Cube.021')
     repositionNode(flexo4, 3.54, 0.504, -2.51, 0, 0, 0)
-  }, [scene, isColorful])
+  }, [scene, isColorful, floorTex, floorType])
 
   return <primitive object={scene} />
 }
@@ -263,6 +435,7 @@ export default function OfficeScene({
   hideTooltip = false,
   scenerySettings = {
     theme: 'colorful',
+    floorType: 'parquet',
     showNPC: true,
     showCoffeeCorner: true
   }
@@ -307,8 +480,11 @@ export default function OfficeScene({
         <directionalLight position={[-8, 12, -8]} intensity={0.35} color="#bae6fd" />
 
         <Suspense fallback={null}>
-          {/* Authentic Office Environment with dynamic theme styling */}
-          <DelegationOffice theme={scenerySettings?.theme || 'colorful'} />
+          {/* Authentic Office Environment with dynamic floor & furniture styling */}
+          <DelegationOffice scenerySettings={scenerySettings} />
+
+          {/* Decorative Colorful Books, Notebooks, Mugs & Sticky Notes on Desks */}
+          <DeskAccessories isColorful={isColorful} />
 
           {/* 4 Active Glowing & Colorful Browser Displays mounted on workstation monitors */}
           <ScreenDisplays agents={agents} onSelectAgent={onSelectAgent} />

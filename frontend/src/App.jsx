@@ -113,12 +113,21 @@ export default function App() {
   const [scenerySettings, setScenerySettings] = useState(() => {
     try {
       const saved = localStorage.getItem('virtual_office_scenery_settings')
-      if (saved) return JSON.parse(saved)
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        return {
+          theme: parsed.theme || 'colorful',
+          floorType: parsed.floorType || 'parquet', // 'parquet' | 'granite' | 'white'
+          showNPC: parsed.showNPC !== false,
+          showCoffeeCorner: parsed.showCoffeeCorner !== false
+        }
+      }
     } catch (e) {
       // ignore
     }
     return {
       theme: 'colorful', // 'colorful' | 'minimalist'
+      floorType: 'parquet', // 'parquet' | 'granite' | 'white'
       showNPC: true,
       showCoffeeCorner: true
     }
