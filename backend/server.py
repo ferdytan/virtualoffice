@@ -169,6 +169,32 @@ def set_agent_avatar_type(agent_id: str, req: AvatarTypeRequest):
     }
 
 
+class AgentColorRequest(BaseModel):
+    color: str = Field(..., description="Hex color code, e.g. #38bdf8")
+
+
+@app.post("/api/agents/{agent_id}/color")
+def set_agent_color(agent_id: str, req: AgentColorRequest):
+    """Updates the custom primary theme color for an agent."""
+    aid = agent_id.lower()
+    if aid not in AGENTS_METADATA:
+        raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found.")
+    
+    color = req.color.strip()
+    if not (color.startswith("#") and (len(color) == 7 or len(color) == 4)):
+        raise HTTPException(status_code=400, detail="Format warna tidak valid. Gunakan format hex seperti #38bdf8")
+    
+    AGENTS_METADATA[aid]["color"] = color
+    logger.info(f"Theme color for agent {aid} updated to: {color}")
+    
+    return {
+        "status": "success",
+        "agent_id": aid,
+        "color": color,
+        "message": f"Warna untuk {AGENTS_METADATA[aid]['name']} berhasil diubah ke {color}."
+    }
+
+
 @app.post("/api/agents/{agent_id}/model")
 async def upload_agent_model(agent_id: str, file: UploadFile = File(...)):
     """Uploads a custom .glb or .gltf 3D character model for an agent."""

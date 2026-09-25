@@ -237,6 +237,32 @@ export default function App() {
     }
   }
 
+  // Handle updating agent primary theme color
+  const handleUpdateAgentColor = async (agentId, color) => {
+    setAgents((prev) =>
+      prev.map((a) =>
+        a.id === agentId
+          ? { ...a, color }
+          : a
+      )
+    )
+    setSelectedAgent((prev) =>
+      prev && prev.id === agentId
+        ? { ...prev, color }
+        : prev
+    )
+
+    try {
+      await fetch(`/api/agents/${agentId}/color`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ color })
+      })
+    } catch (err) {
+      console.warn('Failed to persist color to backend:', err)
+    }
+  }
+
   // Active displayed agent in top-left panel
   const displayedAgent = selectedAgent || agents.find((a) => a.id === 'velocia') || agents[0]
 
@@ -317,102 +343,104 @@ export default function App() {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-[#eef2f6]">
-      {/* --- TOP HEADER OVERLAY --- */}
-      <header className="fixed top-0 left-0 right-0 z-30 pointer-events-none p-4 sm:p-6 flex items-center justify-between">
-        {/* Top-Left Panel with Large Close-Up Avatar */}
-        <div className="pointer-events-auto flex items-center gap-3.5 bg-white/95 backdrop-blur-xl p-2.5 pr-5 rounded-2xl shadow-xl border border-slate-200/80 hover:shadow-2xl transition-all">
-          <AgentCloseUpAvatar
-            agent={displayedAgent}
-            size={52}
-            showStatus={true}
-            onClick={handleCycleAgent}
-          />
+      {/* --- TOP HEADER OVERLAY (OFFICE VIEW ONLY) --- */}
+      {viewMode === 'office' && (
+        <header className="fixed top-0 left-0 right-0 z-30 pointer-events-none p-4 sm:p-6 flex items-center justify-between">
+          {/* Top-Left Panel with Large Close-Up Avatar */}
+          <div className="pointer-events-auto flex items-center gap-3.5 bg-white/95 backdrop-blur-xl p-2.5 pr-5 rounded-2xl shadow-xl border border-slate-200/80 hover:shadow-2xl transition-all">
+            <AgentCloseUpAvatar
+              agent={displayedAgent}
+              size={52}
+              showStatus={true}
+              onClick={handleCycleAgent}
+            />
 
-          <div className="flex flex-col justify-center">
-            <div className="flex items-center gap-2">
-              <h1 className="text-sm font-black text-slate-900 tracking-tight">
-                VIRTUAL OFFICE AI
-              </h1>
-              <span
-                className="text-[10px] font-extrabold px-1.5 py-0.5 rounded text-white shadow-2xs tracking-wide"
-                style={{ backgroundColor: displayedAgent.color }}
-              >
-                {displayedAgent.name}
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-500 font-semibold flex items-center gap-1.5 mt-0.5">
-              <span>{displayedAgent.role_badge || displayedAgent.role}</span>
-              <span className="text-slate-300">&bull;</span>
-              <span className="text-slate-400 font-normal">Klik avatar untuk rotasi</span>
-            </p>
-          </div>
-        </div>
-
-        {/* Quick Agent Jump & Status */}
-        <div className="pointer-events-auto flex items-center gap-2">
-          {/* Quick Agent Jump Buttons */}
-          <div className="hidden md:flex items-center gap-1.5 bg-white/90 backdrop-blur-xl p-1.5 rounded-2xl shadow-lg border border-slate-200/80">
-            {agents.map((agent) => {
-              const isCurrent = selectedAgent?.id === agent.id
-              return (
-                <button
-                  key={agent.id}
-                  onClick={() => handleSelectAgent(agent)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                    isCurrent
-                      ? 'bg-slate-900 text-white shadow-sm'
-                      : 'text-slate-600 hover:bg-slate-100'
-                  }`}
+            <div className="flex flex-col justify-center">
+              <div className="flex items-center gap-2">
+                <h1 className="text-sm font-black text-slate-900 tracking-tight">
+                  VIRTUAL OFFICE AI
+                </h1>
+                <span
+                  className="text-[10px] font-extrabold px-1.5 py-0.5 rounded text-white shadow-2xs tracking-wide"
+                  style={{ backgroundColor: displayedAgent.color }}
                 >
-                  <span
-                    className="w-2.5 h-2.5 rounded-full"
-                    style={{ backgroundColor: agent.color }}
-                  />
-                  {agent.name}
-                </button>
-              )
-            })}
+                  {displayedAgent.name}
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-500 font-semibold flex items-center gap-1.5 mt-0.5">
+                <span>{displayedAgent.role_badge || displayedAgent.role}</span>
+                <span className="text-slate-300">&bull;</span>
+                <span className="text-slate-400 font-normal">Klik avatar untuk rotasi</span>
+              </p>
+            </div>
           </div>
 
-          {/* Reset Camera View Button */}
-          <button
-            onClick={() => handleSelectAgent(null)}
-            className="p-2.5 bg-white/90 backdrop-blur-xl hover:bg-white text-slate-600 hover:text-slate-900 rounded-2xl shadow-lg border border-slate-200/80 transition-all active:scale-95"
-            title="Reset Posisi Kamera"
-          >
-            <RotateCcw className="w-4 h-4" />
-          </button>
+          {/* Quick Agent Jump & Status */}
+          <div className="pointer-events-auto flex items-center gap-2">
+            {/* Quick Agent Jump Buttons */}
+            <div className="hidden md:flex items-center gap-1.5 bg-white/90 backdrop-blur-xl p-1.5 rounded-2xl shadow-lg border border-slate-200/80">
+              {agents.map((agent) => {
+                const isCurrent = selectedAgent?.id === agent.id
+                return (
+                  <button
+                    key={agent.id}
+                    onClick={() => handleSelectAgent(agent)}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                      isCurrent
+                        ? 'bg-slate-900 text-white shadow-sm'
+                        : 'text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    <span
+                      className="w-2.5 h-2.5 rounded-full"
+                      style={{ backgroundColor: agent.color }}
+                    />
+                    {agent.name}
+                  </button>
+                )
+              })}
+            </div>
 
-          {/* Backend Connection Status Badge */}
-          <div className="flex items-center gap-2 px-3.5 py-2.5 bg-white/90 backdrop-blur-xl rounded-2xl shadow-lg border border-slate-200/80">
-            {backendStatus === 'crewai_live' ? (
-              <>
-                <span className="relative flex h-2.5 w-2.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                </span>
-                <span className="text-xs font-bold text-slate-800">
-                  CrewAI Live
-                </span>
-              </>
-            ) : backendStatus === 'connected' ? (
-              <>
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                <span className="text-xs font-bold text-slate-800">
-                  Backend Connected
-                </span>
-              </>
-            ) : (
-              <>
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
-                <span className="text-xs font-bold text-slate-700">
-                  Simulation Mode
-                </span>
-              </>
-            )}
+            {/* Reset Camera View Button */}
+            <button
+              onClick={() => handleSelectAgent(null)}
+              className="p-2.5 bg-white/90 backdrop-blur-xl hover:bg-white text-slate-600 hover:text-slate-900 rounded-2xl shadow-lg border border-slate-200/80 transition-all active:scale-95"
+              title="Reset Posisi Kamera"
+            >
+              <RotateCcw className="w-4 h-4" />
+            </button>
+
+            {/* Backend Connection Status Badge */}
+            <div className="flex items-center gap-2 px-3.5 py-2.5 bg-white/90 backdrop-blur-xl rounded-2xl shadow-lg border border-slate-200/80">
+              {backendStatus === 'crewai_live' ? (
+                <>
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                  </span>
+                  <span className="text-xs font-bold text-slate-800">
+                    CrewAI Live
+                  </span>
+                </>
+              ) : backendStatus === 'connected' ? (
+                <>
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                  <span className="text-xs font-bold text-slate-800">
+                    Backend Connected
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
+                  <span className="text-xs font-bold text-slate-700">
+                    Simulation Mode
+                  </span>
+                </>
+              )}
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       {/* If in Agent Workspace Mode, render the dedicated 20% / 80% AgentWorkspaceView */}
       {viewMode === 'agent_workspace' ? (
@@ -483,6 +511,7 @@ export default function App() {
           onClose={() => setIsAvatarModalOpen(false)}
           onSelectAvatarType={handleSelectAvatarType}
           onUpdateAgentModel={handleUpdateAgentModel}
+          onUpdateAgentColor={handleUpdateAgentColor}
         />
       )}
     </div>

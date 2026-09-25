@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import {
   ArrowLeft,
   Calendar,
@@ -22,8 +22,13 @@ import {
   Settings,
   Bot,
   ChevronRight,
-  Cpu,
-  Layers,
+  Search,
+  Filter,
+  RefreshCw,
+  MessageSquare,
+  ShieldAlert,
+  Server,
+  MapPin,
   ExternalLink
 } from 'lucide-react'
 import AgentCloseUpAvatar from './AgentCloseUpAvatar'
@@ -46,7 +51,11 @@ export default function AgentWorkspaceView({
   const [naraTab, setNaraTab] = useState('offline_units')
   const [scoutTab, setScoutTab] = useState('articles')
 
-  // Notification simulation state for Nara
+  // Search & filter state for Nara's data table
+  const [unitSearch, setUnitSearch] = useState('')
+  const [severityFilter, setSeverityFilter] = useState('ALL') // ALL, KRITIS, TINGGI, SEDANG
+
+  // Notification simulation state for Nara's actions
   const [pingedUnits, setPingedUnits] = useState({})
   const [escalatedUnits, setEscalatedUnits] = useState({})
 
@@ -67,7 +76,7 @@ export default function AgentWorkspaceView({
     if (onSendBrief) {
       onSendBrief(agent.id, briefInput.trim())
     }
-    setBriefFeedback(`Brief berhasil dikirimkan ke ${agent.name}!`)
+    setBriefFeedback(`Brief berhasil didelegasikan ke ${agent.name}!`)
     setBriefInput('')
     setTimeout(() => setBriefFeedback(null), 3500)
   }
@@ -78,14 +87,15 @@ export default function AgentWorkspaceView({
       id: 'september_plan',
       title: '30 Day Plan Marketing September',
       badge: 'SEDANG BERJALAN',
-      badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+      badgeColor: 'bg-emerald-50 text-emerald-700 border-emerald-200',
       period: '1 September — 30 September 2026',
       budget: 'Rp 145.000.000',
       targetKPI: '2.500 Sign-ups / 180 B2B Enterprise Leads',
-      objective: 'Akselerasi akuisisi pengguna awal untuk platform Virtual Office 3D melalui strategi funnel multi-channel dan demo interaktif.',
+      objective: 'Akselerasi akuisisi pengguna awal untuk platform Virtual Office 3D melalui strategi funnel multi-channel dan demo interaktif terpandu.',
       weeklyMilestones: [
         {
-          week: 'Minggu 1 (1 - 7 Sept)',
+          week: 'Minggu 1',
+          dateRange: '1 - 7 Sept',
           title: 'Brand Awareness & Influencer Teaser Sprint',
           items: [
             'Rilis video teaser berdurasi 45 detik: "Ruang Kerja Masa Depan Telah Tiba" di LinkedIn & X.',
@@ -95,7 +105,8 @@ export default function AgentWorkspaceView({
           status: 'Selesai'
         },
         {
-          week: 'Minggu 2 (8 - 14 Sept)',
+          week: 'Minggu 2',
+          dateRange: '8 - 14 Sept',
           title: 'Peluncuran Interaktif & Webinar Eksklusif',
           items: [
             'Webinar Live Demo: "Mendelegasikan Tugas ke 3 AI Agent Otonom dalam 5 Menit".',
@@ -105,7 +116,8 @@ export default function AgentWorkspaceView({
           status: 'Selesai'
         },
         {
-          week: 'Minggu 3 (15 - 21 Sept)',
+          week: 'Minggu 3',
+          dateRange: '15 - 21 Sept',
           title: 'Retargeting Funnel & Mid-Month Conversion Push',
           items: [
             'Retargeting pengunjung demo yang belum mendaftar dengan studi kasus efisiensi kerja tim.',
@@ -115,35 +127,37 @@ export default function AgentWorkspaceView({
           status: 'Berlangsung'
         },
         {
-          week: 'Minggu 4 (22 - 30 Sept)',
+          week: 'Minggu 4',
+          dateRange: '22 - 30 Sept',
           title: 'Showcase Testimonial & Review Kuartal',
           items: [
             'Publikasi studi kasus keberhasilan klien pilot enterprise sektor fintech.',
             'Evaluasi biaya akuisisi (CAC) per channel dan realokasi sisa anggaran ke channel berkinerja tertinggi.',
             'Finalisasi materi promosi menyambut kuartal IV (Q4).'
           ],
-          status: 'Akan Datang'
+          status: 'Terjadwal'
         }
       ],
       channels: [
-        { name: 'LinkedIn Ads & Organic', share: '40%', budget: 'Rp 58.000.000' },
-        { name: 'Google Ads & Performance Max', share: '30%', budget: 'Rp 43.500.000' },
-        { name: 'Kemitraan & Influencer Tech', share: '20%', budget: 'Rp 29.000.000' },
-        { name: 'Email & Retargeting Funnel', share: '10%', budget: 'Rp 14.500.000' }
+        { name: 'LinkedIn Ads & Organic Thought Leadership', share: '40%', percentage: 40, budget: 'Rp 58.000.000', note: 'Target C-Level, VP Eng, & Founders' },
+        { name: 'Google Ads & Performance Max Search', share: '30%', percentage: 30, budget: 'Rp 43.500.000', note: 'Kata kunci intent tinggi: AI office, remote tool' },
+        { name: 'Kemitraan & Influencer Tech Collaboration', share: '20%', percentage: 20, budget: 'Rp 29.000.000', note: 'Demo video review & co-marketing sprint' },
+        { name: 'Email Marketing & Retargeting Lead Funnel', share: '10%', percentage: 10, budget: 'Rp 14.500.000', note: 'Drip campaign 5 seri edukasi otomatis' }
       ]
     },
     pameran_oktober: {
       id: 'pameran_oktober',
       title: 'Program Pameran Oktober',
       badge: 'TERENCANA / LOGISTIK',
-      badgeColor: 'bg-sky-100 text-sky-800 border-sky-200',
+      badgeColor: 'bg-sky-50 text-sky-700 border-sky-200',
       period: '12 — 15 Oktober 2026',
       budget: 'Rp 220.000.000',
       targetKPI: '400+ Qualified Enterprise Leads / 25 Closed Pilot Deals',
       objective: 'Menjadi sorotan utama di Tech Expo Indonesia 2026 dengan booth experiential 3D interaktif yang memungkinkan pengunjung berinteraksi langsung dengan AI Agent.',
       weeklyMilestones: [
         {
-          week: 'Fase Persiapan (1 - 10 Okt)',
+          week: 'Fase Persiapan',
+          dateRange: '1 - 10 Okt',
           title: 'Pembangunan Booth & Rigging Hardware Interaktif',
           items: [
             'Pemasangan layar LED cembung 3x2m untuk menampilkan ruang kerja Virtual Office 3D secara 1:1 skala nyata.',
@@ -153,7 +167,8 @@ export default function AgentWorkspaceView({
           status: 'Persiapan'
         },
         {
-          week: 'Fase Eksekusi (12 - 15 Okt)',
+          week: 'Fase Eksekusi',
+          dateRange: '12 - 15 Okt',
           title: 'Hari Pameran & Sesi Keynote Panggung Utama',
           items: [
             'Sesi Keynote panggung utama: "Arsitektur Multi-Agent 3D: Memangkas Silo Komunikasi Perusahaan".',
@@ -163,7 +178,8 @@ export default function AgentWorkspaceView({
           status: 'Terjadwal'
         },
         {
-          week: 'Fase Follow-up (16 - 25 Okt)',
+          week: 'Fase Follow-up',
+          dateRange: '16 - 25 Okt',
           title: 'Nurturing & Penutupan Kesepakatan Pilot',
           items: [
             'Pemasukan 400+ lead ke sistem CRM dengan segmentasi tingkat kesiapan.',
@@ -174,25 +190,26 @@ export default function AgentWorkspaceView({
         }
       ],
       channels: [
-        { name: 'Sewa Lahan Booth & Konstruksi', share: '50%', budget: 'Rp 110.000.000' },
-        { name: 'Hardware Audio-Visual & LED 3D', share: '25%', budget: 'Rp 55.000.000' },
-        { name: 'VIP Dinner & Hospitality', share: '15%', budget: 'Rp 33.000.000' },
-        { name: 'Merchandise & Collateral', share: '10%', budget: 'Rp 22.000.000' }
+        { name: 'Sewa Lahan Booth & Konstruksi Arsitektural', share: '50%', percentage: 50, budget: 'Rp 110.000.000', note: 'Paviliun 6x6 meter di hall utama expo' },
+        { name: 'Hardware Audio-Visual & Curved LED 3D Wall', share: '25%', percentage: 25, budget: 'Rp 55.000.000', note: 'Layar interaktif 4K & mikrofon spatial directional' },
+        { name: 'VIP Executive Dinner & Hospitality', share: '15%', percentage: 15, budget: 'Rp 33.000.000', note: 'Private suite reservation untuk 30 VIP CTO' },
+        { name: 'Merchandise Premium & Collateral Kit', share: '10%', percentage: 10, budget: 'Rp 22.000.000', note: 'Hardcover lookbook & souvenir kustom tim' }
       ]
     },
     collab_oktober: {
       id: 'collab_oktober',
       title: 'Plan Collab Oktober',
       badge: 'NEGOSIASI / MOU',
-      badgeColor: 'bg-purple-100 text-purple-800 border-purple-200',
+      badgeColor: 'bg-purple-50 text-purple-700 border-purple-200',
       period: '1 Oktober — 31 Oktober 2026',
       budget: 'Rp 85.000.000',
       targetKPI: '3 Kemitraan Strategis / 50.000 Cross-Audience Reach',
       objective: 'Membangun aliansi strategis dengan penyedia SaaS enterprise dan produsen hardware spatial untuk co-marketing dan bundling produk.',
       weeklyMilestones: [
         {
-          week: 'Kolaborasi 1: Hardware Partner',
-          title: 'Bundling Display & Spatial Controller',
+          week: 'Kolaborasi 1',
+          dateRange: '1 - 10 Okt',
+          title: 'Bundling Display Workstation Hardware Partner',
           items: [
             'Kerjasama dengan produsen monitor ultra-wide: Demo Virtual Office dipasang pre-installed di display showroom resmi.',
             'Diskon bundling: Pembelian layar workstation mendapatkan lisensi 6 bulan Virtual Office AI.'
@@ -200,8 +217,9 @@ export default function AgentWorkspaceView({
           status: 'MOU Draft'
         },
         {
-          week: 'Kolaborasi 2: Enterprise Cloud Provider',
-          title: 'Co-Branded Webinar & Marketplace Listing',
+          week: 'Kolaborasi 2',
+          dateRange: '11 - 20 Okt',
+          title: 'Co-Branded Webinar & Enterprise Cloud Marketplace',
           items: [
             'Listing Virtual Office AI di marketplace cloud terkemuka.',
             'Pelaksanaan seri webinar kolaboratif: "Automated CS & Task Management di Era AI Spatial".'
@@ -209,8 +227,9 @@ export default function AgentWorkspaceView({
           status: 'Finalisasi'
         },
         {
-          week: 'Kolaborasi 3: Komunitas Developer & Startup Hub',
-          title: 'Hackathon & Workshop Spatial Office',
+          week: 'Kolaborasi 3',
+          dateRange: '21 - 31 Okt',
+          title: 'Komunitas Developer & Startup Accelerator Hub',
           items: [
             'Sponsor utama workshop virtual office di inkubator startup regional.',
             'Penyediaan API key uji coba bagi 100 startup peserta program inkubasi.'
@@ -219,32 +238,34 @@ export default function AgentWorkspaceView({
         }
       ],
       channels: [
-        { name: 'Co-Branded Events & Workshop', share: '45%', budget: 'Rp 38.250.000' },
-        { name: 'Marketing Collateral Bersama', share: '30%', budget: 'Rp 25.500.000' },
-        { name: 'Legal & Integrasi Teknis MOU', share: '25%', budget: 'Rp 21.250.000' }
+        { name: 'Co-Branded Events & Workshop Nasional', share: '45%', percentage: 45, budget: 'Rp 38.250.000', note: '3 kota besar bersama partner cloud' },
+        { name: 'Marketing Collateral & PR Bersama', share: '30%', percentage: 30, budget: 'Rp 25.500.000', note: 'Joint press release & feature artikel tech portal' },
+        { name: 'Legal Review & Integrasi Teknis MOU API', share: '25%', percentage: 25, budget: 'Rp 21.250.000', note: 'Notaris, agreement, dan endpoint connector' }
       ]
     },
     end_year_sale: {
       id: 'end_year_sale',
       title: 'Plan End Year Sale (Q4 Promo)',
       badge: 'PERSIAPAN AKHIR TAHUN',
-      badgeColor: 'bg-red-100 text-red-800 border-red-200',
+      badgeColor: 'bg-rose-50 text-rose-700 border-rose-200',
       period: '15 November — 31 Desember 2026',
       budget: 'Rp 190.000.000',
-      targetKPI: 'Rp 1.25 Milyar Pendapatan Baru / 350 Langganan Tahunan Baru',
+      targetKPI: 'Rp 1.25 Milyar Pendapatan Baru / 350 Langganan Tahunan',
       objective: 'Memanfaatkan momen penutupan anggaran perusahaan akhir tahun dengan penawaran diskon lisensi tahunan bernilai tinggi dan insentif upgrade.',
       weeklyMilestones: [
         {
-          week: 'Fase Teaser (15 - 24 Nov)',
-          title: 'Kampanye "Early Bird 2027 Workspace"',
+          week: 'Fase 1',
+          dateRange: '15 - 24 Nov',
+          title: 'Kampanye "Early Bird 2027 Workspace Upgrade"',
           items: [
             'Pemberitahuan awal kepada pengguna gratis dan freemium mengenai penawaran akhir tahun.',
-            'Rilis kalkulator ROI online: Hitung berapa banyak biaya operasional yang dihemat dengan beralih ke paket tahunan.'
+            'Rilis kalkulator ROI online: Hitung berapa biaya operasional yang dihemat dengan beralih ke paket tahunan.'
           ],
           status: 'Draft'
         },
         {
-          week: 'Fase Black Friday & Cyber Week (25 Nov - 5 Des)',
+          week: 'Fase 2',
+          dateRange: '25 Nov - 5 Des',
           title: 'Flash Sale: Diskon 40% Paket Lisensi Tahunan Enterprise',
           items: [
             'Penawaran terbatas: Diskon 40% untuk komitmen tahunan paket tim 10+ kursi.',
@@ -254,7 +275,8 @@ export default function AgentWorkspaceView({
           status: 'Draft'
         },
         {
-          week: 'Fase Last Call Akhir Tahun (20 - 31 Des)',
+          week: 'Fase 3',
+          dateRange: '20 - 31 Des',
           title: 'Hitung Mundur Akhir Tahun: "Gunakan Sisa Budget Q4"',
           items: [
             'Email blast berorientasi CFO/Finance: "Maksimalkan Sisa Alokasi Anggaran 2026 untuk Efisiensi 2027".',
@@ -264,60 +286,132 @@ export default function AgentWorkspaceView({
         }
       ],
       channels: [
-        { name: 'Diskon Promosi & Subsider Kupon', share: '40%', budget: 'Rp 76.000.000' },
-        { name: 'Kampanye Iklan Paid Retargeting', share: '35%', budget: 'Rp 66.500.000' },
-        { name: 'Email Automation & Outbound Sales', share: '25%', budget: 'Rp 47.500.000' }
+        { name: 'Diskon Promosi & Subsider Kupon Tahunan', share: '40%', percentage: 40, budget: 'Rp 76.000.000', note: 'Potongan harga paket bundling tahunan enterprise' },
+        { name: 'Kampanye Iklan Paid Search & Retargeting', share: '35%', percentage: 35, budget: 'Rp 66.500.000', note: 'Iklan Google Search, LinkedIn sponsored content' },
+        { name: 'Email Automation & Outbound Sales Team', share: '25%', percentage: 25, budget: 'Rp 47.500.000', note: 'Direct outreach ke 500 akun prospek aktif' }
       ]
     }
   }
 
-  // --- NARA OFFLINE UNIT TELEMETRY DATA ---
+  // --- NARA OFFLINE UNIT TELEMETRY DATA (9 UNITS) ---
   const NARA_OFFLINE_UNITS = [
     {
       id: 'UNIT-JKT-402',
-      location: 'Hub Kuningan, Jakarta Selatan',
-      offlineSince: '18 menit lalu',
+      region: 'Jakarta Selatan',
+      hub: 'Hub Kuningan Tower A',
+      offlineSince: '18 mnt lalu (17:24 WIB)',
       severity: 'KRITIS',
       technician: 'Rian Pratama',
       techPhone: '+62 812-4455-8901',
-      issue: 'Tegangan listrik suplai drop di bawah 180V, baterai UPS cadangan habis.',
-      lastPing: '17:24 WIB',
+      issue: 'Tegangan listrik suplai drop <180V, baterai cadangan UPS menipis.',
       status: 'Menunggu Teknisi'
     },
     {
       id: 'UNIT-SBY-108',
-      location: 'Gudang Logistik Rungkut, Surabaya',
-      offlineSince: '42 menit lalu',
+      region: 'Surabaya Timur',
+      hub: 'Gudang Logistik Rungkut 2',
+      offlineSince: '42 mnt lalu (17:00 WIB)',
       severity: 'TINGGI',
       technician: 'Dimas Santoso',
       techPhone: '+62 813-8899-2311',
-      issue: 'Koneksi jaringan 4G timeout berulang kali, potensi modul SIM card bermasalah.',
-      lastPing: '17:00 WIB',
+      issue: 'Koneksi seluler 4G timeout berulang kali, modul SIM card lock.',
       status: 'Eskalasi Terkirim'
     },
     {
       id: 'UNIT-BDG-214',
-      location: 'Outlet Dago, Bandung',
-      offlineSince: '1 jam 12 menit lalu',
+      region: 'Bandung Utara',
+      hub: 'Outlet Dago Junction',
+      offlineSince: '1j 12m lalu (16:30 WIB)',
       severity: 'SEDANG',
       technician: 'Asep Supriatna',
       techPhone: '+62 856-7788-1290',
-      issue: 'Sensor telemetri terputus setelah reboot otomatis berkala.',
-      lastPing: '16:30 WIB',
+      issue: 'Sensor telemetri terputus pasca reboot otomatis berkala.',
       status: 'Teknisi di Jalan'
     },
     {
       id: 'UNIT-MDN-089',
-      location: 'Pusat Distribusi Belawan, Medan',
-      offlineSince: '2 jam 5 menit lalu',
+      region: 'Medan',
+      hub: 'Pusat Distribusi Belawan',
+      offlineSince: '2j 05m lalu (15:37 WIB)',
       severity: 'TINGGI',
       technician: 'Budi Siregar',
       techPhone: '+62 821-3322-9900',
-      issue: 'Kabel LAN utama terlepas saat pemeliharaan rak server lokal.',
-      lastPing: '15:37 WIB',
+      issue: 'Kabel LAN uplink terlepas saat pemeliharaan rak server.',
       status: 'Perbaikan Berjalan'
+    },
+    {
+      id: 'UNIT-SMG-055',
+      region: 'Semarang',
+      hub: 'Hub Simpang Lima Sentral',
+      offlineSince: '35 mnt lalu (17:07 WIB)',
+      severity: 'KRITIS',
+      technician: 'Tri Wibowo',
+      techPhone: '+62 817-4433-2110',
+      issue: 'Overheating thermal shutdown pada prosesor gateway edge (89°C).',
+      status: 'Menunggu Teknisi'
+    },
+    {
+      id: 'UNIT-MKS-071',
+      region: 'Makassar',
+      hub: 'Terminal Kargo Hasanuddin',
+      offlineSince: '58 mnt lalu (16:44 WIB)',
+      severity: 'TINGGI',
+      technician: 'Fajar Hamzah',
+      techPhone: '+62 811-9988-7711',
+      issue: 'Gangguan routing fiber ISP lokal di area perkantoran pelabuhan.',
+      status: 'Tiket ISP Dibuat'
+    },
+    {
+      id: 'UNIT-DPS-112',
+      region: 'Bali - Denpasar',
+      hub: 'Hub Kuta Square',
+      offlineSince: '2j 30m lalu (15:12 WIB)',
+      severity: 'SEDANG',
+      technician: 'Wayan Suartana',
+      techPhone: '+62 819-2233-4455',
+      issue: 'Konfigurasi VLAN berubah pasca update firmware router switch.',
+      status: 'Analisis Jarak Jauh'
+    },
+    {
+      id: 'UNIT-PLB-034',
+      region: 'Palembang',
+      hub: 'Depot Jakabaring',
+      offlineSince: '22 mnt lalu (17:20 WIB)',
+      severity: 'KRITIS',
+      technician: 'M. Rizky',
+      techPhone: '+62 812-7711-2233',
+      issue: 'Unit tidak merespon paket heartbeat (Dead Host detection).',
+      status: 'Investigasi Mandiri'
+    },
+    {
+      id: 'UNIT-YOG-028',
+      region: 'Yogyakarta',
+      hub: 'Hub Malioboro Sentra',
+      offlineSince: '14 mnt lalu (17:28 WIB)',
+      severity: 'KRITIS',
+      technician: 'Agus Purnomo',
+      techPhone: '+62 878-3344-5566',
+      issue: 'Port serial pembaca sensor mati mendadak (Hardware fault).',
+      status: 'Menunggu Teknisi'
     }
   ]
+
+  // Filtered units for Nara
+  const filteredUnits = useMemo(() => {
+    return NARA_OFFLINE_UNITS.filter((unit) => {
+      const matchSeverity =
+        severityFilter === 'ALL' || unit.severity.toUpperCase() === severityFilter
+      const query = unitSearch.toLowerCase().trim()
+      const matchQuery =
+        !query ||
+        unit.id.toLowerCase().includes(query) ||
+        unit.region.toLowerCase().includes(query) ||
+        unit.hub.toLowerCase().includes(query) ||
+        unit.technician.toLowerCase().includes(query) ||
+        unit.issue.toLowerCase().includes(query)
+      return matchSeverity && matchQuery
+    })
+  }, [severityFilter, unitSearch])
 
   // --- SCOUT RESEARCH & ARTICLE LAB DATA ---
   const SCOUT_ARTICLES = [
@@ -364,17 +458,17 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
   ]
 
   const handlePingUnit = (unitId) => {
-    setPingedUnits((prev) => ({ ...prev, [unitId]: 'Ping terkirim! (Latency 48ms)' }))
+    setPingedUnits((prev) => ({ ...prev, [unitId]: 'Ping OK (38ms)' }))
     setTimeout(() => {
       setPingedUnits((prev) => ({ ...prev, [unitId]: null }))
-    }, 3500)
+    }, 4000)
   }
 
   const handleEscalateUnit = (unitId, techName) => {
-    setEscalatedUnits((prev) => ({ ...prev, [unitId]: `Notifikasi WA terkirim ke ${techName}!` }))
+    setEscalatedUnits((prev) => ({ ...prev, [unitId]: `WA Terkirim ke ${techName}!` }))
     setTimeout(() => {
       setEscalatedUnits((prev) => ({ ...prev, [unitId]: null }))
-    }, 4000)
+    }, 4500)
   }
 
   const handleDelegatePlan = (planTitle) => {
@@ -404,11 +498,11 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
 
           {/* Breadcrumb Title */}
           <div className="hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-500">
-            <span>Virtual Office</span>
+            <span>Workspace</span>
             <span>/</span>
-            <span className="text-slate-900 font-bold flex items-center gap-1.5">
+            <span className="text-slate-900 font-extrabold flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: agentColor }} />
-              Workspace {agent.name}
+              Dashboard {agent.name}
             </span>
           </div>
         </div>
@@ -439,8 +533,8 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
           {/* Gear icon for avatar */}
           <button
             onClick={onOpenAvatarModal}
-            className="p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 active:scale-95 transition-all cursor-pointer"
-            title="Pengaturan Avatar 3D"
+            className="p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 active:scale-95 transition-all cursor-pointer border border-slate-200/60"
+            title="Pengaturan Avatar & Warna 3D"
           >
             <Settings className="w-4 h-4" />
           </button>
@@ -461,22 +555,22 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
         {/* ======================================================== */}
         {/* LEFT CONTROL PANEL (20-22% WIDTH)                        */}
         {/* ======================================================== */}
-        <aside className="w-72 lg:w-80 shrink-0 bg-white border-r border-slate-200/90 flex flex-col p-4.5 overflow-y-auto space-y-4">
+        <aside className="w-72 lg:w-80 shrink-0 bg-white border-r border-slate-200/90 flex flex-col p-4 overflow-y-auto space-y-4">
           {/* Agent Profile Hero */}
           <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200/80">
             <div className="flex items-center gap-3 mb-2.5">
-              <AgentCloseUpAvatar agent={agent} size={52} showStatus={true} />
+              <AgentCloseUpAvatar agent={agent} size={48} showStatus={true} />
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <h3 className="text-base font-black text-slate-900 truncate">{agent.name}</h3>
+                  <h3 className="text-sm font-black text-slate-900 truncate">{agent.name}</h3>
                   <span
-                    className="text-[9px] font-extrabold px-1.5 py-0.2 rounded text-white tracking-wider uppercase"
+                    className="text-[9px] font-extrabold px-1.5 py-0.2 rounded text-white tracking-wider uppercase shadow-2xs"
                     style={{ backgroundColor: agentColor }}
                   >
                     {agent.role_badge}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 font-medium line-clamp-1">{agent.role}</p>
+                <p className="text-[11px] text-slate-500 font-medium truncate">{agent.role}</p>
               </div>
             </div>
 
@@ -488,7 +582,7 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
           {/* Vertical Menu Navigation for Modules */}
           <div className="space-y-1.5 flex-1">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-1 block mb-1">
-              Modul & Spesifikasi Kerja
+              Spesifikasi & Menu Dashboard
             </span>
 
             {/* VELOCIA MENU TABS */}
@@ -500,17 +594,19 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                     <button
                       key={plan.id}
                       onClick={() => setVelociaTab(plan.id)}
-                      className={`w-full p-3 rounded-2xl text-left transition-all cursor-pointer flex flex-col gap-1 ${
+                      className={`w-full p-2.5 rounded-xl text-left transition-all cursor-pointer flex flex-col gap-1 ${
                         isActive
-                          ? 'bg-red-50/80 border-2 border-red-500 text-slate-900 shadow-xs'
+                          ? 'bg-slate-900 text-white shadow-xs'
                           : 'bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-700'
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-black line-clamp-1">{plan.title}</span>
-                        {isActive && <ChevronRight className="w-3.5 h-3.5 text-red-600 shrink-0" />}
+                        <span className="text-xs font-bold truncate">{plan.title}</span>
+                        {isActive && <ChevronRight className="w-3.5 h-3.5 text-emerald-400 shrink-0" />}
                       </div>
-                      <span className={`text-[9px] font-extrabold px-1.5 py-0.2 rounded border w-fit ${plan.badgeColor}`}>
+                      <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded w-fit ${
+                        isActive ? 'bg-white/20 text-white' : plan.badgeColor
+                      }`}>
                         {plan.badge}
                       </span>
                     </button>
@@ -524,32 +620,32 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
               <div className="space-y-1.5">
                 <button
                   onClick={() => setNaraTab('offline_units')}
-                  className={`w-full p-3 rounded-2xl text-left transition-all cursor-pointer flex items-center justify-between ${
+                  className={`w-full p-2.5 rounded-xl text-left transition-all cursor-pointer flex items-center justify-between ${
                     naraTab === 'offline_units'
-                      ? 'bg-sky-50/80 border-2 border-sky-500 text-slate-900 shadow-xs font-black text-xs'
-                      : 'bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-700 font-bold text-xs'
+                      ? 'bg-slate-900 text-white shadow-xs font-bold text-xs'
+                      : 'bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-700 font-medium text-xs'
                   }`}
                 >
                   <span className="flex items-center gap-2">
-                    <AlertTriangle className="w-4 h-4 text-red-500" />
+                    <AlertTriangle className={`w-3.5 h-3.5 ${naraTab === 'offline_units' ? 'text-amber-400' : 'text-red-500'}`} />
                     Unit Offline & Eskalasi (9)
                   </span>
-                  {naraTab === 'offline_units' && <ChevronRight className="w-3.5 h-3.5 text-sky-600 shrink-0" />}
+                  {naraTab === 'offline_units' && <ChevronRight className="w-3.5 h-3.5 text-white shrink-0" />}
                 </button>
 
                 <button
                   onClick={() => setNaraTab('telemetry')}
-                  className={`w-full p-3 rounded-2xl text-left transition-all cursor-pointer flex items-center justify-between ${
+                  className={`w-full p-2.5 rounded-xl text-left transition-all cursor-pointer flex items-center justify-between ${
                     naraTab === 'telemetry'
-                      ? 'bg-sky-50/80 border-2 border-sky-500 text-slate-900 shadow-xs font-black text-xs'
-                      : 'bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-700 font-bold text-xs'
+                      ? 'bg-slate-900 text-white shadow-xs font-bold text-xs'
+                      : 'bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-700 font-medium text-xs'
                   }`}
                 >
                   <span className="flex items-center gap-2">
-                    <Radio className="w-4 h-4 text-emerald-500" />
-                    Telemetri Uptime Regional
+                    <Radio className={`w-3.5 h-3.5 ${naraTab === 'telemetry' ? 'text-emerald-400' : 'text-emerald-600'}`} />
+                    Statistik Uptime Regional
                   </span>
-                  {naraTab === 'telemetry' && <ChevronRight className="w-3.5 h-3.5 text-sky-600 shrink-0" />}
+                  {naraTab === 'telemetry' && <ChevronRight className="w-3.5 h-3.5 text-white shrink-0" />}
                 </button>
               </div>
             )}
@@ -559,32 +655,32 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
               <div className="space-y-1.5">
                 <button
                   onClick={() => setScoutTab('articles')}
-                  className={`w-full p-3 rounded-2xl text-left transition-all cursor-pointer flex items-center justify-between ${
+                  className={`w-full p-2.5 rounded-xl text-left transition-all cursor-pointer flex items-center justify-between ${
                     scoutTab === 'articles'
-                      ? 'bg-emerald-50/80 border-2 border-emerald-500 text-slate-900 shadow-xs font-black text-xs'
-                      : 'bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-700 font-bold text-xs'
+                      ? 'bg-slate-900 text-white shadow-xs font-bold text-xs'
+                      : 'bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-700 font-medium text-xs'
                   }`}
                 >
                   <span className="flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-emerald-600" />
+                    <FileText className={`w-3.5 h-3.5 ${scoutTab === 'articles' ? 'text-emerald-400' : 'text-slate-600'}`} />
                     Draf Naskah Artikel (3)
                   </span>
-                  {scoutTab === 'articles' && <ChevronRight className="w-3.5 h-3.5 text-emerald-600 shrink-0" />}
+                  {scoutTab === 'articles' && <ChevronRight className="w-3.5 h-3.5 text-white shrink-0" />}
                 </button>
 
                 <button
                   onClick={() => setScoutTab('trends')}
-                  className={`w-full p-3 rounded-2xl text-left transition-all cursor-pointer flex items-center justify-between ${
+                  className={`w-full p-2.5 rounded-xl text-left transition-all cursor-pointer flex items-center justify-between ${
                     scoutTab === 'trends'
-                      ? 'bg-emerald-50/80 border-2 border-emerald-500 text-slate-900 shadow-xs font-black text-xs'
-                      : 'bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-700 font-bold text-xs'
+                      ? 'bg-slate-900 text-white shadow-xs font-bold text-xs'
+                      : 'bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-700 font-medium text-xs'
                   }`}
                 >
                   <span className="flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-emerald-600" />
+                    <TrendingUp className={`w-3.5 h-3.5 ${scoutTab === 'trends' ? 'text-emerald-400' : 'text-slate-600'}`} />
                     Radar Tren AI 2026
                   </span>
-                  {scoutTab === 'trends' && <ChevronRight className="w-3.5 h-3.5 text-emerald-600 shrink-0" />}
+                  {scoutTab === 'trends' && <ChevronRight className="w-3.5 h-3.5 text-white shrink-0" />}
                 </button>
               </div>
             )}
@@ -600,7 +696,7 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                 type="text"
                 value={briefInput}
                 onChange={(e) => setBriefInput(e.target.value)}
-                placeholder="Brief tugas baru..."
+                placeholder="Instruksi tugas..."
                 className="flex-1 bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900"
               />
               <button
@@ -621,244 +717,442 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
         {/* ======================================================== */}
         {/* RIGHT MAIN WORKSPACE (80% WIDTH)                         */}
         {/* ======================================================== */}
-        <main className="flex-1 bg-slate-50/60 overflow-y-auto p-6 lg:p-8 space-y-6">
+        <main className="flex-1 bg-slate-50/70 overflow-y-auto p-5 sm:p-7 space-y-6">
           {/* ======================================================== */}
-          {/* 1. VELOCIA WORKSPACE VIEW (MARKETING STRATEGIST)         */}
+          {/* 1. NARA WORKSPACE VIEW (OFFLINE UNIT TELEMETRY & TABLE)  */}
           {/* ======================================================== */}
-          {agentId === 'velocia' && VELOCIA_PLANS[velociaTab] && (
-            <div className="max-w-5xl mx-auto space-y-6 animate-in fade-in duration-200">
-              {/* Header Hero Banner */}
-              <div className="p-6 lg:p-8 bg-gradient-to-r from-red-500/10 via-white to-white rounded-3xl border border-red-200/70 shadow-xs">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-                  <div>
-                    <span className={`text-[10px] font-extrabold px-3 py-1 rounded-full border ${VELOCIA_PLANS[velociaTab].badgeColor}`}>
-                      {VELOCIA_PLANS[velociaTab].badge}
-                    </span>
-                    <h2 className="text-2xl lg:text-3xl font-black text-slate-900 tracking-tight mt-2.5">
-                      {VELOCIA_PLANS[velociaTab].title}
-                    </h2>
-                    <p className="text-xs text-slate-500 font-medium flex items-center gap-1.5 mt-1.5">
-                      <Clock className="w-4 h-4 text-slate-400" />
-                      Periode Pelaksanaan: <strong>{VELOCIA_PLANS[velociaTab].period}</strong>
-                    </p>
+          {agentId === 'nara' && (
+            <div className="max-w-6xl mx-auto space-y-5 animate-in fade-in duration-200">
+              {/* Telemetry Overview Metrics */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+                <div className="p-4 bg-white rounded-2xl border border-slate-200/90 shadow-2xs">
+                  <div className="flex items-center justify-between text-emerald-600 mb-1">
+                    <span className="text-[11px] font-bold uppercase tracking-wider">Online Uptime</span>
+                    <Radio className="w-3.5 h-3.5" />
                   </div>
-
-                  <button
-                    onClick={() => handleDelegatePlan(VELOCIA_PLANS[velociaTab].title)}
-                    className="py-2.5 px-5 bg-red-600 hover:bg-red-700 active:scale-95 text-white font-extrabold text-xs rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer self-start sm:self-auto"
-                  >
-                    <Send className="w-4 h-4" />
-                    <span>Diskusikan di Chat Velocia</span>
-                  </button>
+                  <p className="text-xl font-black text-slate-900">99.28%</p>
+                  <span className="text-[10px] text-emerald-600 font-semibold">1.239 dari 1.248 Unit Aktif</span>
                 </div>
 
-                <p className="text-xs text-slate-700 leading-relaxed bg-white/90 p-4 rounded-2xl border border-slate-200/80">
-                  <strong>Ringkasan Strategis:</strong> {VELOCIA_PLANS[velociaTab].objective}
-                </p>
-
-                {/* Key Metrics Counter Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                  <div className="p-4 bg-white rounded-2xl border border-slate-200/90 shadow-xs flex items-center gap-3.5">
-                    <div className="w-12 h-12 rounded-xl bg-red-50 text-red-600 flex items-center justify-center font-bold shrink-0">
-                      <DollarSign className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <span className="text-[11px] font-bold uppercase text-slate-400">Total Alokasi Budget</span>
-                      <p className="text-lg font-black text-slate-900">{VELOCIA_PLANS[velociaTab].budget}</p>
-                    </div>
+                <div className="p-4 bg-white rounded-2xl border border-slate-200/90 shadow-2xs">
+                  <div className="flex items-center justify-between text-rose-600 mb-1">
+                    <span className="text-[11px] font-bold uppercase tracking-wider">Unit Offline</span>
+                    <WifiOff className="w-3.5 h-3.5" />
                   </div>
+                  <p className="text-xl font-black text-rose-600">9 Unit</p>
+                  <span className="text-[10px] text-rose-500 font-semibold">Perlu intervensi teknisi</span>
+                </div>
 
-                  <div className="p-4 bg-white rounded-2xl border border-slate-200/90 shadow-xs flex items-center gap-3.5">
-                    <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold shrink-0">
-                      <Target className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <span className="text-[11px] font-bold uppercase text-slate-400">Target KPI & Konversi</span>
-                      <p className="text-lg font-black text-slate-900">{VELOCIA_PLANS[velociaTab].targetKPI}</p>
-                    </div>
+                <div className="p-4 bg-white rounded-2xl border border-slate-200/90 shadow-2xs">
+                  <div className="flex items-center justify-between text-sky-600 mb-1">
+                    <span className="text-[11px] font-bold uppercase tracking-wider">Rata-rata Respon</span>
+                    <Clock className="w-3.5 h-3.5" />
                   </div>
+                  <p className="text-xl font-black text-slate-900">4.2 Menit</p>
+                  <span className="text-[10px] text-sky-600 font-semibold">SLA Target &lt; 10 menit</span>
+                </div>
+
+                <div className="p-4 bg-white rounded-2xl border border-slate-200/90 shadow-2xs">
+                  <div className="flex items-center justify-between text-slate-700 mb-1">
+                    <span className="text-[11px] font-bold uppercase tracking-wider">Eskalasi Hari Ini</span>
+                    <BellRing className="w-3.5 h-3.5" />
+                  </div>
+                  <p className="text-xl font-black text-slate-900">28 Tiket</p>
+                  <span className="text-[10px] text-emerald-600 font-semibold">24 Tiket terselesaikan</span>
                 </div>
               </div>
 
-              {/* Weekly Deliverables & Milestones */}
-              <div className="bg-white p-6 lg:p-7 rounded-3xl border border-slate-200/90 shadow-xs">
-                <h3 className="text-base font-black text-slate-900 mb-4 flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-red-600" />
-                  Rincian Tahapan & Deliverables
-                </h3>
-
-                <div className="space-y-4">
-                  {VELOCIA_PLANS[velociaTab].weeklyMilestones.map((ms, idx) => (
-                    <div key={idx} className="p-4.5 bg-slate-50/70 rounded-2xl border border-slate-200">
-                      <div className="flex items-center justify-between mb-2.5">
-                        <span className="text-xs font-black text-slate-800">
-                          {ms.week}: {ms.title}
-                        </span>
-                        <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full ${
-                          ms.status === 'Selesai'
-                            ? 'bg-emerald-100 text-emerald-700'
-                            : ms.status === 'Berlangsung'
-                            ? 'bg-amber-100 text-amber-700 animate-pulse'
-                            : 'bg-slate-200 text-slate-600'
-                        }`}>
-                          {ms.status}
-                        </span>
-                      </div>
-                      <ul className="space-y-1.5 text-xs text-slate-600">
-                        {ms.items.map((item, i) => (
-                          <li key={i} className="flex items-start gap-2">
-                            <span className="text-red-500 font-bold shrink-0">•</span>
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
+              {/* OFFLINE UNITS ENTERPRISE DATA TABLE */}
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+                {/* Table Header Controls: Search + Severity Filter */}
+                <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/50">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 bg-rose-50 text-rose-600 rounded-lg">
+                      <AlertTriangle className="w-4 h-4" />
                     </div>
-                  ))}
+                    <div>
+                      <h3 className="text-sm font-black text-slate-900">
+                        Matriks Unit Offline & Status Eskalasi Teknisi
+                      </h3>
+                      <p className="text-[11px] text-slate-500">
+                        Menampilkan {filteredUnits.length} dari {NARA_OFFLINE_UNITS.length} unit yang membutuhkan tindakan cepat
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Filter & Search Bar */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    {/* Severity Pills */}
+                    <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200">
+                      {['ALL', 'KRITIS', 'TINGGI', 'SEDANG'].map((sev) => {
+                        const isSel = severityFilter === sev
+                        return (
+                          <button
+                            key={sev}
+                            type="button"
+                            onClick={() => setSeverityFilter(sev)}
+                            className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold transition-all cursor-pointer ${
+                              isSel
+                                ? 'bg-white text-slate-900 shadow-2xs'
+                                : 'text-slate-500 hover:text-slate-800'
+                            }`}
+                          >
+                            {sev === 'ALL' ? 'Semua' : sev}
+                          </button>
+                        )
+                      })}
+                    </div>
+
+                    {/* Search Input */}
+                    <div className="relative">
+                      <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        value={unitSearch}
+                        onChange={(e) => setUnitSearch(e.target.value)}
+                        placeholder="Cari ID, Hub, Teknisi..."
+                        className="pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900 w-48 sm:w-56"
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
 
-              {/* Channel Breakdown */}
-              <div className="bg-white p-6 lg:p-7 rounded-3xl border border-slate-200/90 shadow-xs">
-                <h3 className="text-base font-black text-slate-900 mb-4 flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5 text-red-600" />
-                  Alokasi Saluran Pemasaran (Channel Breakdown)
-                </h3>
+                {/* The Responsive Data Table */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-slate-100 bg-slate-50/70 text-[11px] font-black text-slate-500 uppercase tracking-wider">
+                        <th className="py-3 px-4">Unit ID</th>
+                        <th className="py-3 px-3">Urgensi</th>
+                        <th className="py-3 px-4">Lokasi & Hub</th>
+                        <th className="py-3 px-3">Waktu Offline</th>
+                        <th className="py-3 px-4 min-w-[220px]">Indikasi Kendala</th>
+                        <th className="py-3 px-4">Teknisi Penanggung Jawab</th>
+                        <th className="py-3 px-4 text-right">Aksi Cepat</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
+                      {filteredUnits.length === 0 ? (
+                        <tr>
+                          <td colSpan={7} className="py-8 text-center text-slate-400 font-medium text-xs">
+                            Tidak ada unit yang sesuai dengan kriteria filter.
+                          </td>
+                        </tr>
+                      ) : (
+                        filteredUnits.map((unit) => {
+                          const isPinged = pingedUnits[unit.id]
+                          const isEscalated = escalatedUnits[unit.id]
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {VELOCIA_PLANS[velociaTab].channels.map((ch, idx) => (
-                    <div key={idx} className="p-4 bg-slate-50/60 rounded-2xl border border-slate-200 flex items-center justify-between">
-                      <div>
-                        <p className="text-xs font-bold text-slate-900">{ch.name}</p>
-                        <span className="text-[11px] text-slate-500">{ch.budget}</span>
-                      </div>
-                      <span className="text-xs font-black text-red-600 bg-red-50 px-2.5 py-1 rounded-xl">
-                        {ch.share}
-                      </span>
-                    </div>
-                  ))}
+                          return (
+                            <tr key={unit.id} className="hover:bg-slate-50/70 transition-colors">
+                              {/* Unit ID */}
+                              <td className="py-3 px-4 font-mono font-bold text-slate-900 whitespace-nowrap">
+                                <div className="flex items-center gap-1.5">
+                                  <Server className="w-3.5 h-3.5 text-slate-400" />
+                                  <span>{unit.id}</span>
+                                </div>
+                              </td>
+
+                              {/* Urgensi */}
+                              <td className="py-3 px-3 whitespace-nowrap">
+                                <span
+                                  className={`inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-full border ${
+                                    unit.severity === 'KRITIS'
+                                      ? 'bg-rose-50 text-rose-700 border-rose-200'
+                                      : unit.severity === 'TINGGI'
+                                      ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                      : 'bg-slate-100 text-slate-700 border-slate-200'
+                                  }`}
+                                >
+                                  <span
+                                    className={`w-1.5 h-1.5 rounded-full ${
+                                      unit.severity === 'KRITIS'
+                                        ? 'bg-rose-500 animate-ping'
+                                        : unit.severity === 'TINGGI'
+                                        ? 'bg-amber-500'
+                                        : 'bg-slate-400'
+                                    }`}
+                                  />
+                                  {unit.severity}
+                                </span>
+                              </td>
+
+                              {/* Lokasi & Hub */}
+                              <td className="py-3 px-4 whitespace-nowrap">
+                                <div className="font-bold text-slate-900 text-xs flex items-center gap-1">
+                                  <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+                                  <span>{unit.hub}</span>
+                                </div>
+                                <div className="text-[11px] text-slate-400">{unit.region}</div>
+                              </td>
+
+                              {/* Waktu Offline */}
+                              <td className="py-3 px-3 whitespace-nowrap">
+                                <span className="font-medium text-slate-600 text-[11px] flex items-center gap-1">
+                                  <Clock className="w-3 h-3 text-slate-400 shrink-0" />
+                                  {unit.offlineSince}
+                                </span>
+                              </td>
+
+                              {/* Indikasi Kendala */}
+                              <td className="py-3 px-4">
+                                <p className="text-slate-600 text-xs leading-relaxed max-w-xs">
+                                  {unit.issue}
+                                </p>
+                              </td>
+
+                              {/* Teknisi PJ */}
+                              <td className="py-3 px-4 whitespace-nowrap">
+                                <div className="font-bold text-slate-900 text-xs">{unit.technician}</div>
+                                <div className="text-[11px] font-mono text-slate-500">{unit.techPhone}</div>
+                              </td>
+
+                              {/* Aksi Cepat */}
+                              <td className="py-3 px-4 text-right whitespace-nowrap">
+                                <div className="flex items-center justify-end gap-1.5">
+                                  {/* Ping Button */}
+                                  <button
+                                    type="button"
+                                    onClick={() => handlePingUnit(unit.id)}
+                                    className={`py-1.5 px-2.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer border ${
+                                      isPinged
+                                        ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                                        : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200 shadow-2xs'
+                                    }`}
+                                    title="Kirim Ping detak jantung ke unit"
+                                  >
+                                    {isPinged ? isPinged : 'Ping'}
+                                  </button>
+
+                                  {/* Escalation WA Button */}
+                                  <button
+                                    type="button"
+                                    onClick={() => handleEscalateUnit(unit.id, unit.technician)}
+                                    className={`py-1.5 px-3 rounded-lg text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs ${
+                                      isEscalated
+                                        ? 'bg-emerald-600 text-white'
+                                        : 'bg-slate-900 hover:bg-slate-800 text-white'
+                                    }`}
+                                    title={`Kirim notifikasi otomatis ke WhatsApp ${unit.technician}`}
+                                  >
+                                    <MessageSquare className="w-3 h-3 text-emerald-400" />
+                                    <span>{isEscalated ? isEscalated : 'Kirim WA'}</span>
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          )
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Table Footer Summary */}
+                <div className="p-3 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between text-[11px] text-slate-500">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                    Sistem pemantauan heartbeat aktif (Polling setiap 30 detik)
+                  </span>
+                  <span>Data sinkron dengan Pusat Pemantauan IoT Regional</span>
                 </div>
               </div>
             </div>
           )}
 
           {/* ======================================================== */}
-          {/* 2. NARA WORKSPACE VIEW (OFFLINE UNIT TELEMETRY)          */}
+          {/* 2. VELOCIA WORKSPACE VIEW (MARKETING STRATEGIST MATRIX)  */}
           {/* ======================================================== */}
-          {agentId === 'nara' && (
-            <div className="max-w-5xl mx-auto space-y-6 animate-in fade-in duration-200">
-              {/* Telemetry Overview Metrics */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div className="p-5 bg-white rounded-3xl border border-slate-200 shadow-xs">
-                  <div className="flex items-center justify-between text-emerald-600 mb-1.5">
-                    <span className="text-[11px] font-bold uppercase">Online Uptime</span>
-                    <Radio className="w-4 h-4" />
+          {agentId === 'velocia' && VELOCIA_PLANS[velociaTab] && (
+            <div className="max-w-6xl mx-auto space-y-5 animate-in fade-in duration-200">
+              {/* Plan Switcher Tabs (Horizontal Pills) */}
+              <div className="flex flex-wrap items-center gap-2 p-1.5 bg-white rounded-2xl border border-slate-200 shadow-2xs">
+                {Object.values(VELOCIA_PLANS).map((p) => {
+                  const isCur = velociaTab === p.id
+                  return (
+                    <button
+                      key={p.id}
+                      onClick={() => setVelociaTab(p.id)}
+                      className={`py-2 px-3.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+                        isCur
+                          ? 'bg-slate-900 text-white shadow-2xs'
+                          : 'text-slate-600 hover:bg-slate-100'
+                      }`}
+                    >
+                      <span>{p.title}</span>
+                      <span className={`text-[9px] font-extrabold px-1.5 py-0.2 rounded ${
+                        isCur ? 'bg-white/20 text-white' : p.badgeColor
+                      }`}>
+                        {p.badge}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Executive Overview Hero Banner */}
+              <div className="p-6 bg-white rounded-2xl border border-slate-200 shadow-2xs space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full border ${VELOCIA_PLANS[velociaTab].badgeColor}`}>
+                      {VELOCIA_PLANS[velociaTab].badge}
+                    </span>
+                    <h2 className="text-xl font-black text-slate-900 tracking-tight mt-1.5">
+                      {VELOCIA_PLANS[velociaTab].title}
+                    </h2>
+                    <p className="text-xs text-slate-500 font-medium flex items-center gap-1.5 mt-1">
+                      <Clock className="w-3.5 h-3.5 text-slate-400" />
+                      Periode Pelaksanaan: <strong>{VELOCIA_PLANS[velociaTab].period}</strong>
+                    </p>
                   </div>
-                  <p className="text-2xl font-black text-slate-900">99.28%</p>
-                  <span className="text-[10px] text-emerald-600 font-bold">1.239 dari 1.248 Unit</span>
+
+                  <button
+                    onClick={() => handleDelegatePlan(VELOCIA_PLANS[velociaTab].title)}
+                    className="py-2 px-4 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-bold text-xs rounded-xl shadow-2xs transition-all flex items-center gap-2 cursor-pointer self-start sm:self-auto"
+                  >
+                    <Send className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Diskusikan di Chat Velocia</span>
+                  </button>
                 </div>
 
-                <div className="p-5 bg-white rounded-3xl border border-slate-200 shadow-xs">
-                  <div className="flex items-center justify-between text-red-600 mb-1.5">
-                    <span className="text-[11px] font-bold uppercase">Unit Offline</span>
-                    <WifiOff className="w-4 h-4" />
-                  </div>
-                  <p className="text-2xl font-black text-red-600">9 Unit</p>
-                  <span className="text-[10px] text-red-500 font-bold">Perlu tindakan cepat</span>
+                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 text-xs text-slate-700 leading-relaxed">
+                  <strong className="text-slate-900 font-black">Sasaran & Objektif Utama:</strong>{' '}
+                  {VELOCIA_PLANS[velociaTab].objective}
                 </div>
 
-                <div className="p-5 bg-white rounded-3xl border border-slate-200 shadow-xs">
-                  <div className="flex items-center justify-between text-sky-600 mb-1.5">
-                    <span className="text-[11px] font-bold uppercase">Rata-rata Respon</span>
-                    <Clock className="w-4 h-4" />
+                {/* Key Metrics Counter Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div className="p-3.5 bg-slate-50/70 rounded-xl border border-slate-200 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold shrink-0">
+                      <DollarSign className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Alokasi Anggaran</span>
+                      <p className="text-base font-black text-slate-900">{VELOCIA_PLANS[velociaTab].budget}</p>
+                    </div>
                   </div>
-                  <p className="text-2xl font-black text-slate-900">4.2 Menit</p>
-                  <span className="text-[10px] text-sky-600 font-bold">Target SLA &lt; 10 menit</span>
-                </div>
 
-                <div className="p-5 bg-white rounded-3xl border border-slate-200 shadow-xs">
-                  <div className="flex items-center justify-between text-purple-600 mb-1.5">
-                    <span className="text-[11px] font-bold uppercase">Eskalasi Hari Ini</span>
-                    <BellRing className="w-4 h-4" />
+                  <div className="p-3.5 bg-slate-50/70 rounded-xl border border-slate-200 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold shrink-0 border border-emerald-200">
+                      <Target className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Target KPI & Konversi</span>
+                      <p className="text-base font-black text-slate-900">{VELOCIA_PLANS[velociaTab].targetKPI}</p>
+                    </div>
                   </div>
-                  <p className="text-2xl font-black text-slate-900">28 Tiket</p>
-                  <span className="text-[10px] text-purple-600 font-bold">24 Selesai tertangani</span>
                 </div>
               </div>
 
-              {/* Offline Unit Action Table */}
-              <div className="bg-white p-6 lg:p-7 rounded-3xl border border-slate-200/90 shadow-xs">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
-                    <AlertTriangle className="w-5 h-5 text-red-600" />
-                    Daftar Unit Offline Membutuhkan Eskalasi Teknisi
+              {/* TIMELINE MATRIX & DELIVERABLES TABLE */}
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+                <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                  <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-slate-700" />
+                    Rincian Tahapan & Deliverables (Timeline Matrix)
                   </h3>
-                  <span className="text-xs text-slate-400 font-medium">Auto-refresh setiap 30 detik</span>
+                  <span className="text-[11px] text-slate-400 font-medium">4 Tahapan Strategis</span>
                 </div>
 
-                <div className="space-y-3.5">
-                  {NARA_OFFLINE_UNITS.map((unit) => (
-                    <div
-                      key={unit.id}
-                      className="p-4.5 bg-slate-50/70 rounded-2xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-slate-300 transition-colors"
-                    >
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-black text-slate-900">{unit.id}</span>
-                          <span className={`text-[9px] font-extrabold px-2 py-0.2 rounded-full ${
-                            unit.severity === 'KRITIS'
-                              ? 'bg-red-100 text-red-700'
-                              : unit.severity === 'TINGGI'
-                              ? 'bg-amber-100 text-amber-700'
-                              : 'bg-slate-100 text-slate-700'
-                          }`}>
-                            {unit.severity}
-                          </span>
-                          <span className="text-[10px] text-slate-400 font-medium">
-                            Offline: {unit.offlineSince}
-                          </span>
-                        </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-slate-100 bg-slate-50/70 text-[11px] font-black text-slate-500 uppercase tracking-wider">
+                        <th className="py-3 px-4 w-36">Fase / Periode</th>
+                        <th className="py-3 px-4 w-60">Fokus & Judul Milestone</th>
+                        <th className="py-3 px-4">Rincian Deliverables</th>
+                        <th className="py-3 px-4 w-28 text-right">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
+                      {VELOCIA_PLANS[velociaTab].weeklyMilestones.map((ms, idx) => (
+                        <tr key={idx} className="hover:bg-slate-50/70 transition-colors">
+                          <td className="py-3.5 px-4 font-bold text-slate-900 align-top whitespace-nowrap">
+                            <div>{ms.week}</div>
+                            <div className="text-[10px] text-slate-400 font-normal">{ms.dateRange}</div>
+                          </td>
+                          <td className="py-3.5 px-4 font-black text-slate-900 align-top">
+                            {ms.title}
+                          </td>
+                          <td className="py-3.5 px-4 align-top">
+                            <ul className="space-y-1.5 text-slate-600 text-xs">
+                              {ms.items.map((item, i) => (
+                                <li key={i} className="flex items-start gap-2">
+                                  <span className="text-slate-400 font-bold shrink-0">•</span>
+                                  <span>{item}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </td>
+                          <td className="py-3.5 px-4 text-right align-top whitespace-nowrap">
+                            <span className={`inline-block text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${
+                              ms.status === 'Selesai'
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                : ms.status === 'Berlangsung'
+                                ? 'bg-amber-50 text-amber-700 border-amber-200 animate-pulse'
+                                : ms.status === 'Persiapan'
+                                ? 'bg-sky-50 text-sky-700 border-sky-200'
+                                : 'bg-slate-100 text-slate-600 border-slate-200'
+                            }`}>
+                              {ms.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
 
-                        <p className="text-xs font-bold text-slate-800">{unit.location}</p>
-                        <p className="text-xs text-slate-600 leading-relaxed">
-                          <strong>Kendala:</strong> {unit.issue}
-                        </p>
-                        <p className="text-[11px] text-slate-400">
-                          Teknisi Penanggung Jawab: <strong>{unit.technician}</strong> ({unit.techPhone})
-                        </p>
+              {/* CHANNEL ALLOCATION MATRIX TABLE */}
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+                <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                  <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
+                    <BarChart3 className="w-4 h-4 text-slate-700" />
+                    Alokasi Saluran Pemasaran (Channel Breakdown)
+                  </h3>
+                  <span className="text-[11px] text-slate-400 font-medium">Distribusi Anggaran Multi-Channel</span>
+                </div>
 
-                        {/* Interactive Status Messages */}
-                        {pingedUnits[unit.id] && (
-                          <p className="text-xs text-emerald-600 font-bold animate-in fade-in">
-                            ✓ {pingedUnits[unit.id]}
-                          </p>
-                        )}
-                        {escalatedUnits[unit.id] && (
-                          <p className="text-xs text-sky-600 font-bold animate-in fade-in">
-                            ✓ {escalatedUnits[unit.id]}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Action buttons */}
-                      <div className="flex items-center gap-2 shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => handlePingUnit(unit.id)}
-                          className="py-2 px-3.5 bg-white hover:bg-slate-100 border border-slate-200 text-slate-800 text-xs font-bold rounded-xl transition-all cursor-pointer shadow-xs"
-                        >
-                          Ping Ulang
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleEscalateUnit(unit.id, unit.technician)}
-                          className="py-2 px-3.5 bg-sky-600 hover:bg-sky-700 active:scale-95 text-white text-xs font-bold rounded-xl shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
-                        >
-                          <Send className="w-3.5 h-3.5" />
-                          Kirim Notifikasi WA
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-slate-100 bg-slate-50/70 text-[11px] font-black text-slate-500 uppercase tracking-wider">
+                        <th className="py-3 px-4">Saluran Pemasaran</th>
+                        <th className="py-3 px-4 w-48">Porsi Alokasi (%)</th>
+                        <th className="py-3 px-4">Nominal Budget</th>
+                        <th className="py-3 px-4">Catatan Strategis</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
+                      {VELOCIA_PLANS[velociaTab].channels.map((ch, idx) => (
+                        <tr key={idx} className="hover:bg-slate-50/70 transition-colors">
+                          <td className="py-3 px-4 font-bold text-slate-900 whitespace-nowrap">
+                            {ch.name}
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-2.5">
+                              <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
+                                <div
+                                  className="h-full bg-slate-900 rounded-full"
+                                  style={{ width: `${ch.percentage}%` }}
+                                />
+                              </div>
+                              <span className="font-mono font-bold text-[11px] text-slate-700 w-8 text-right">
+                                {ch.share}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="py-3 px-4 font-mono font-bold text-slate-900 whitespace-nowrap">
+                            {ch.budget}
+                          </td>
+                          <td className="py-3 px-4 text-slate-500 text-xs">
+                            {ch.note}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
@@ -868,51 +1162,65 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
           {/* 3. SCOUT WORKSPACE VIEW (RESEARCH & ARTICLE LAB)         */}
           {/* ======================================================== */}
           {agentId === 'scout' && (
-            <div className="max-w-5xl mx-auto space-y-6 animate-in fade-in duration-200">
+            <div className="max-w-6xl mx-auto space-y-5 animate-in fade-in duration-200">
               {/* Radar Trend Summary */}
-              <div className="p-6 bg-white rounded-3xl border border-slate-200 shadow-xs">
-                <span className="text-xs font-extrabold text-emerald-800 uppercase tracking-wider flex items-center gap-2 mb-3">
+              <div className="p-5 bg-white rounded-2xl border border-slate-200 shadow-2xs">
+                <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2 mb-3">
                   <TrendingUp className="w-4 h-4 text-emerald-600" />
-                  Top 3 AI Trends Terpantau Minggu Ini
+                  Top Radar Tren AI Terpantau Minggu Ini
                 </span>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                  <div className="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100">
-                    <p className="text-xs font-black text-slate-900 mb-1">Spatial Multi-Agent Web</p>
-                    <span className="text-xs text-slate-600 leading-relaxed">Lonjakan diskusi +184% di kalangan enterprise CTO & tech founders.</span>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-xs font-black text-slate-900">Spatial Multi-Agent</p>
+                      <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">+184% Diskusi</span>
+                    </div>
+                    <span className="text-[11px] text-slate-600 leading-relaxed block">Lonjakan adopsi arsitektur 3D ruang kerja di kalangan enterprise CTO & tech founders.</span>
                   </div>
-                  <div className="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100">
-                    <p className="text-xs font-black text-slate-900 mb-1">Voice-to-Action Protocol</p>
-                    <span className="text-xs text-slate-600 leading-relaxed">Adopsi delegasi suara real-time langsung ke kanban board tim.</span>
+
+                  <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-xs font-black text-slate-900">Voice-to-Action Protocol</p>
+                      <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">+122% Adopsi</span>
+                    </div>
+                    <span className="text-[11px] text-slate-600 leading-relaxed block">Pendelegasian tugas lisan real-time langsung ke pipeline task management kanban tim.</span>
                   </div>
-                  <div className="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100">
-                    <p className="text-xs font-black text-slate-900 mb-1">Edge Telemetry IoT Sync</p>
-                    <span className="text-xs text-slate-600 leading-relaxed">AI pengaudit unit offline otomatis dengan respons instan.</span>
+
+                  <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-xs font-black text-slate-900">Edge IoT Telemetry Sync</p>
+                      <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">+95% Penetrasi</span>
+                    </div>
+                    <span className="text-[11px] text-slate-600 leading-relaxed block">Pengawasan detak unit offline otomatis oleh AI dengan respons penanganan instan.</span>
                   </div>
                 </div>
               </div>
 
               {/* Ready to Publish Articles */}
               <div className="space-y-4">
-                <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-emerald-600" />
-                  Draf Artikel & Blog Siap Rilis (Dibuat Otomatis oleh Scout)
-                </h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-slate-700" />
+                    Draf Artikel & Blog Siap Rilis (Otomatis dibuat oleh Scout)
+                  </h3>
+                  <span className="text-[11px] text-slate-400 font-medium">3 Draf Terpublikasikan</span>
+                </div>
 
                 {SCOUT_ARTICLES.map((art) => (
-                  <div key={art.id} className="p-6 lg:p-7 bg-white rounded-3xl border border-slate-200 shadow-xs space-y-3.5">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                  <div key={art.id} className="p-5 bg-white rounded-2xl border border-slate-200 shadow-2xs space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                        <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-800 border border-slate-200">
                           {art.category}
                         </span>
-                        <span className="text-xs text-slate-400 font-medium">
+                        <span className="text-[11px] text-slate-400 font-medium">
                           {art.readTime} • SEO Score: <strong className="text-emerald-600">{art.seoScore}</strong>
                         </span>
                       </div>
 
                       <button
                         onClick={() => copyToClipboard(art.content, art.id)}
-                        className="self-start sm:self-auto py-2 px-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+                        className="self-start sm:self-auto py-1.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
                       >
                         {copiedId === art.id ? (
                           <>
@@ -928,11 +1236,11 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                       </button>
                     </div>
 
-                    <h4 className="text-lg font-black text-slate-900">
+                    <h4 className="text-base font-black text-slate-900">
                       {art.title}
                     </h4>
 
-                    <p className="text-xs text-slate-700 leading-relaxed bg-slate-50/80 p-4 rounded-2xl border border-slate-100 whitespace-pre-line font-serif">
+                    <p className="text-xs text-slate-700 leading-relaxed bg-slate-50/80 p-3.5 rounded-xl border border-slate-100 whitespace-pre-line font-serif">
                       {art.content}
                     </p>
                   </div>

@@ -6,18 +6,33 @@ import {
   Sparkles,
   Check,
   Box,
-  Layers,
-  CheckCircle2
+  Palette,
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react'
+
+// Curated modern color swatches
+const PRESET_COLORS = [
+  { name: 'Sky Blue', hex: '#38bdf8' },
+  { name: 'Emerald', hex: '#10b981' },
+  { name: 'Violet', hex: '#8b5cf6' },
+  { name: 'Coral Red', hex: '#ef4444' },
+  { name: 'Amber Gold', hex: '#f59e0b' },
+  { name: 'Cyan Neon', hex: '#06b6d4' },
+  { name: 'Dark Slate', hex: '#1e293b' },
+  { name: 'Magenta Pink', hex: '#ec4899' }
+]
 
 export default function AvatarModal({
   agent,
   isOpen,
   onClose,
   onSelectAvatarType,
-  onUpdateAgentModel
+  onUpdateAgentModel,
+  onUpdateAgentColor
 }) {
   const fileInputRef = useRef(null)
+  const colorInputRef = useRef(null)
   const [uploadLoading, setUploadLoading] = useState(false)
   const [statusMessage, setStatusMessage] = useState(null)
 
@@ -26,15 +41,27 @@ export default function AvatarModal({
   const agentColor = agent.color || '#38bdf8'
   const currentType = agent.avatar_type || (agent.custom_model_url ? 'custom' : 'default')
 
-  const handleSelectPreset = async (type) => {
+  const handleSelectPreset = (type) => {
     if (onSelectAvatarType) {
       onSelectAvatarType(agent.id, type)
     }
     setStatusMessage({
       type: 'success',
       text: type === 'boxhead'
-        ? 'Karakter BoxHead Chibi berhasil diaktifkan!'
-        : 'Karakter Chibi Klasik berhasil diaktifkan!'
+        ? 'Karakter BoxHead Chibi aktif!'
+        : 'Karakter Chibi Klasik aktif!'
+    })
+    setTimeout(() => setStatusMessage(null), 3000)
+  }
+
+  const handleColorChange = (hex) => {
+    if (!hex) return
+    if (onUpdateAgentColor) {
+      onUpdateAgentColor(agent.id, hex)
+    }
+    setStatusMessage({
+      type: 'success',
+      text: `Warna tema ${agent.name} diubah ke ${hex.toUpperCase()}!`
     })
     setTimeout(() => setStatusMessage(null), 3000)
   }
@@ -106,25 +133,25 @@ export default function AvatarModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-in fade-in duration-200">
       <div
-        className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-6 py-4.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
-          <div className="flex items-center gap-2.5">
+        <div className="px-6 py-4.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
+          <div className="flex items-center gap-3">
             <div
-              className="w-3.5 h-3.5 rounded-full"
+              className="w-4 h-4 rounded-full shadow-xs transition-colors duration-200"
               style={{ backgroundColor: agentColor }}
             />
             <div>
-              <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                Pengaturan Avatar 3D
-                <span className="text-xs font-bold text-slate-500 bg-slate-200/80 px-2 py-0.5 rounded-full">
+              <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
+                Pengaturan Avatar & Tampilan Karakter
+                <span className="text-xs font-bold text-slate-600 bg-slate-200/80 px-2 py-0.5 rounded-full">
                   {agent.name}
                 </span>
               </h3>
               <p className="text-[11px] text-slate-500 font-medium">
-                Pilih opsi bentuk karakter atau unggah model kustom
+                Kustomisasi warna tema, gaya bentuk karakter 3D, atau unggah model file .glb
               </p>
             </div>
           </div>
@@ -138,11 +165,72 @@ export default function AvatarModal({
         </div>
 
         {/* Content Body */}
-        <div className="p-6 space-y-5">
-          {/* Preset Character Selection Cards */}
+        <div className="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
+          {/* SECTION 1: CUSTOM AGENT COLOR PALETTE */}
+          <div className="p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80">
+            <div className="flex items-center justify-between mb-2.5">
+              <label className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                <Palette className="w-4 h-4 text-slate-700" />
+                Pilihan Warna Tema AI Agent
+              </label>
+              <span className="text-[11px] font-mono font-bold text-slate-500 bg-white px-2 py-0.5 rounded-lg border border-slate-200">
+                {agentColor.toUpperCase()}
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-500 mb-3.5 leading-relaxed">
+              Pilih warna identitas utama agent. Warna ini otomatis diaplikasikan ke karakter 3D (kepala & badan), glow lantai kantor, avatar portrait, serta badge status.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-2.5">
+              {PRESET_COLORS.map((col) => {
+                const isSelected = agentColor.toLowerCase() === col.hex.toLowerCase()
+                return (
+                  <button
+                    key={col.hex}
+                    type="button"
+                    onClick={() => handleColorChange(col.hex)}
+                    className={`relative w-8 h-8 rounded-xl shadow-xs transition-all cursor-pointer flex items-center justify-center ${
+                      isSelected
+                        ? 'ring-2 ring-slate-900 ring-offset-2 scale-110'
+                        : 'hover:scale-105 hover:shadow-md'
+                    }`}
+                    style={{ backgroundColor: col.hex }}
+                    title={col.name}
+                  >
+                    {isSelected && <Check className="w-4 h-4 text-white drop-shadow-md" />}
+                  </button>
+                )
+              })}
+
+              {/* Custom Color Input Picker */}
+              <div className="relative">
+                <input
+                  type="color"
+                  ref={colorInputRef}
+                  value={agentColor}
+                  onChange={(e) => handleColorChange(e.target.value)}
+                  className="sr-only"
+                />
+                <button
+                  type="button"
+                  onClick={() => colorInputRef.current?.click()}
+                  className="h-8 px-2.5 rounded-xl border border-dashed border-slate-300 hover:border-slate-500 bg-white text-[11px] font-bold text-slate-700 flex items-center gap-1.5 shadow-2xs hover:bg-slate-50 transition-all cursor-pointer"
+                  title="Pilih Warna Hex Bebas"
+                >
+                  <span
+                    className="w-3.5 h-3.5 rounded-full border border-slate-300"
+                    style={{ backgroundColor: agentColor }}
+                  />
+                  <span>Warna Bebas</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* SECTION 2: BUILT-IN CHARACTER PRESETS */}
           <div>
-            <label className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2.5 block">
-              Pilihan Karakter Bawaan (Built-in)
+            <label className="text-xs font-black uppercase tracking-wider text-slate-800 mb-2.5 block">
+              Pilihan Bentuk Karakter Bawaan
             </label>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -151,22 +239,22 @@ export default function AvatarModal({
                 onClick={() => handleSelectPreset('default')}
                 className={`relative p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
                   currentType === 'default'
-                    ? 'border-emerald-500 bg-emerald-50/60 shadow-md ring-2 ring-emerald-500/20'
+                    ? 'border-slate-900 bg-slate-50 shadow-md ring-2 ring-slate-900/10'
                     : 'border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50'
                 }`}
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     {/* Sphere Preview Graphic */}
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-slate-300 to-slate-100 border-2 border-white shadow-md flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-slate-200 to-white border-2 border-white shadow-md flex items-center justify-center">
                       <div
-                        className="w-7 h-7 rounded-full shadow-inner"
+                        className="w-7 h-7 rounded-full shadow-inner transition-colors duration-200"
                         style={{ backgroundColor: agentColor }}
                       />
                     </div>
                     {currentType === 'default' && (
-                      <span className="flex items-center gap-1 text-[10px] font-extrabold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
-                        <Check className="w-3 h-3" />
+                      <span className="flex items-center gap-1 text-[10px] font-extrabold text-slate-900 bg-slate-200/80 px-2 py-0.5 rounded-full">
+                        <Check className="w-3 h-3 text-slate-900" />
                         Aktif
                       </span>
                     )}
@@ -175,7 +263,7 @@ export default function AvatarModal({
                     Chibi Klasik
                   </h4>
                   <p className="text-[11px] text-slate-500 leading-relaxed">
-                    Avatar bola chibi original The Delegation dengan claymorphic finish.
+                    Bentuk bola chibi original The Delegation dengan claymorphic finish mengkilap.
                   </p>
                 </div>
 
@@ -183,7 +271,7 @@ export default function AvatarModal({
                   type="button"
                   className={`mt-4 py-1.5 px-3 text-xs font-bold rounded-xl transition-all ${
                     currentType === 'default'
-                      ? 'bg-emerald-600 text-white'
+                      ? 'bg-slate-900 text-white'
                       : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                   }`}
                 >
@@ -196,25 +284,28 @@ export default function AvatarModal({
                 onClick={() => handleSelectPreset('boxhead')}
                 className={`relative p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
                   currentType === 'boxhead'
-                    ? 'border-sky-500 bg-sky-50/60 shadow-md ring-2 ring-sky-500/20'
+                    ? 'border-slate-900 bg-slate-50 shadow-md ring-2 ring-slate-900/10'
                     : 'border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50'
                 }`}
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     {/* BoxHead Preview Graphic */}
-                    <div className="w-12 h-12 rounded-2xl bg-[#94beea] border-2 border-white shadow-md flex items-center justify-center">
-                      <div className="text-center font-black text-xs text-[#1e293b] select-none tracking-tighter">
+                    <div
+                      className="w-12 h-12 rounded-2xl border-2 border-white shadow-md flex items-center justify-center transition-colors duration-200"
+                      style={{ backgroundColor: agentColor }}
+                    >
+                      <div className="text-center font-black text-xs text-white drop-shadow select-none tracking-tighter">
                         (• ^ •)
                       </div>
                     </div>
                     {currentType === 'boxhead' ? (
-                      <span className="flex items-center gap-1 text-[10px] font-extrabold text-sky-700 bg-sky-100 px-2 py-0.5 rounded-full">
-                        <Check className="w-3 h-3" />
+                      <span className="flex items-center gap-1 text-[10px] font-extrabold text-slate-900 bg-slate-200/80 px-2 py-0.5 rounded-full">
+                        <Check className="w-3 h-3 text-slate-900" />
                         Aktif
                       </span>
                     ) : (
-                      <span className="flex items-center gap-1 text-[10px] font-extrabold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
+                      <span className="flex items-center gap-1 text-[10px] font-extrabold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">
                         <Sparkles className="w-3 h-3 text-amber-600" />
                         Baru
                       </span>
@@ -224,7 +315,7 @@ export default function AvatarModal({
                     BoxHead Chibi
                   </h4>
                   <p className="text-[11px] text-slate-500 leading-relaxed">
-                    Kepala kotak rounded-cube dengan mata bulat ekspresif & alis tegas.
+                    Kepala kubus berpenutup leher mulus, mata bulat ekspresif, warna kepala & badan serasi.
                   </p>
                 </div>
 
@@ -232,7 +323,7 @@ export default function AvatarModal({
                   type="button"
                   className={`mt-4 py-1.5 px-3 text-xs font-bold rounded-xl transition-all ${
                     currentType === 'boxhead'
-                      ? 'bg-sky-600 text-white'
+                      ? 'bg-slate-900 text-white'
                       : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                   }`}
                 >
@@ -242,21 +333,21 @@ export default function AvatarModal({
             </div>
           </div>
 
-          {/* Custom Model (.glb) Upload Section */}
-          <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                <Box className="w-4 h-4 text-purple-600" />
-                Upload Model 3D Sendiri (.glb)
+          {/* SECTION 3: CUSTOM 3D MODEL (.GLB) UPLOAD */}
+          <div className="p-4.5 bg-slate-50/70 rounded-2xl border border-slate-200/80">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-xs font-black text-slate-800 flex items-center gap-1.5">
+                <Box className="w-4 h-4 text-slate-700" />
+                Upload Model 3D Kustom Sendiri (.glb)
               </span>
               {agent.custom_model_url && currentType === 'custom' && (
-                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-200">
-                  Custom Aktif: {agent.custom_model_name || 'model.glb'}
+                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-900 text-white shadow-2xs">
+                  Model Aktif: {agent.custom_model_name || 'model.glb'}
                 </span>
               )}
             </div>
-            <p className="text-[11px] text-slate-500 mb-3">
-              Unggah file 3D berformat .glb dari Blender, Sketchfab, atau Mixamo untuk karakter kustom.
+            <p className="text-[11px] text-slate-500 mb-3.5 leading-relaxed">
+              Unggah file 3D berformat .glb dari Blender, Sketchfab, atau Mixamo untuk menggantikan karakter agent.
             </p>
 
             <input
@@ -266,12 +357,12 @@ export default function AvatarModal({
               accept=".glb,.gltf"
               className="hidden"
             />
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadLoading}
-                className="flex-1 flex items-center justify-center gap-2 py-2 px-4 bg-purple-600 hover:bg-purple-700 active:scale-[0.98] text-white font-bold text-xs rounded-xl shadow-sm transition-all cursor-pointer disabled:opacity-50"
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white font-bold text-xs rounded-xl shadow-sm transition-all cursor-pointer disabled:opacity-50"
               >
                 <Upload className="w-3.5 h-3.5" />
                 {uploadLoading ? 'Memproses...' : 'Upload File .glb'}
@@ -281,9 +372,9 @@ export default function AvatarModal({
                 type="button"
                 onClick={handleResetDefault}
                 disabled={uploadLoading || (currentType === 'default' && !agent.custom_model_url)}
-                className={`flex items-center justify-center gap-1.5 py-2 px-3 font-bold text-xs rounded-xl transition-all cursor-pointer ${
+                className={`flex items-center justify-center gap-1.5 py-2.5 px-3.5 font-bold text-xs rounded-xl transition-all cursor-pointer ${
                   currentType !== 'default' || agent.custom_model_url
-                    ? 'bg-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 border border-slate-300 text-slate-800 active:scale-[0.98]'
+                    ? 'bg-white hover:bg-red-50 hover:text-red-600 hover:border-red-200 border border-slate-300 text-slate-700 active:scale-[0.98] shadow-2xs'
                     : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
                 }`}
                 title="Reset kembali ke Chibi Klasik"
@@ -297,20 +388,27 @@ export default function AvatarModal({
           {/* Feedback status message */}
           {statusMessage && (
             <div
-              className={`p-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 animate-in fade-in ${
+              className={`p-3 rounded-xl text-xs font-semibold flex items-center gap-2 animate-in fade-in ${
                 statusMessage.type === 'error'
                   ? 'bg-red-50 text-red-700 border border-red-200'
                   : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
               }`}
             >
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              {statusMessage.type === 'error' ? (
+                <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+              ) : (
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              )}
               <span>{statusMessage.text}</span>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+        <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+          <span className="text-[11px] text-slate-400 font-medium">
+            Perubahan otomatis tersimpan ke sistem
+          </span>
           <button
             type="button"
             onClick={onClose}
