@@ -6,8 +6,11 @@ import CallModal from './components/CallModal'
 import AvatarModal from './components/AvatarModal'
 import AgentWorkspaceView from './components/AgentWorkspaceView'
 import AgentCloseUpAvatar from './components/AgentCloseUpAvatar'
+import ScenerySettingsModal from './components/ScenerySettingsModal'
 import {
-  RotateCcw
+  RotateCcw,
+  Palette,
+  Sliders
 } from 'lucide-react'
 
 // Agent configurations matching 2x2 face-to-face collaborative office pod
@@ -106,6 +109,31 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isCallModalOpen, setIsCallModalOpen] = useState(false)
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false)
+  const [isSceneryModalOpen, setIsSceneryModalOpen] = useState(false)
+  const [scenerySettings, setScenerySettings] = useState(() => {
+    try {
+      const saved = localStorage.getItem('virtual_office_scenery_settings')
+      if (saved) return JSON.parse(saved)
+    } catch (e) {
+      // ignore
+    }
+    return {
+      theme: 'colorful', // 'colorful' | 'minimalist'
+      showLightBeams: true,
+      showNPC: true,
+      showCoffeeCorner: true
+    }
+  })
+
+  const handleUpdateScenerySettings = (newSettings) => {
+    setScenerySettings(newSettings)
+    try {
+      localStorage.setItem('virtual_office_scenery_settings', JSON.stringify(newSettings))
+    } catch (e) {
+      // ignore
+    }
+  }
+
   const [viewMode, setViewMode] = useState('office') // 'office' | 'agent_workspace'
   const [backendStatus, setBackendStatus] = useState('checking')
   const [tasks, setTasks] = useState(INITIAL_TASKS)
@@ -401,10 +429,22 @@ export default function App() {
               })}
             </div>
 
+            {/* Scenery Theme & Setting Button */}
+            <button
+              onClick={() => setIsSceneryModalOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-2 bg-white/90 backdrop-blur-xl hover:bg-white text-slate-700 hover:text-slate-950 rounded-2xl shadow-lg border border-slate-200/80 transition-all active:scale-95 cursor-pointer"
+              title="Pengaturan Suasana Ruang Kerja 3D (Warna, Sinar Lampu, NPC, Mesin Kopi)"
+            >
+              <Palette className="w-4 h-4 text-amber-500" />
+              <span className="text-xs font-black">
+                {scenerySettings.theme === 'colorful' ? '🎨 Ruang Berwarna' : '⚪ Minimalis Putih'}
+              </span>
+            </button>
+
             {/* Reset Camera View Button */}
             <button
               onClick={() => handleSelectAgent(null)}
-              className="p-2.5 bg-white/90 backdrop-blur-xl hover:bg-white text-slate-600 hover:text-slate-900 rounded-2xl shadow-lg border border-slate-200/80 transition-all active:scale-95"
+              className="p-2.5 bg-white/90 backdrop-blur-xl hover:bg-white text-slate-600 hover:text-slate-900 rounded-2xl shadow-lg border border-slate-200/80 transition-all active:scale-95 cursor-pointer"
               title="Reset Posisi Kamera"
             >
               <RotateCcw className="w-4 h-4" />
@@ -461,7 +501,8 @@ export default function App() {
               agents={agents}
               selectedAgent={selectedAgent}
               onSelectAgent={handleSelectAgent}
-              hideTooltip={isAvatarModalOpen || isCallModalOpen}
+              hideTooltip={isAvatarModalOpen || isCallModalOpen || isSceneryModalOpen}
+              scenerySettings={scenerySettings}
             />
           </main>
 
@@ -512,6 +553,16 @@ export default function App() {
           onSelectAvatarType={handleSelectAvatarType}
           onUpdateAgentModel={handleUpdateAgentModel}
           onUpdateAgentColor={handleUpdateAgentColor}
+        />
+      )}
+
+      {/* --- SCENERY 3D VISUAL SETTINGS MODAL --- */}
+      {isSceneryModalOpen && (
+        <ScenerySettingsModal
+          isOpen={isSceneryModalOpen}
+          onClose={() => setIsSceneryModalOpen(false)}
+          scenerySettings={scenerySettings}
+          onUpdateScenerySettings={handleUpdateScenerySettings}
         />
       )}
     </div>

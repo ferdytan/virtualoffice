@@ -4,6 +4,9 @@ import { OrbitControls, useGLTF, ContactShadows } from '@react-three/drei'
 import * as THREE from 'three'
 import AgentAvatar from './AgentAvatar'
 import ScreenDisplays from './ScreenDisplays'
+import LightBeams from './LightBeams'
+import CoffeeCorner from './CoffeeCorner'
+import OfficeNPC from './OfficeNPC'
 
 /**
  * Camera controller that smoothly transitions focus when an agent is selected.
@@ -94,9 +97,11 @@ function repositionNode(node, x, y, z, rx = 0, ry = 0, rz = 0) {
  * Symmetrically aligns the 4 workstation desks into a neat 2x2 face-to-face team pod:
  * - South Row (Desk 1 & 2): Velocia & Scout facing North (+Z)
  * - North Row (Desk 3 & 4): Nara & Team Desk facing South (-Z), perfectly face-to-face!
+ * Supports dynamic scenery theme: 'colorful' (warm wood, colored seats, cozy accents) vs 'minimalist' (pure white).
  */
-function DelegationOffice() {
+function DelegationOffice({ theme = 'colorful' }) {
   const { scene } = useGLTF('/models/office.glb', '/draco/')
+  const isColorful = theme === 'colorful'
 
   useEffect(() => {
     if (!scene) return
@@ -105,15 +110,110 @@ function DelegationOffice() {
       if (child.isMesh) {
         child.castShadow = true
         child.receiveShadow = true
-        const name = child.name.toLowerCase()
-        if (name.includes('navmesh')) {
+        const name = (child.name || '').toLowerCase()
+        const parentName = (child.parent?.name || '').toLowerCase()
+
+        if (name.includes('navmesh') || parentName.includes('navmesh')) {
           child.visible = false
+          return
         }
-        if (name.startsWith('colored')) {
-          child.material = new THREE.MeshStandardMaterial({
-            color: new THREE.Color('#38bdf8'),
-            roughness: 0.5
-          })
+
+        if (isColorful) {
+          // --- VIBRANT MODERN THEME (Aksen Kayu Hangat & Sentuhan Warna) ---
+          // Work desks: Warm light oak wood top
+          if (
+            name.includes('work-desk') ||
+            parentName.includes('work-desk') ||
+            name === 'cube.008' ||
+            name === 'cube.012' ||
+            name === 'cube.017' ||
+            name === 'cube.020'
+          ) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: new THREE.Color('#d4bf9c'), // Warm Scandinavian oak
+              roughness: 0.38,
+              metalness: 0.04
+            })
+          }
+          // Work Chairs: Designer color fabric cushions
+          else if (name.includes('chair.001') || parentName.includes('chair.001') || name === 'cube.010') {
+            // Velocia's chair: Coral
+            child.material = new THREE.MeshStandardMaterial({
+              color: new THREE.Color('#f87171'),
+              roughness: 0.55
+            })
+          } else if (name.includes('chair.002') || parentName.includes('chair.002') || name === 'cube.014') {
+            // Scout's chair: Mint / Emerald
+            child.material = new THREE.MeshStandardMaterial({
+              color: new THREE.Color('#34d399'),
+              roughness: 0.55
+            })
+          } else if (name.includes('chair.003') || parentName.includes('chair.003') || name === 'cube.019') {
+            // Nara's chair: Sky Blue
+            child.material = new THREE.MeshStandardMaterial({
+              color: new THREE.Color('#60a5fa'),
+              roughness: 0.55
+            })
+          } else if (name.includes('chair.004') || parentName.includes('chair.004') || name === 'cube.022') {
+            // Team chair: Lavender
+            child.material = new THREE.MeshStandardMaterial({
+              color: new THREE.Color('#a78bfa'),
+              roughness: 0.55
+            })
+          }
+          // Lounge Sofa: Cozy warm amber / terracotta
+          else if (name.includes('sofa') || parentName.includes('sofa') || name === 'cube.006') {
+            child.material = new THREE.MeshStandardMaterial({
+              color: new THREE.Color('#d97706'),
+              roughness: 0.65
+            })
+          }
+          // Counter & Cafe Table: Warm rich walnut
+          else if (
+            name.includes('counter') ||
+            parentName.includes('counter') ||
+            name.includes('cafe-table') ||
+            parentName.includes('cafe-table')
+          ) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: new THREE.Color('#946b45'),
+              roughness: 0.42,
+              metalness: 0.05
+            })
+          }
+          // Plants: Fresh vibrant leafy green
+          else if (
+            name.includes('plant') ||
+            parentName.includes('plant') ||
+            name === 'circle.002' ||
+            name === 'circle.004'
+          ) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: new THREE.Color('#16a34a'),
+              roughness: 0.3
+            })
+          }
+          // Border glow line
+          else if (name.startsWith('colored') || parentName.startsWith('colored')) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: new THREE.Color('#0284c7'),
+              roughness: 0.4
+            })
+          }
+        } else {
+          // --- MINIMALIST PURE WHITE THEME (Clean Scandinavian White) ---
+          if (name.startsWith('colored') || parentName.startsWith('colored')) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: new THREE.Color('#38bdf8'),
+              roughness: 0.5
+            })
+          } else if (!name.includes('pc') && !name.includes('laptop')) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: new THREE.Color('#f8fafc'),
+              roughness: 0.45,
+              metalness: 0.05
+            })
+          }
         }
       }
     })
@@ -147,7 +247,7 @@ function DelegationOffice() {
 
     const flexo4 = findSceneNode(scene, 'static-flexo.003', 'static-flexo003', 'Cube.021')
     repositionNode(flexo4, 3.54, 0.504, -2.51, 0, 0, 0)
-  }, [scene])
+  }, [scene, isColorful])
 
   return <primitive object={scene} />
 }
@@ -161,8 +261,16 @@ export default function OfficeScene({
   agents = [],
   selectedAgent,
   onSelectAgent,
-  hideTooltip = false
+  hideTooltip = false,
+  scenerySettings = {
+    theme: 'colorful',
+    showLightBeams: true,
+    showNPC: true,
+    showCoffeeCorner: true
+  }
 }) {
+  const isColorful = scenerySettings?.theme === 'colorful'
+
   return (
     <div className="w-full h-full relative cursor-grab active:cursor-grabbing">
       <Canvas
@@ -170,16 +278,20 @@ export default function OfficeScene({
         camera={{ position: [9, 8.5, 13], fov: 40 }}
         gl={{ antialias: true, alpha: false }}
       >
-        {/* Warm Canvas Background */}
-        <color attach="background" args={['#eef2f6']} />
+        {/* Canvas Background: Warm tint in colorful mode, clean slate in minimalist */}
+        <color attach="background" args={[isColorful ? '#f1f5f9' : '#eef2f6']} />
 
-        {/* Ambient & Directional Lighting Setup (matching The Delegation Stage) */}
-        <ambientLight intensity={Math.PI * 0.9} />
-        <hemisphereLight skyColor="#ffffff" groundColor="#cbd5e1" intensity={0.5} />
+        {/* Ambient & Directional Lighting Setup */}
+        <ambientLight intensity={Math.PI * (isColorful ? 0.95 : 0.9)} />
+        <hemisphereLight
+          skyColor="#ffffff"
+          groundColor={isColorful ? '#e2e8f0' : '#cbd5e1'}
+          intensity={0.55}
+        />
 
         <directionalLight
           position={[10, 20, 10]}
-          intensity={Math.PI * 0.6}
+          intensity={Math.PI * 0.65}
           castShadow
           shadow-mapSize-width={2048}
           shadow-mapSize-height={2048}
@@ -197,17 +309,32 @@ export default function OfficeScene({
         <directionalLight position={[-8, 12, -8]} intensity={0.35} color="#bae6fd" />
 
         {/* Warm Desk Lamp Ambient Accents over the 4-desk pod */}
-        <pointLight position={[1.77, 1.15, -2.51]} color="#ffeedd" intensity={0.6} distance={2.5} />
-        <pointLight position={[3.54, 1.15, -2.51]} color="#ffeedd" intensity={0.6} distance={2.5} />
-        <pointLight position={[0.89, 1.15, -3.07]} color="#ffeedd" intensity={0.6} distance={2.5} />
-        <pointLight position={[2.66, 1.15, -3.07]} color="#ffeedd" intensity={0.6} distance={2.5} />
+        <pointLight position={[1.77, 1.15, -2.51]} color="#ffeedd" intensity={0.65} distance={2.5} />
+        <pointLight position={[3.54, 1.15, -2.51]} color="#ffeedd" intensity={0.65} distance={2.5} />
+        <pointLight position={[0.89, 1.15, -3.07]} color="#ffeedd" intensity={0.65} distance={2.5} />
+        <pointLight position={[2.66, 1.15, -3.07]} color="#ffeedd" intensity={0.65} distance={2.5} />
 
         <Suspense fallback={null}>
-          {/* Authentic Office Environment with neat 2x2 face-to-face pod */}
-          <DelegationOffice />
+          {/* Authentic Office Environment with dynamic theme styling */}
+          <DelegationOffice theme={scenerySettings?.theme || 'colorful'} />
 
           {/* 4 Active Glowing & Colorful Browser Displays mounted on workstation monitors */}
           <ScreenDisplays agents={agents} onSelectAgent={onSelectAgent} />
+
+          {/* Visible Lamp Beams & Desk Glows */}
+          {scenerySettings?.showLightBeams && (
+            <LightBeams isColorful={isColorful} />
+          )}
+
+          {/* Espresso Coffee Corner & Lounge Bar */}
+          {scenerySettings?.showCoffeeCorner && (
+            <CoffeeCorner isColorful={isColorful} />
+          )}
+
+          {/* Autonomous NPC Cleaning & Coffee Delivery Robot */}
+          {scenerySettings?.showNPC && (
+            <OfficeNPC isColorful={isColorful} />
+          )}
 
           {/* 3D Agent Avatars sitting at designated clean workstations */}
           {agents.map((agent) => (
