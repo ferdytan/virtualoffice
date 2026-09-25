@@ -195,6 +195,154 @@ function repositionNode(node, x, y, z, rx = 0, ry = 0, rz = 0) {
 }
 
 /**
+ * Custom colorizer for the storage shelf rack (Cube.002 / static-cabinet).
+ * Distinguishes the wooden shelf frame (coklat kayu) from the cardboard storage boxes (coklat karton)
+ * with individual shade variations across different boxes using per-vertex colors.
+ */
+function colorizeCabinetMesh(mesh) {
+  const geom = mesh.geometry
+  if (!geom || !geom.attributes.position) return
+
+  const pos = geom.attributes.position.array
+  const numVerts = geom.attributes.position.count
+  const indices = geom.index ? geom.index.array : null
+  const numFaces = indices ? indices.length / 3 : Math.floor(numVerts / 3)
+
+  // Disjoint Set / Union-Find on vertices to partition connected geometry parts
+  const parent = new Int32Array(numVerts)
+  for (let i = 0; i < numVerts; i++) parent[i] = i
+
+  function find(i) {
+    let root = i
+    while (root !== parent[root]) root = parent[root]
+    let curr = i
+    while (curr !== root) {
+      const nxt = parent[curr]
+      parent[curr] = root
+      curr = nxt
+    }
+    return root
+  }
+
+  function union(i, j) {
+    const r1 = find(i)
+    const r2 = find(j)
+    if (r1 !== r2) parent[r1] = r2
+  }
+
+  // Union all vertices of each face
+  for (let f = 0; f < numFaces; f++) {
+    const a = indices ? indices[f * 3] : f * 3
+    const b = indices ? indices[f * 3 + 1] : f * 3 + 1
+    const c = indices ? indices[f * 3 + 2] : f * 3 + 2
+    union(a, b)
+    union(b, c)
+  }
+
+  // Aggregate components with bounding boxes
+  const compMap = new Map()
+  for (let v = 0; v < numVerts; v++) {
+    const root = find(v)
+    let comp = compMap.get(root)
+    if (!comp) {
+      comp = {
+        root,
+        verts: [],
+        minX: Infinity, maxX: -Infinity,
+        minY: Infinity, maxY: -Infinity,
+        minZ: Infinity, maxZ: -Infinity
+      }
+      compMap.set(root, comp)
+    }
+    comp.verts.push(v)
+    const x = pos[v * 3]
+    const y = pos[v * 3 + 1]
+    const z = pos[v * 3 + 2]
+    if (x < comp.minX) comp.minX = x; if (x > comp.maxX) comp.maxX = x
+    if (y < comp.minY) comp.minY = y; if (y > comp.maxY) comp.maxY = y
+    if (z < comp.minZ) comp.minZ = z; if (z > comp.maxZ) comp.maxZ = z
+  }
+
+  const components = Array.from(compMap.values()).map(comp => {
+    comp.sizeX = comp.maxX - comp.minX
+    comp.sizeY = comp.maxY - comp.minY
+    comp.sizeZ = comp.maxZ - comp.minZ
+    comp.centerX = (comp.minX + comp.maxX) / 2
+    comp.centerY = (comp.minY + comp.maxY) / 2
+    comp.centerZ = (comp.minZ + comp.maxZ) / 2
+    return comp
+  })
+
+  // Scandinavian natural wood brown for the rack frame and shelves (coklat kayu)
+  const woodRackColor = new THREE.Color('#7c4826')
+
+  // Cardboard Kraft palette with varied natural tones (coklat karton beragam)
+  const cardboardPalette = [
+    new THREE.Color('#c59b6c'), // Classic kraft paper cardboard
+    new THREE.Color('#b58750'), // Golden warm tan cardboard
+    new THREE.Color('#cca275'), // Light buff kraft cardboard
+    new THREE.Color('#a87948'), // Deeper recycled cardboard
+    new THREE.Color('#be915d'), // Medium raw cardboard
+  ]
+
+  // Identify rack vs boxes
+  // The rack has long horizontal shelves (sizeX > 0.65) and tall A-frame uprights (sizeY > 0.55)
+  const compColors = new Map()
+  const boxComponents = []
+
+  components.forEach(comp => {
+    const isRack = comp.sizeX > 0.65 || comp.sizeY > 0.55
+    if (isRack) {
+      compColors.set(comp.root, woodRackColor)
+    } else {
+      boxComponents.push(comp)
+    }
+  })
+
+  // Group box components (e.g. body + lid of the same physical box) by XZ position
+  const boxGroups = []
+  boxComponents.forEach(comp => {
+    let group = boxGroups.find(g => Math.hypot(g.centerX - comp.centerX, g.centerZ - comp.centerZ) < 0.22)
+    if (!group) {
+      group = { centerX: comp.centerX, centerZ: comp.centerZ, comps: [] }
+      boxGroups.push(group)
+    }
+    group.comps.push(comp)
+  })
+
+  // Sort box groups from left to right along X axis
+  boxGroups.sort((a, b) => a.centerX - b.centerX)
+
+  boxGroups.forEach((g, gIdx) => {
+    const baseCol = cardboardPalette[gIdx % cardboardPalette.length]
+    const minSizeY = Math.min(...g.comps.map(c => c.sizeY))
+    g.comps.forEach(comp => {
+      const isLid = g.comps.length > 1 && (comp.sizeY === minSizeY || comp.sizeY < 0.09)
+      const col = isLid ? baseCol.clone().offsetHSL(0, 0.03, -0.05) : baseCol
+      compColors.set(comp.root, col)
+    })
+  })
+
+  const colorAttr = new Float32Array(numVerts * 3)
+  for (let v = 0; v < numVerts; v++) {
+    const root = find(v)
+    const col = compColors.get(root) || woodRackColor
+    colorAttr[v * 3] = col.r
+    colorAttr[v * 3 + 1] = col.g
+    colorAttr[v * 3 + 2] = col.b
+  }
+
+  geom.setAttribute('color', new THREE.BufferAttribute(colorAttr, 3))
+  geom.attributes.color.needsUpdate = true
+
+  mesh.material = new THREE.MeshStandardMaterial({
+    vertexColors: true,
+    roughness: 0.58,
+    metalness: 0.04
+  })
+}
+
+/**
  * Loads and renders the office environment from The Delegation (office.glb).
  * Symmetrically aligns the 4 workstation desks into a neat 2x2 face-to-face team pod:
  * - South Row (Desk 1 & 2): Velocia & Scout facing North (+Z)
@@ -237,6 +385,7 @@ function DelegationOffice({ scenerySettings }) {
         }
 
         if (isColorful) {
+
           // --- 2. WORK CHAIRS: SLEEK DARK GRAPHITE / CHARCOAL (ABU2 / HITAM) ---
           if (
             name.includes('work-chair') ||
@@ -245,7 +394,12 @@ function DelegationOffice({ scenerySettings }) {
             name === 'cube.014' ||
             name === 'cube.019' ||
             name === 'cube.022' ||
-            name === 'cube.003'
+            name === 'cube.003' ||
+            name === 'cube010' ||
+            name === 'cube014' ||
+            name === 'cube019' ||
+            name === 'cube022' ||
+            name === 'cube003'
           ) {
             child.material = new THREE.MeshStandardMaterial({
               color: new THREE.Color('#252b33'), // Dark charcoal/graphite ergonomic office chair
@@ -255,12 +409,10 @@ function DelegationOffice({ scenerySettings }) {
           }
           // --- 3. COFFEE TABLE CHAIRS: WARM RICH COGNAC / SADDLE BROWN (COKLAT) ---
           else if (
-            name === 'static-chair' ||
-            name === 'static-chair.001' ||
-            parentName === 'static-chair' ||
-            parentName === 'static-chair.001' ||
-            name === 'circle.001' ||
-            name === 'circle.003'
+            (name.includes('chair') || parentName.includes('chair') ||
+             name.startsWith('circle') || parentName.startsWith('circle')) &&
+            !name.includes('work') && !parentName.includes('work') &&
+            !name.includes('plant') && !parentName.includes('plant')
           ) {
             child.material = new THREE.MeshStandardMaterial({
               color: new THREE.Color('#783818'), // Warm rich saddle brown / cognac
@@ -275,7 +427,11 @@ function DelegationOffice({ scenerySettings }) {
             name === 'cube.008' ||
             name === 'cube.012' ||
             name === 'cube.017' ||
-            name === 'cube.020'
+            name === 'cube.020' ||
+            name === 'cube008' ||
+            name === 'cube012' ||
+            name === 'cube017' ||
+            name === 'cube020'
           ) {
             child.material = new THREE.MeshStandardMaterial({
               color: new THREE.Color('#d4bf9c'), // Warm Scandinavian oak
@@ -287,7 +443,8 @@ function DelegationOffice({ scenerySettings }) {
           else if (
             name.includes('cafe-table') ||
             parentName.includes('cafe-table') ||
-            name === 'cube.001'
+            name === 'cube.001' ||
+            name === 'cube001'
           ) {
             child.material = new THREE.MeshStandardMaterial({
               color: new THREE.Color('#9e6b42'), // Warm honey walnut
@@ -295,17 +452,14 @@ function DelegationOffice({ scenerySettings }) {
               metalness: 0.05
             })
           }
-          // --- 6. STORAGE CABINET CREDENZA: MODERN DEEP SLATE GRAY ---
+          // --- 6. STORAGE CABINET / SHELVING RACK: WOOD BROWN FRAME & MULTI-TONED CARDBOARD BOXES ---
           else if (
             name.includes('cabinet') ||
             parentName.includes('cabinet') ||
-            name === 'cube.002'
+            name === 'cube.002' ||
+            name === 'cube002'
           ) {
-            child.material = new THREE.MeshStandardMaterial({
-              color: new THREE.Color('#475569'), // Slate gray credenza
-              roughness: 0.42,
-              metalness: 0.1
-            })
+            colorizeCabinetMesh(child)
           }
           // --- 7. BARISTA COUNTER: WARM MAHOGANY BAR ---
           else if (
@@ -323,26 +477,31 @@ function DelegationOffice({ scenerySettings }) {
           else if (
             name.includes('sofa') ||
             parentName.includes('sofa') ||
-            name === 'cube.006'
+            name === 'cube.006' ||
+            name === 'cube006'
           ) {
             child.material = new THREE.MeshStandardMaterial({
               color: new THREE.Color('#b45309'),
               roughness: 0.65
             })
           }
-          // --- 9. DESK LAMPS: ARCHITECTURAL MATTE DARK SLATE ---
+          // --- 9. DESK LAMPS: CLEAN WHITE / LIGHT ARCHITECTURAL GRAY (PUTIH / ABU2 MUDA) ---
           else if (
             name.includes('flexo') ||
             parentName.includes('flexo') ||
             name === 'cube.009' ||
             name === 'cube.013' ||
             name === 'cube.018' ||
-            name === 'cube.021'
+            name === 'cube.021' ||
+            name === 'cube009' ||
+            name === 'cube013' ||
+            name === 'cube018' ||
+            name === 'cube021'
           ) {
             child.material = new THREE.MeshStandardMaterial({
-              color: new THREE.Color('#334155'), // Architectural matte dark slate
-              roughness: 0.32,
-              metalness: 0.25
+              color: new THREE.Color('#f1f5f9'), // Clean off-white / light architectural gray
+              roughness: 0.25,
+              metalness: 0.12
             })
           }
           // --- 10. PLANTS: FRESH VIBRANT MONSTERA GREEN ---

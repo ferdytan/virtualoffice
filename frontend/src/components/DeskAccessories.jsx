@@ -134,16 +134,13 @@ export default function DeskAccessories({ isColorful = true }) {
       </group>
 
       {/* ======================================================== */}
-      {/* CABINET CREDENZA: [-4.79, 0, -3.64]                      */}
-      {/* Top surface height approx ~0.82m                          */}
-      {/* Standing row of colorful reference books                 */}
+      {/* CABINET / SHELVING RACK: [-4.79, 0, -3.64]               */}
+      {/* Sitting neatly on top of the storage box                 */}
       {/* ======================================================== */}
-      <group position={[-4.72, 0.82, -3.55]} rotation={[0, Math.PI / 2, 0]}>
-        <Book width={0.18} thickness={0.032} depth={0.15} color="#b91c1c" position={[-0.08, 0, 0]} />
-        <Book width={0.19} thickness={0.036} depth={0.15} color="#1d4ed8" position={[-0.04, 0, 0]} />
-        <Book width={0.17} thickness={0.028} depth={0.14} color="#047857" position={[0, 0, 0]} />
-        <Book width={0.20} thickness={0.038} depth={0.15} color="#b45309" position={[0.04, 0, 0]} />
-        <Book width={0.18} thickness={0.030} depth={0.14} color="#6d28d9" position={[0.08, 0, 0]} />
+      <group position={[-4.72, 0.805, -3.55]} rotation={[0, Math.PI / 2 + 0.08, 0]}>
+        <Book width={0.24} thickness={0.032} depth={0.16} color="#b91c1c" position={[0, 0, 0]} />
+        <Book width={0.21} thickness={0.028} depth={0.15} color="#1d4ed8" position={[0.008, 0.032, 0.005]} rotation={[0, 0.07, 0]} />
+        <Book width={0.18} thickness={0.022} depth={0.14} color="#f59e0b" position={[-0.005, 0.060, -0.005]} rotation={[0, -0.05, 0]} />
       </group>
     </group>
   )
