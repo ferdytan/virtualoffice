@@ -35,13 +35,13 @@ class ModelErrorBoundary extends Component {
 function BoxHeadFacePlate() {
   const texture = useTexture('/textures/boxhead_face_features.png')
   return (
-    <mesh position={[0, 0.01, 0.232]}>
+    <mesh position={[0, 0.01, 0.228]}>
       <planeGeometry args={[0.38, 0.38]} />
       <meshStandardMaterial
         map={texture}
         transparent={true}
         alphaTest={0.02}
-        roughness={0.35}
+        roughness={0.32}
         polygonOffset={true}
         polygonOffsetFactor={-2}
       />
@@ -51,16 +51,20 @@ function BoxHeadFacePlate() {
 
 /**
  * 3D BoxHead Rig:
- * Dynamically tracks the skeleton's 'head' bone world transform every frame,
- * applying the true rounded-cube head geometry directly atop the neck with
- * seamless synchronization to all skeletal animations (typing, waving, idling).
+ * Dynamically tracks the skeleton's 'head' bone world transform every frame.
+ * Features:
+ * - Chamfered rounded-cube head with unified color matching the body.
+ * - Smooth tapered neck collar mesh that seamlessly seals the junction between
+ *   the box bottom and the body collarbone without gaps or jagged artifacts.
+ * - Synchronized skeletal animation movement (typing, nodding, waving).
  */
-function BoxHeadRig({ clone }) {
+function BoxHeadRig({ clone, color }) {
   const boxRef = useRef()
   const tempPos = useMemo(() => new THREE.Vector3(), [])
   const tempQuat = useMemo(() => new THREE.Quaternion(), [])
   const parentQuat = useMemo(() => new THREE.Quaternion(), [])
-  const offset = useMemo(() => new THREE.Vector3(0, 0.22, 0.02), [])
+  // Sits comfortably down on the collar (Y = 0.17m above head bone)
+  const offset = useMemo(() => new THREE.Vector3(0, 0.17, 0.01), [])
   const rotatedOffset = useMemo(() => new THREE.Vector3(), [])
 
   useFrame(() => {
@@ -89,16 +93,28 @@ function BoxHeadRig({ clone }) {
     }
   })
 
+  const headColor = new THREE.Color(color)
+
   return (
     <group ref={boxRef}>
-      {/* Authentic Chamfered Rounded Cube Head (#94beea soft sky blue) */}
-      <RoundedBox args={[0.46, 0.44, 0.46]} radius={0.085} smoothness={8} castShadow receiveShadow>
+      {/* Authentic Chamfered Rounded Cube Head (Unified color with body) */}
+      <RoundedBox args={[0.45, 0.44, 0.45]} radius={0.085} smoothness={8} castShadow receiveShadow>
         <meshStandardMaterial
-          color="#94beea"
-          roughness={0.35}
-          metalness={0.04}
+          color={headColor}
+          roughness={0.32}
+          metalness={0.05}
         />
       </RoundedBox>
+
+      {/* Smooth Tapered Neck Collar - seamlessly closes the gap at the neck */}
+      <mesh position={[0, -0.21, -0.005]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.09, 0.13, 0.08, 32]} />
+        <meshStandardMaterial
+          color={headColor}
+          roughness={0.32}
+          metalness={0.05}
+        />
+      </mesh>
 
       {/* Front Face Features */}
       <Suspense fallback={null}>
@@ -112,7 +128,7 @@ function BoxHeadRig({ clone }) {
  * Inner component that loads and renders the 3D model.
  * Supports:
  * 1. 'default': Authentic spherical claymorphic chibi avatar from The Delegation
- * 2. 'boxhead': True rounded-cube chibi character matching user reference photos
+ * 2. 'boxhead': True rounded-cube chibi character with matching body & head color
  * 3. 'custom': User-uploaded .glb file with auto-scaling and bounding-box fit
  */
 function CharacterModel({
@@ -131,6 +147,8 @@ function CharacterModel({
   // Configure materials, accessories, and head visibility
   useEffect(() => {
     if (!clone) return
+
+    const agentColor = new THREE.Color(agent.color || '#38bdf8')
 
     if (avatarType === 'custom') {
       // Custom Uploaded 3D Model: auto-scale and center to fit the chair
@@ -151,10 +169,7 @@ function CharacterModel({
       })
     } else if (avatarType === 'boxhead') {
       // BoxHead Chibi Character:
-      // Body colored in slate blue (#446889).
-      // Crucial: collapse all vertices of the original round head (Y > 0.56) in the vertex shader,
-      // completely removing the spherical head so only the true rounded-cube head is visible!
-      const bodyColor = new THREE.Color('#446889')
+      // Unified color matching body and head seamlessly!
       clone.traverse((child) => {
         if (child.isMesh) {
           child.castShadow = true
@@ -162,7 +177,7 @@ function CharacterModel({
 
           if (child.name === 'body') {
             const bodyMat = new THREE.MeshStandardMaterial({
-              color: bodyColor,
+              color: agentColor,
               roughness: 0.32,
               metalness: 0.05
             })
@@ -171,7 +186,7 @@ function CharacterModel({
               shader.vertexShader = shader.vertexShader.replace(
                 '#include <begin_vertex>',
                 `#include <begin_vertex>
-                 if (position.y > 0.56) {
+                 if (position.y > 0.58) {
                    transformed = vec3(0.0);
                  }
                 `
@@ -185,7 +200,6 @@ function CharacterModel({
       })
     } else {
       // Default Chibi Avatar: clean spherical claymorphic finish, hidden accessories
-      const agentColor = new THREE.Color(agent.color || '#ef4444')
       clone.traverse((child) => {
         if (child.isMesh) {
           child.castShadow = true
@@ -255,7 +269,9 @@ function CharacterModel({
   return (
     <group ref={groupRef}>
       <primitive object={clone} />
-      {avatarType === 'boxhead' && <BoxHeadRig clone={clone} />}
+      {avatarType === 'boxhead' && (
+        <BoxHeadRig clone={clone} color={agent.color || '#38bdf8'} />
+      )}
     </group>
   )
 }
@@ -264,7 +280,7 @@ function CharacterModel({
  * AgentAvatar Component
  * Supports:
  * - 'default': Classic spherical chibi avatar
- * - 'boxhead': Rounded-cube chibi avatar (user's photos)
+ * - 'boxhead': Rounded-cube chibi avatar with matching body/head color & seamless neck
  * - 'custom': User-uploaded GLB model
  */
 export default function AgentAvatar({
@@ -273,7 +289,8 @@ export default function AgentAvatar({
   onSelect,
   position = [0, 0, 0],
   rotation = [0, 0, 0],
-  initialAnimation = 'Sit_Work'
+  initialAnimation = 'Sit_Work',
+  hideTooltip = false
 }) {
   const [hovered, setHovered] = useState(false)
   const agentColor = agent.color || '#38bdf8'
@@ -303,12 +320,13 @@ export default function AgentAvatar({
         document.body.style.cursor = 'auto'
       }}
     >
-      {/* --- Floating Hover Badge Pill --- */}
-      {(hovered || isSelected) && (
+      {/* --- Floating Hover Badge Pill (Hidden when any modal/dashboard is open) --- */}
+      {(hovered || isSelected) && !hideTooltip && (
         <Html
           position={[0, 1.45, 0]}
           center
           distanceFactor={9}
+          zIndexRange={[1, 5]}
           style={{ pointerEvents: 'none' }}
         >
           <div className="flex items-center gap-2 bg-slate-950/92 text-white px-3.5 py-1.5 rounded-full shadow-2xl border border-slate-700/80 backdrop-blur-md whitespace-nowrap animate-in fade-in zoom-in duration-150">
@@ -371,7 +389,7 @@ export default function AgentAvatar({
       >
         <Suspense fallback={null}>
           <CharacterModel
-            key={`${avatarType}_${effectiveModelUrl}`}
+            key={`${avatarType}_${effectiveModelUrl}_${agent.color}`}
             modelUrl={effectiveModelUrl}
             avatarType={avatarType}
             agent={agent}

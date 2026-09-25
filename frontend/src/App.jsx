@@ -4,7 +4,7 @@ import Sidebar from './components/Sidebar'
 import KanbanBar from './components/KanbanBar'
 import CallModal from './components/CallModal'
 import AvatarModal from './components/AvatarModal'
-import AgentDashboardModal from './components/AgentDashboardModal'
+import AgentWorkspaceView from './components/AgentWorkspaceView'
 import AgentCloseUpAvatar from './components/AgentCloseUpAvatar'
 import {
   RotateCcw
@@ -106,7 +106,7 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isCallModalOpen, setIsCallModalOpen] = useState(false)
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false)
-  const [isDashboardModalOpen, setIsDashboardModalOpen] = useState(false)
+  const [viewMode, setViewMode] = useState('office') // 'office' | 'agent_workspace'
   const [backendStatus, setBackendStatus] = useState('checking')
   const [tasks, setTasks] = useState(INITIAL_TASKS)
   const [chatHistory, setChatHistory] = useState({
@@ -414,37 +414,56 @@ export default function App() {
         </div>
       </header>
 
-      {/* --- 3D OFFICE SCENE CANVAS --- */}
-      <main className="w-full h-full">
-        <OfficeScene
+      {/* If in Agent Workspace Mode, render the dedicated 20% / 80% AgentWorkspaceView */}
+      {viewMode === 'agent_workspace' ? (
+        <AgentWorkspaceView
+          agent={selectedAgent || agents[0]}
           agents={agents}
-          selectedAgent={selectedAgent}
           onSelectAgent={handleSelectAgent}
-        />
-      </main>
-
-      {/* --- SIDEBAR AGENT PROFILE & BRIEF --- */}
-      {isSidebarOpen && selectedAgent && (
-        <Sidebar
-          agent={selectedAgent}
-          onClose={() => {
-            setIsSidebarOpen(false)
-            setSelectedAgent(null)
-          }}
+          onBackToOffice={() => setViewMode('office')}
           onOpenCall={handleOpenCall}
           onOpenAvatarModal={() => setIsAvatarModalOpen(true)}
-          onOpenDashboardModal={() => setIsDashboardModalOpen(true)}
           onSendBrief={handleSendBrief}
-          chatHistory={chatHistory[selectedAgent.id] || []}
-          isLoading={isLoadingBrief}
         />
-      )}
+      ) : (
+        <>
+          {/* --- 3D OFFICE SCENE CANVAS --- */}
+          <main className="w-full h-full">
+            <OfficeScene
+              agents={agents}
+              selectedAgent={selectedAgent}
+              onSelectAgent={handleSelectAgent}
+              hideTooltip={isAvatarModalOpen || isCallModalOpen}
+            />
+          </main>
 
-      {/* --- KANBAN STATUS BAR (BOTTOM) --- */}
-      <KanbanBar
-        tasks={tasks}
-        onSelectAgentById={handleSelectAgentById}
-      />
+          {/* --- SIDEBAR AGENT PROFILE & BRIEF --- */}
+          {isSidebarOpen && selectedAgent && (
+            <Sidebar
+              agent={selectedAgent}
+              onClose={() => {
+                setIsSidebarOpen(false)
+                setSelectedAgent(null)
+              }}
+              onOpenCall={handleOpenCall}
+              onOpenAvatarModal={() => setIsAvatarModalOpen(true)}
+              onOpenDashboardModal={() => {
+                setViewMode('agent_workspace')
+                setIsSidebarOpen(false)
+              }}
+              onSendBrief={handleSendBrief}
+              chatHistory={chatHistory[selectedAgent.id] || []}
+              isLoading={isLoadingBrief}
+            />
+          )}
+
+          {/* --- KANBAN STATUS BAR (BOTTOM) --- */}
+          <KanbanBar
+            tasks={tasks}
+            onSelectAgentById={handleSelectAgentById}
+          />
+        </>
+      )}
 
       {/* --- INTERACTIVE TWO-WAY VOICE CALL MODAL --- */}
       {isCallModalOpen && (
@@ -464,16 +483,6 @@ export default function App() {
           onClose={() => setIsAvatarModalOpen(false)}
           onSelectAvatarType={handleSelectAvatarType}
           onUpdateAgentModel={handleUpdateAgentModel}
-        />
-      )}
-
-      {/* --- ROLE-SPECIFIC WORKSPACE DASHBOARD MODAL --- */}
-      {isDashboardModalOpen && selectedAgent && (
-        <AgentDashboardModal
-          agent={selectedAgent}
-          isOpen={isDashboardModalOpen}
-          onClose={() => setIsDashboardModalOpen(false)}
-          onDelegateBrief={handleSendBrief}
         />
       )}
     </div>

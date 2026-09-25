@@ -160,7 +160,8 @@ useGLTF.preload('/models/office.glb', '/draco/')
 export default function OfficeScene({
   agents = [],
   selectedAgent,
-  onSelectAgent
+  onSelectAgent,
+  hideTooltip = false
 }) {
   return (
     <div className="w-full h-full relative cursor-grab active:cursor-grabbing">
@@ -218,6 +219,7 @@ export default function OfficeScene({
               position={agent.position || [0, 0, 0]}
               rotation={agent.rotation || [0, 0, 0]}
               initialAnimation="Sit_Work"
+              hideTooltip={hideTooltip}
             />
           ))}
         </Suspense>
