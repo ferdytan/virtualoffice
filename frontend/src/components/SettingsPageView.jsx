@@ -309,8 +309,8 @@ export default function SettingsPageView({
                     </span>
                   </div>
 
-                  {/* Floor Option Cards: Parquet / Granite / White */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1">
+                  {/* Floor Option Cards: Parquet / White */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                     {/* Option 1: Parket Kayu Hangat (Oak Wood Parquet) */}
                     <div
                       onClick={() => handleSelectFloor('parquet')}
@@ -338,56 +338,20 @@ export default function SettingsPageView({
                           Parket Kayu Hangat
                         </h4>
                         <p className="text-[11px] text-slate-500 leading-relaxed">
-                          Papan kayu oak Skandinavia dengan garis serat alami, membuat suasana kantor terasa hangat dan nyaman.
+                          Papan kayu oak Skandinavia dengan garis serat alami dan pola sambungan rapi, menghadirkan nuansa kantor yang hangat, hidup, dan nyaman.
                         </p>
                       </div>
 
                       {/* Swatch Preview */}
                       <div className="mt-3.5 pt-2 border-t border-slate-100 flex items-center gap-1.5">
-                        <span className="w-3 h-3 rounded-full bg-[#bf935d]" />
-                        <span className="w-3 h-3 rounded-full bg-[#b5864e]" />
-                        <span className="w-3 h-3 rounded-full bg-[#c49963]" />
-                        <span className="text-[10px] font-semibold text-slate-400 ml-1">Oak Parquet</span>
+                        <span className="w-3 h-3 rounded-full bg-[#c8965a]" />
+                        <span className="w-3 h-3 rounded-full bg-[#b88448]" />
+                        <span className="w-3 h-3 rounded-full bg-[#d4a367]" />
+                        <span className="text-[10px] font-semibold text-slate-400 ml-1">Oak Parquet Planks</span>
                       </div>
                     </div>
 
-                    {/* Option 2: Granit Polished (Granite Tile) */}
-                    <div
-                      onClick={() => handleSelectFloor('granite')}
-                      className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
-                        scenerySettings.floorType === 'granite'
-                          ? 'border-slate-900 bg-slate-50 shadow-sm ring-2 ring-slate-900/10'
-                          : 'border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50'
-                      }`}
-                    >
-                      <div>
-                        <div className="flex items-center justify-between mb-2.5">
-                          <span className="text-xl">🏛️</span>
-                          {scenerySettings.floorType === 'granite' && (
-                            <span className="flex items-center gap-1 text-[9px] font-extrabold text-slate-900 bg-slate-200/90 px-2 py-0.5 rounded-full">
-                              <Check className="w-3 h-3 text-slate-900" />
-                              Aktif
-                            </span>
-                          )}
-                        </div>
-                        <h4 className="text-xs font-black text-slate-900 mb-1">
-                          Granit Polished
-                        </h4>
-                        <p className="text-[11px] text-slate-500 leading-relaxed">
-                          Ubin batu granit gelap elegan dengan refleksi kilap halus dan mineral flecks untuk tampilan studio modern.
-                        </p>
-                      </div>
-
-                      {/* Swatch Preview */}
-                      <div className="mt-3.5 pt-2 border-t border-slate-100 flex items-center gap-1.5">
-                        <span className="w-3 h-3 rounded-full bg-[#283142]" />
-                        <span className="w-3 h-3 rounded-full bg-[#334155]" />
-                        <span className="w-3 h-3 rounded-full bg-[#1a202c]" />
-                        <span className="text-[10px] font-semibold text-slate-400 ml-1">Slate Granite</span>
-                      </div>
-                    </div>
-
-                    {/* Option 3: Putih Bersih (Clean Studio White) */}
+                    {/* Option 2: Putih Bersih (Clean Studio White) */}
                     <div
                       onClick={() => handleSelectFloor('white')}
                       className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
@@ -410,7 +374,7 @@ export default function SettingsPageView({
                           Putih Studio Bersih
                         </h4>
                         <p className="text-[11px] text-slate-500 leading-relaxed">
-                          Ubin studio putih bersih dengan garis grid lapang, terang, dan minimalis.
+                          Ubin studio putih bersih dengan garis nat halus minimalis, memberikan kesan lapang, terang, dan modern.
                         </p>
                       </div>
 
@@ -418,7 +382,7 @@ export default function SettingsPageView({
                       <div className="mt-3.5 pt-2 border-t border-slate-100 flex items-center gap-1.5">
                         <span className="w-3 h-3 rounded-full bg-[#f8fafc] border border-slate-300" />
                         <span className="w-3 h-3 rounded-full bg-[#e2e8f0]" />
-                        <span className="text-[10px] font-semibold text-slate-400 ml-1">Studio White</span>
+                        <span className="text-[10px] font-semibold text-slate-400 ml-1">Studio White Tiles</span>
                       </div>
                     </div>
                   </div>

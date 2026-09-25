@@ -1,114 +1,12 @@
 import React, { useRef, useEffect, useMemo, Suspense } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls, useGLTF, ContactShadows } from '@react-three/drei'
+import { OrbitControls, useGLTF, useTexture, ContactShadows } from '@react-three/drei'
 import * as THREE from 'three'
 import AgentAvatar from './AgentAvatar'
 import ScreenDisplays from './ScreenDisplays'
 import CoffeeCorner from './CoffeeCorner'
 import OfficeNPC from './OfficeNPC'
 import DeskAccessories from './DeskAccessories'
-
-/**
- * Procedurally generates realistic tile and plank textures for the office floor:
- * - 'parquet': Warm Scandinavian oak wood parquet planks with natural grain
- * - 'granite': Polished charcoal/slate granite stone tiles with mineral flecks
- * - 'white': Clean studio white tile grid with crisp grout lines
- */
-function createFloorTexture(type = 'parquet') {
-  if (typeof document === 'undefined') return null
-  const canvas = document.createElement('canvas')
-  canvas.width = 512
-  canvas.height = 512
-  const ctx = canvas.getContext('2d')
-
-  if (type === 'granite') {
-    // Elegant Polished Charcoal / Slate Granite Tiles
-    ctx.fillStyle = '#2d3748'
-    ctx.fillRect(0, 0, 512, 512)
-
-    const tileSize = 128
-    const tileColors = ['#283142', '#334155', '#242e3d', '#3a4a61']
-
-    for (let y = 0; y < 512; y += tileSize) {
-      for (let x = 0; x < 512; x += tileSize) {
-        const cIdx = Math.floor((x / tileSize + y / tileSize) % tileColors.length)
-        ctx.fillStyle = tileColors[cIdx]
-        ctx.fillRect(x, y, tileSize, tileSize)
-
-        // Granite speckles / mineral flecks
-        for (let s = 0; s < 50; s++) {
-          const sx = x + Math.random() * tileSize
-          const sy = y + Math.random() * tileSize
-          ctx.fillStyle = Math.random() > 0.4 ? 'rgba(255,255,255,0.22)' : 'rgba(15,23,42,0.45)'
-          ctx.beginPath()
-          ctx.arc(sx, sy, Math.random() * 2 + 0.5, 0, Math.PI * 2)
-          ctx.fill()
-        }
-
-        // Grout line
-        ctx.strokeStyle = '#1a202c'
-        ctx.lineWidth = 2
-        ctx.strokeRect(x, y, tileSize, tileSize)
-      }
-    }
-  } else if (type === 'white') {
-    // Studio White Tile Grid
-    ctx.fillStyle = '#f8fafc'
-    ctx.fillRect(0, 0, 512, 512)
-
-    const tileSize = 128
-    for (let y = 0; y < 512; y += tileSize) {
-      for (let x = 0; x < 512; x += tileSize) {
-        ctx.fillStyle = ((x / tileSize) + (y / tileSize)) % 2 === 0 ? '#f8fafc' : '#f1f5f9'
-        ctx.fillRect(x, y, tileSize, tileSize)
-
-        ctx.strokeStyle = '#e2e8f0'
-        ctx.lineWidth = 1.5
-        ctx.strokeRect(x, y, tileSize, tileSize)
-      }
-    }
-  } else {
-    // 'parquet' - Warm Scandinavian Oak Wood Parquet Planks
-    ctx.fillStyle = '#b88c56'
-    ctx.fillRect(0, 0, 512, 512)
-
-    const plankHeight = 32
-    const plankWidth = 128
-    const woodColors = [
-      '#bf935d', '#b5864e', '#c49963', '#ad7e46', '#c99f69', '#ba8c53'
-    ]
-
-    for (let y = 0; y < 512; y += plankHeight) {
-      const rowOffset = (y / plankHeight) % 2 === 0 ? 0 : plankWidth / 2
-      for (let x = -plankWidth; x < 512 + plankWidth; x += plankWidth) {
-        const posX = x + rowOffset
-        const seed = Math.abs(Math.sin(posX * 12.9898 + y * 78.233))
-        const colorIdx = Math.floor(seed * woodColors.length) % woodColors.length
-        ctx.fillStyle = woodColors[colorIdx]
-        ctx.fillRect(posX, y, plankWidth, plankHeight)
-
-        // Wood grain streaks
-        ctx.fillStyle = 'rgba(70, 40, 15, 0.08)'
-        for (let g = 0; g < 4; g++) {
-          const gy = y + 4 + g * 7
-          ctx.fillRect(posX + 2, gy, plankWidth - 4, 1.5)
-        }
-
-        // Dark plank seams
-        ctx.strokeStyle = '#6d4822'
-        ctx.lineWidth = 1.2
-        ctx.strokeRect(posX, y, plankWidth, plankHeight)
-      }
-    }
-  }
-
-  const texture = new THREE.CanvasTexture(canvas)
-  texture.wrapS = THREE.RepeatWrapping
-  texture.wrapT = THREE.RepeatWrapping
-  texture.repeat.set(type === 'parquet' ? 8 : 6, type === 'parquet' ? 8 : 6)
-  texture.needsUpdate = true
-  return texture
-}
 
 /**
  * Camera controller that smoothly transitions focus when an agent is selected.
@@ -352,13 +250,28 @@ function colorizeCabinetMesh(mesh) {
 function DelegationOffice({ scenerySettings }) {
   const { scene } = useGLTF('/models/office.glb', '/draco/')
   const theme = scenerySettings?.theme || 'colorful'
-  const floorType = scenerySettings?.floorType || 'parquet'
+  const floorType = scenerySettings?.floorType === 'white' ? 'white' : 'parquet'
   const isColorful = theme === 'colorful'
 
-  const floorTex = useMemo(() => createFloorTexture(floorType), [floorType])
+  const textures = useTexture({
+    parquet: '/textures/parquet.png',
+    white: '/textures/white_tiles.png'
+  })
+
+  const floorTex = textures[floorType] || textures.parquet
 
   useEffect(() => {
-    if (!scene) return
+    if (!scene || !floorTex) return
+
+    floorTex.wrapS = THREE.RepeatWrapping
+    floorTex.wrapT = THREE.RepeatWrapping
+    // Plane.001 UV range is ~5.7 units across 10m:
+    // repeat 1.0 = ~5.6 repeats across 10m (each plank ~45cm x 11cm, perfect parquet scale!)
+    // white tile repeat 1.5 = ~8.5 repeats across 10m
+    floorTex.repeat.set(floorType === 'white' ? 1.5 : 1.0, floorType === 'white' ? 1.5 : 1.0)
+    floorTex.colorSpace = THREE.SRGBColorSpace
+    floorTex.anisotropy = 16
+    floorTex.needsUpdate = true
 
     scene.traverse((child) => {
       if (child.isMesh) {
@@ -367,20 +280,18 @@ function DelegationOffice({ scenerySettings }) {
         const name = (child.name || '').toLowerCase()
         const parentName = (child.parent?.name || '').toLowerCase()
 
-        if (name.includes('navmesh') || parentName.includes('navmesh')) {
+        if (name.includes('navmesh') || parentName.includes('navmesh') || name === 'plane.002' || name === 'plane002') {
           child.visible = false
           return
         }
 
-        // --- 1. FLOOR TEXTURE (PARQUET / GRANITE / WHITE) ---
-        if (name.includes('floor') || parentName.includes('floor') || name === 'plane.001') {
-          if (floorTex) {
-            child.material = new THREE.MeshStandardMaterial({
-              map: floorTex,
-              roughness: floorType === 'granite' ? 0.2 : floorType === 'parquet' ? 0.38 : 0.45,
-              metalness: floorType === 'granite' ? 0.08 : 0.02
-            })
-          }
+        // --- 1. FLOOR TEXTURE (PARQUET / WHITE) ---
+        if (name.includes('floor') || parentName.includes('floor') || name === 'plane.001' || name === 'plane001') {
+          child.material = new THREE.MeshStandardMaterial({
+            map: floorTex,
+            roughness: floorType === 'white' ? 0.42 : 0.32,
+            metalness: 0.02
+          })
           return
         }
 
@@ -583,6 +494,8 @@ function DelegationOffice({ scenerySettings }) {
 }
 
 useGLTF.preload('/models/office.glb', '/draco/')
+useTexture.preload('/textures/parquet.png')
+useTexture.preload('/textures/white_tiles.png')
 
 /**
  * Main OfficeScene Component
