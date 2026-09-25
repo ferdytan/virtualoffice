@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useMemo, useState, Suspense, Component } from 'react'
-import { useGLTF, useAnimations, Html } from '@react-three/drei'
-import { RoundedBoxGeometry } from 'three-stdlib'
+import { useFrame } from '@react-three/fiber'
+import { useGLTF, useAnimations, useTexture, RoundedBox, Html } from '@react-three/drei'
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js'
 import * as THREE from 'three'
 
@@ -28,10 +28,91 @@ class ModelErrorBoundary extends Component {
 }
 
 /**
+ * Face plate component for the BoxHead character,
+ * rendering the determined eyebrows, anime eyes with white catchlight highlights,
+ * and inverted-V mouth.
+ */
+function BoxHeadFacePlate() {
+  const texture = useTexture('/textures/boxhead_face_features.png')
+  return (
+    <mesh position={[0, 0.01, 0.232]}>
+      <planeGeometry args={[0.38, 0.38]} />
+      <meshStandardMaterial
+        map={texture}
+        transparent={true}
+        alphaTest={0.02}
+        roughness={0.35}
+        polygonOffset={true}
+        polygonOffsetFactor={-2}
+      />
+    </mesh>
+  )
+}
+
+/**
+ * 3D BoxHead Rig:
+ * Dynamically tracks the skeleton's 'head' bone world transform every frame,
+ * applying the true rounded-cube head geometry directly atop the neck with
+ * seamless synchronization to all skeletal animations (typing, waving, idling).
+ */
+function BoxHeadRig({ clone }) {
+  const boxRef = useRef()
+  const tempPos = useMemo(() => new THREE.Vector3(), [])
+  const tempQuat = useMemo(() => new THREE.Quaternion(), [])
+  const parentQuat = useMemo(() => new THREE.Quaternion(), [])
+  const offset = useMemo(() => new THREE.Vector3(0, 0.22, 0.02), [])
+  const rotatedOffset = useMemo(() => new THREE.Vector3(), [])
+
+  useFrame(() => {
+    if (!boxRef.current || !clone) return
+    const headBone = clone.getObjectByName('head')
+    if (headBone) {
+      headBone.getWorldPosition(tempPos)
+      headBone.getWorldQuaternion(tempQuat)
+
+      // Apply head bone rotation to the neck-to-head center offset
+      rotatedOffset.copy(offset).applyQuaternion(tempQuat)
+      tempPos.add(rotatedOffset)
+
+      // Convert world position into parent group's local space
+      if (boxRef.current.parent) {
+        boxRef.current.parent.worldToLocal(tempPos)
+
+        // Convert world rotation into parent group's local space
+        boxRef.current.parent.getWorldQuaternion(parentQuat)
+        parentQuat.invert()
+        tempQuat.premultiply(parentQuat)
+      }
+
+      boxRef.current.position.copy(tempPos)
+      boxRef.current.quaternion.copy(tempQuat)
+    }
+  })
+
+  return (
+    <group ref={boxRef}>
+      {/* Authentic Chamfered Rounded Cube Head (#94beea soft sky blue) */}
+      <RoundedBox args={[0.46, 0.44, 0.46]} radius={0.085} smoothness={8} castShadow receiveShadow>
+        <meshStandardMaterial
+          color="#94beea"
+          roughness={0.35}
+          metalness={0.04}
+        />
+      </RoundedBox>
+
+      {/* Front Face Features */}
+      <Suspense fallback={null}>
+        <BoxHeadFacePlate />
+      </Suspense>
+    </group>
+  )
+}
+
+/**
  * Inner component that loads and renders the 3D model.
  * Supports:
  * 1. 'default': Authentic spherical claymorphic chibi avatar from The Delegation
- * 2. 'boxhead': Rounded-cube chibi character matching user reference photos (#94beea pastel head, determined face, #446889 slate body)
+ * 2. 'boxhead': True rounded-cube chibi character matching user reference photos
  * 3. 'custom': User-uploaded .glb file with auto-scaling and bounding-box fit
  */
 function CharacterModel({
@@ -47,7 +128,7 @@ function CharacterModel({
   const clone = useMemo(() => SkeletonUtils.clone(scene), [scene])
   const { actions } = useAnimations(animations, groupRef)
 
-  // Configure materials, accessories, and BoxHead head attachment
+  // Configure materials, accessories, and head visibility
   useEffect(() => {
     if (!clone) return
 
@@ -69,8 +150,10 @@ function CharacterModel({
         }
       })
     } else if (avatarType === 'boxhead') {
-      // BoxHead Chibi Character (from user photos):
-      // 1. Body: Darker slate blue (#446889) or agent color
+      // BoxHead Chibi Character:
+      // Body colored in slate blue (#446889).
+      // Crucial: collapse all vertices of the original round head (Y > 0.56) in the vertex shader,
+      // completely removing the spherical head so only the true rounded-cube head is visible!
       const bodyColor = new THREE.Color('#446889')
       clone.traverse((child) => {
         if (child.isMesh) {
@@ -78,61 +161,30 @@ function CharacterModel({
           child.receiveShadow = true
 
           if (child.name === 'body') {
-            child.material = new THREE.MeshStandardMaterial({
+            const bodyMat = new THREE.MeshStandardMaterial({
               color: bodyColor,
               roughness: 0.32,
               metalness: 0.05
             })
+            // Hide the original round head by collapsing vertices above the neck to zero
+            bodyMat.onBeforeCompile = (shader) => {
+              shader.vertexShader = shader.vertexShader.replace(
+                '#include <begin_vertex>',
+                `#include <begin_vertex>
+                 if (position.y > 0.56) {
+                   transformed = vec3(0.0);
+                 }
+                `
+              )
+            }
+            child.material = bodyMat
           } else if (child.name === 'eyes' || child.name === 'mouth' || child.name === 'cap' || child.name === 'headphones') {
             child.visible = false
           }
         }
       })
-
-      // 2. Attach RoundedBox Head directly to the skeleton 'head' bone
-      const headBone = clone.getObjectByName('head')
-      if (headBone) {
-        // Remove any previous instance of boxhead_group
-        const existing = headBone.getObjectByName('boxhead_group')
-        if (existing) headBone.remove(existing)
-
-        const boxGroup = new THREE.Group()
-        boxGroup.name = 'boxhead_group'
-
-        // 3D Rounded Box Head (soft chamfered cube)
-        // args: width, height, depth, segments, radius
-        const headGeom = new RoundedBoxGeometry(0.45, 0.44, 0.46, 8, 0.085)
-        const headMat = new THREE.MeshStandardMaterial({
-          color: new THREE.Color('#94beea'),
-          roughness: 0.35,
-          metalness: 0.04
-        })
-        const headMesh = new THREE.Mesh(headGeom, headMat)
-        headMesh.castShadow = true
-        headMesh.receiveShadow = true
-        headMesh.position.set(0, 0.22, 0.02)
-        boxGroup.add(headMesh)
-
-        // Front Face plate with determined eyebrows, anime eyes with white catchlight speculars, and inverted-V mouth
-        const faceTex = new THREE.TextureLoader().load('/textures/boxhead_face_features.png')
-        faceTex.colorSpace = THREE.SRGBColorSpace
-        const faceGeom = new THREE.PlaneGeometry(0.38, 0.38)
-        const faceMat = new THREE.MeshStandardMaterial({
-          map: faceTex,
-          transparent: true,
-          alphaTest: 0.02,
-          roughness: 0.35,
-          polygonOffset: true,
-          polygonOffsetFactor: -1
-        })
-        const faceMesh = new THREE.Mesh(faceGeom, faceMat)
-        faceMesh.position.set(0, 0.22, 0.252)
-        boxGroup.add(faceMesh)
-
-        headBone.add(boxGroup)
-      }
     } else {
-      // Default Chibi Avatar: clean claymorphic finish, hidden accessories
+      // Default Chibi Avatar: clean spherical claymorphic finish, hidden accessories
       const agentColor = new THREE.Color(agent.color || '#ef4444')
       clone.traverse((child) => {
         if (child.isMesh) {
@@ -153,19 +205,6 @@ function CharacterModel({
           }
         }
       })
-
-      // Ensure no leftover boxhead on default
-      const headBone = clone.getObjectByName('head')
-      if (headBone) {
-        const existing = headBone.getObjectByName('boxhead_group')
-        if (existing) headBone.remove(existing)
-      }
-    }
-
-    return () => {
-      const hb = clone?.getObjectByName('head')
-      const existing = hb?.getObjectByName('boxhead_group')
-      if (existing && hb) hb.remove(existing)
     }
   }, [clone, avatarType, agent.color])
 
@@ -194,7 +233,7 @@ function CharacterModel({
         }
       }
     } else {
-      // Custom model animations: find Sit, Work, Idle, or default to the first animation
+      // Custom model animations: find Sit, Work, Idle, or default to first animation
       const animNames = Object.keys(actions)
       let targetAnim = null
       for (const name of animNames) {
@@ -216,6 +255,7 @@ function CharacterModel({
   return (
     <group ref={groupRef}>
       <primitive object={clone} />
+      {avatarType === 'boxhead' && <BoxHeadRig clone={clone} />}
     </group>
   )
 }
@@ -346,3 +386,4 @@ export default function AgentAvatar({
 }
 
 useGLTF.preload('/models/character.glb', '/draco/')
+useTexture.preload('/textures/boxhead_face_features.png')

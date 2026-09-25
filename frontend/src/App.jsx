@@ -3,6 +3,8 @@ import OfficeScene from './components/OfficeScene'
 import Sidebar from './components/Sidebar'
 import KanbanBar from './components/KanbanBar'
 import CallModal from './components/CallModal'
+import AvatarModal from './components/AvatarModal'
+import AgentDashboardModal from './components/AgentDashboardModal'
 import AgentCloseUpAvatar from './components/AgentCloseUpAvatar'
 import {
   RotateCcw
@@ -103,6 +105,8 @@ export default function App() {
   const [selectedAgent, setSelectedAgent] = useState(null)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isCallModalOpen, setIsCallModalOpen] = useState(false)
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false)
+  const [isDashboardModalOpen, setIsDashboardModalOpen] = useState(false)
   const [backendStatus, setBackendStatus] = useState('checking')
   const [tasks, setTasks] = useState(INITIAL_TASKS)
   const [chatHistory, setChatHistory] = useState({
@@ -428,9 +432,9 @@ export default function App() {
             setSelectedAgent(null)
           }}
           onOpenCall={handleOpenCall}
+          onOpenAvatarModal={() => setIsAvatarModalOpen(true)}
+          onOpenDashboardModal={() => setIsDashboardModalOpen(true)}
           onSendBrief={handleSendBrief}
-          onUpdateAgentModel={handleUpdateAgentModel}
-          onSelectAvatarType={handleSelectAvatarType}
           chatHistory={chatHistory[selectedAgent.id] || []}
           isLoading={isLoadingBrief}
         />
@@ -449,6 +453,27 @@ export default function App() {
           isOpen={isCallModalOpen}
           onClose={() => setIsCallModalOpen(false)}
           backendUrl={backendUrl}
+        />
+      )}
+
+      {/* --- AVATAR 3D SETTINGS MODAL --- */}
+      {isAvatarModalOpen && selectedAgent && (
+        <AvatarModal
+          agent={selectedAgent}
+          isOpen={isAvatarModalOpen}
+          onClose={() => setIsAvatarModalOpen(false)}
+          onSelectAvatarType={handleSelectAvatarType}
+          onUpdateAgentModel={handleUpdateAgentModel}
+        />
+      )}
+
+      {/* --- ROLE-SPECIFIC WORKSPACE DASHBOARD MODAL --- */}
+      {isDashboardModalOpen && selectedAgent && (
+        <AgentDashboardModal
+          agent={selectedAgent}
+          isOpen={isDashboardModalOpen}
+          onClose={() => setIsDashboardModalOpen(false)}
+          onDelegateBrief={handleSendBrief}
         />
       )}
     </div>
