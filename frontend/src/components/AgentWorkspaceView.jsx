@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import {
   ArrowLeft,
   Calendar,
@@ -32,6 +32,7 @@ import {
   ExternalLink
 } from 'lucide-react'
 import AgentCloseUpAvatar from './AgentCloseUpAvatar'
+import AgentAvatarSettingsView from './AgentAvatarSettingsView'
 
 export default function AgentWorkspaceView({
   agent,
@@ -39,10 +40,17 @@ export default function AgentWorkspaceView({
   onSelectAgent,
   onBackToOffice,
   onOpenCall,
-  onOpenAvatarModal,
-  onSendBrief
+  onSendBrief,
+  onSelectAvatarType,
+  onUpdateAgentModel,
+  onUpdateAgentColor
 }) {
+  const [leftPanelView, setLeftPanelView] = useState('menu') // 'menu' | 'avatar_settings'
   const [copiedId, setCopiedId] = useState(null)
+
+  useEffect(() => {
+    setLeftPanelView('menu')
+  }, [agent?.id])
   const [briefInput, setBriefInput] = useState('')
   const [briefFeedback, setBriefFeedback] = useState(null)
 
@@ -532,8 +540,12 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
 
           {/* Gear icon for avatar */}
           <button
-            onClick={onOpenAvatarModal}
-            className="p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 active:scale-95 transition-all cursor-pointer border border-slate-200/60"
+            onClick={() => setLeftPanelView((prev) => (prev === 'avatar_settings' ? 'menu' : 'avatar_settings'))}
+            className={`p-2 rounded-xl active:scale-95 transition-all cursor-pointer border ${
+              leftPanelView === 'avatar_settings'
+                ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
+                : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100 border-slate-200/60'
+            }`}
             title="Pengaturan Avatar & Warna 3D"
           >
             <Settings className="w-4 h-4" />
@@ -555,29 +567,47 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
         {/* ======================================================== */}
         {/* LEFT CONTROL PANEL (20-22% WIDTH)                        */}
         {/* ======================================================== */}
-        <aside className="w-72 lg:w-80 shrink-0 bg-white border-r border-slate-200/90 flex flex-col p-4 overflow-y-auto space-y-4">
-          {/* Agent Profile Hero */}
-          <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200/80">
-            <div className="flex items-center gap-3 mb-2.5">
-              <AgentCloseUpAvatar agent={agent} size={48} showStatus={true} />
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <h3 className="text-sm font-black text-slate-900 truncate">{agent.name}</h3>
-                  <span
-                    className="text-[9px] font-extrabold px-1.5 py-0.2 rounded text-white tracking-wider uppercase shadow-2xs"
-                    style={{ backgroundColor: agentColor }}
-                  >
-                    {agent.role_badge}
-                  </span>
+        <aside className="w-72 lg:w-80 shrink-0 bg-white border-r border-slate-200/90 flex flex-col overflow-hidden">
+          {leftPanelView === 'avatar_settings' ? (
+            <AgentAvatarSettingsView
+              agent={agent}
+              onSelectAvatarType={onSelectAvatarType}
+              onUpdateAgentModel={onUpdateAgentModel}
+              onUpdateAgentColor={onUpdateAgentColor}
+              onBack={() => setLeftPanelView('menu')}
+            />
+          ) : (
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col">
+              {/* Agent Profile Hero */}
+              <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200/80 shrink-0">
+                <div className="flex items-center gap-3 mb-2.5">
+                  <AgentCloseUpAvatar agent={agent} size={48} showStatus={true} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <h3 className="text-sm font-black text-slate-900 truncate">{agent.name}</h3>
+                      <button
+                        type="button"
+                        onClick={() => setLeftPanelView('avatar_settings')}
+                        className="p-1 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-200/60 transition-colors cursor-pointer"
+                        title="Pengaturan Avatar & Warna 3D"
+                      >
+                        <Settings className="w-3.5 h-3.5" />
+                      </button>
+                      <span
+                        className="text-[9px] font-extrabold px-1.5 py-0.2 rounded text-white tracking-wider uppercase shadow-2xs ml-auto shrink-0"
+                        style={{ backgroundColor: agentColor }}
+                      >
+                        {agent.role_badge}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 font-medium truncate">{agent.role}</p>
+                  </div>
                 </div>
-                <p className="text-[11px] text-slate-500 font-medium truncate">{agent.role}</p>
-              </div>
-            </div>
 
-            <p className="text-[11px] text-slate-600 leading-relaxed bg-white p-2.5 rounded-xl border border-slate-200/70">
-              {agent.description}
-            </p>
-          </div>
+                <p className="text-[11px] text-slate-600 leading-relaxed bg-white p-2.5 rounded-xl border border-slate-200/70">
+                  {agent.description}
+                </p>
+              </div>
 
           {/* Vertical Menu Navigation for Modules */}
           <div className="space-y-1.5 flex-1">
@@ -712,6 +742,8 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
               </p>
             )}
           </div>
+            </div>
+          )}
         </aside>
 
         {/* ======================================================== */}

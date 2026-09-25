@@ -3,7 +3,6 @@ import OfficeScene from './components/OfficeScene'
 import Sidebar from './components/Sidebar'
 import KanbanBar from './components/KanbanBar'
 import CallModal from './components/CallModal'
-import AvatarModal from './components/AvatarModal'
 import AgentWorkspaceView from './components/AgentWorkspaceView'
 import AgentCloseUpAvatar from './components/AgentCloseUpAvatar'
 import SettingsPageView from './components/SettingsPageView'
@@ -108,7 +107,6 @@ export default function App() {
   const [selectedAgent, setSelectedAgent] = useState(null)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isCallModalOpen, setIsCallModalOpen] = useState(false)
-  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false)
   const [scenerySettings, setScenerySettings] = useState(() => {
     try {
       const saved = localStorage.getItem('virtual_office_scenery_settings')
@@ -494,8 +492,10 @@ export default function App() {
           onSelectAgent={handleSelectAgent}
           onBackToOffice={() => setViewMode('office')}
           onOpenCall={handleOpenCall}
-          onOpenAvatarModal={() => setIsAvatarModalOpen(true)}
           onSendBrief={handleSendBrief}
+          onSelectAvatarType={handleSelectAvatarType}
+          onUpdateAgentModel={handleUpdateAgentModel}
+          onUpdateAgentColor={handleUpdateAgentColor}
         />
       ) : (
         <>
@@ -505,7 +505,7 @@ export default function App() {
               agents={agents}
               selectedAgent={selectedAgent}
               onSelectAgent={handleSelectAgent}
-              hideTooltip={isAvatarModalOpen || isCallModalOpen}
+              hideTooltip={isCallModalOpen || isSidebarOpen}
               scenerySettings={scenerySettings}
             />
           </main>
@@ -519,7 +519,6 @@ export default function App() {
                 setSelectedAgent(null)
               }}
               onOpenCall={handleOpenCall}
-              onOpenAvatarModal={() => setIsAvatarModalOpen(true)}
               onOpenDashboardModal={() => {
                 setViewMode('agent_workspace')
                 setIsSidebarOpen(false)
@@ -527,6 +526,9 @@ export default function App() {
               onSendBrief={handleSendBrief}
               chatHistory={chatHistory[selectedAgent.id] || []}
               isLoading={isLoadingBrief}
+              onSelectAvatarType={handleSelectAvatarType}
+              onUpdateAgentModel={handleUpdateAgentModel}
+              onUpdateAgentColor={handleUpdateAgentColor}
             />
           )}
 
@@ -545,18 +547,6 @@ export default function App() {
           isOpen={isCallModalOpen}
           onClose={() => setIsCallModalOpen(false)}
           backendUrl={backendUrl}
-        />
-      )}
-
-      {/* --- AVATAR 3D SETTINGS MODAL --- */}
-      {isAvatarModalOpen && selectedAgent && (
-        <AvatarModal
-          agent={selectedAgent}
-          isOpen={isAvatarModalOpen}
-          onClose={() => setIsAvatarModalOpen(false)}
-          onSelectAvatarType={handleSelectAvatarType}
-          onUpdateAgentModel={handleUpdateAgentModel}
-          onUpdateAgentColor={handleUpdateAgentColor}
         />
       )}
     </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   X,
   Phone,
@@ -13,24 +13,32 @@ import {
   LayoutDashboard
 } from 'lucide-react'
 import AgentCloseUpAvatar from './AgentCloseUpAvatar'
+import AgentAvatarSettingsView from './AgentAvatarSettingsView'
 
 /**
  * Sidebar Component
  * Displays agent details, task brief form, response history,
  * with streamlined actions (Call Agent & Open Workspace Dashboard),
- * and a gear icon next to the agent name to open AvatarModal.
+ * and an in-place panel transition to AgentAvatarSettingsView when clicking the gear icon.
  */
 export default function Sidebar({
   agent,
   onClose,
   onOpenCall,
-  onOpenAvatarModal,
   onOpenDashboardModal,
   onSendBrief,
   chatHistory = [],
-  isLoading = false
+  isLoading = false,
+  onSelectAvatarType,
+  onUpdateAgentModel,
+  onUpdateAgentColor
 }) {
+  const [panelView, setPanelView] = useState('profile') // 'profile' | 'avatar_settings'
   const [briefInput, setBriefInput] = useState('')
+
+  useEffect(() => {
+    setPanelView('profile')
+  }, [agent?.id])
 
   if (!agent) return null
 
@@ -49,51 +57,62 @@ export default function Sidebar({
 
   return (
     <div className="fixed top-0 right-0 w-full sm:w-[440px] h-full z-40 bg-white/95 backdrop-blur-xl border-l border-slate-200/80 shadow-2xl flex flex-col transition-all duration-300 animate-in slide-in-from-right">
-      {/* --- Header & Close --- */}
-      <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
-        <div className="flex items-center gap-2.5">
-          <div
-            className="w-3.5 h-3.5 rounded-full"
-            style={{ backgroundColor: agentColor }}
-          />
-          <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500">
-            Agent Profile
-          </span>
-        </div>
-        <button
-          onClick={onClose}
-          className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors cursor-pointer"
-          title="Tutup Panel"
-        >
-          <X className="w-5 h-5" />
-        </button>
-      </div>
+      {panelView === 'avatar_settings' ? (
+        <AgentAvatarSettingsView
+          agent={agent}
+          onSelectAvatarType={onSelectAvatarType}
+          onUpdateAgentModel={onUpdateAgentModel}
+          onUpdateAgentColor={onUpdateAgentColor}
+          onBack={() => setPanelView('profile')}
+          onClose={onClose}
+        />
+      ) : (
+        <>
+          {/* --- Header & Close --- */}
+          <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/60 shrink-0">
+            <div className="flex items-center gap-2.5">
+              <div
+                className="w-3.5 h-3.5 rounded-full"
+                style={{ backgroundColor: agentColor }}
+              />
+              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500">
+                Agent Profile
+              </span>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors cursor-pointer"
+              title="Tutup Panel"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
-      {/* --- Agent Info Banner --- */}
-      <div className="p-6 border-b border-slate-100">
-        <div className="flex items-start gap-4">
-          {/* Large Close-up Avatar Icon */}
-          <AgentCloseUpAvatar
-            agent={agent}
-            size={68}
-            showStatus={true}
-          />
+          {/* --- Agent Info Banner --- */}
+          <div className="p-6 border-b border-slate-100 shrink-0">
+            <div className="flex items-start gap-4">
+              {/* Large Close-up Avatar Icon */}
+              <AgentCloseUpAvatar
+                agent={agent}
+                size={68}
+                showStatus={true}
+              />
 
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <h2 className="text-xl font-extrabold text-slate-900 truncate">
-                {agent.name}
-              </h2>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <h2 className="text-xl font-extrabold text-slate-900 truncate">
+                    {agent.name}
+                  </h2>
 
-              {/* Gear / Settings button for Avatar */}
-              <button
-                type="button"
-                onClick={onOpenAvatarModal}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 active:scale-95 transition-all cursor-pointer"
-                title="Pengaturan Avatar 3D"
-              >
-                <Settings className="w-4 h-4" />
-              </button>
+                  {/* Gear / Settings button for Avatar */}
+                  <button
+                    type="button"
+                    onClick={() => setPanelView('avatar_settings')}
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 active:scale-95 transition-all cursor-pointer"
+                    title="Pengaturan Avatar & Warna 3D"
+                  >
+                    <Settings className="w-4 h-4" />
+                  </button>
 
               <span
                 className="text-[10px] font-bold px-2 py-0.5 rounded text-white tracking-wide ml-auto shrink-0"
@@ -258,6 +277,8 @@ export default function Sidebar({
           </button>
         </form>
       </div>
+        </>
+      )}
     </div>
   )
 }
