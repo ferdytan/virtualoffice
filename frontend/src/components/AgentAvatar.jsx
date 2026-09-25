@@ -320,46 +320,50 @@ export default function AgentAvatar({
         document.body.style.cursor = 'auto'
       }}
     >
-      {/* --- Floating Hover Badge Pill (Hidden when any modal/dashboard is open) --- */}
+      {/* --- Floating Hover Badge (Name on top, role below with smaller font) --- */}
       {(hovered || isSelected) && !hideTooltip && (
         <Html
-          position={[0, 1.45, 0]}
+          position={[0, 1.48, 0]}
           center
           distanceFactor={9}
           zIndexRange={[1, 5]}
           style={{ pointerEvents: 'none' }}
         >
-          <div className="flex items-center gap-2 bg-slate-950/92 text-white px-3.5 py-1.5 rounded-full shadow-2xl border border-slate-700/80 backdrop-blur-md whitespace-nowrap animate-in fade-in zoom-in duration-150">
-            {/* Blinking Dot */}
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600"></span>
-            </span>
+          <div className="flex flex-col items-center justify-center bg-slate-950/95 text-white px-3.5 py-1.5 rounded-2xl shadow-2xl border border-slate-700/80 backdrop-blur-md whitespace-nowrap select-none animate-in fade-in zoom-in-95 duration-150 text-center">
+            {/* Top row: Status ping dot + Agent Name */}
+            <div className="flex items-center gap-1.5">
+              <span className="relative flex h-2 w-2">
+                <span
+                  className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+                  style={{ backgroundColor: agentColor }}
+                />
+                <span
+                  className="relative inline-flex rounded-full h-2 w-2"
+                  style={{ backgroundColor: agentColor }}
+                />
+              </span>
 
-            {/* Role Title */}
-            <span className="text-[11px] font-bold tracking-wider uppercase text-slate-100">
+              <span className="text-xs font-black tracking-tight text-white">
+                {agent.name}
+              </span>
+
+              {avatarType === 'boxhead' && (
+                <span className="text-[8px] bg-sky-500/90 font-extrabold px-1.5 py-0.2 rounded text-white uppercase tracking-wider">
+                  BoxHead
+                </span>
+              )}
+
+              {avatarType === 'custom' && (
+                <span className="text-[8px] bg-purple-500/90 font-extrabold px-1.5 py-0.2 rounded text-white uppercase tracking-wider">
+                  Custom
+                </span>
+              )}
+            </div>
+
+            {/* Bottom row: Jabatan (Role) below name with smaller font */}
+            <span className="text-[9px] font-bold tracking-wider uppercase text-slate-400 mt-0.5">
               {agent.role_badge || agent.role || 'AGENT'}
             </span>
-
-            {/* Agent Short Tag */}
-            <span
-              className="text-[10px] font-extrabold px-1.5 py-0.5 rounded text-white"
-              style={{ backgroundColor: agentColor }}
-            >
-              {agent.name}
-            </span>
-
-            {avatarType === 'boxhead' && (
-              <span className="text-[9px] bg-sky-600 font-bold px-1.5 py-0.5 rounded text-white uppercase tracking-wider">
-                BoxHead
-              </span>
-            )}
-
-            {avatarType === 'custom' && (
-              <span className="text-[9px] bg-purple-600/80 font-bold px-1.5 py-0.5 rounded text-white uppercase tracking-wider">
-                Custom GLB
-              </span>
-            )}
           </div>
         </Html>
       )}

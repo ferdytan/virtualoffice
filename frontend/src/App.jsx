@@ -6,11 +6,11 @@ import CallModal from './components/CallModal'
 import AvatarModal from './components/AvatarModal'
 import AgentWorkspaceView from './components/AgentWorkspaceView'
 import AgentCloseUpAvatar from './components/AgentCloseUpAvatar'
-import ScenerySettingsModal from './components/ScenerySettingsModal'
+import SettingsPageView from './components/SettingsPageView'
 import {
   RotateCcw,
   Palette,
-  Sliders
+  Settings
 } from 'lucide-react'
 
 // Agent configurations matching 2x2 face-to-face collaborative office pod
@@ -109,7 +109,6 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isCallModalOpen, setIsCallModalOpen] = useState(false)
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false)
-  const [isSceneryModalOpen, setIsSceneryModalOpen] = useState(false)
   const [scenerySettings, setScenerySettings] = useState(() => {
     try {
       const saved = localStorage.getItem('virtual_office_scenery_settings')
@@ -428,16 +427,13 @@ export default function App() {
               })}
             </div>
 
-            {/* Scenery Theme & Setting Button */}
+            {/* Settings Page Button (Gear icon) */}
             <button
-              onClick={() => setIsSceneryModalOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-2 bg-white/90 backdrop-blur-xl hover:bg-white text-slate-700 hover:text-slate-950 rounded-2xl shadow-lg border border-slate-200/80 transition-all active:scale-95 cursor-pointer"
-              title="Pengaturan Suasana Ruang Kerja 3D (Warna, Sinar Lampu, NPC, Mesin Kopi)"
+              onClick={() => setViewMode('settings')}
+              className="p-2.5 bg-white/90 backdrop-blur-xl hover:bg-white text-slate-600 hover:text-slate-900 rounded-2xl shadow-lg border border-slate-200/80 transition-all active:scale-95 cursor-pointer"
+              title="Buka Pengaturan Sistem & Workspace"
             >
-              <Palette className="w-4 h-4 text-amber-500" />
-              <span className="text-xs font-black">
-                {scenerySettings.theme === 'colorful' ? '🎨 Ruang Berwarna' : '⚪ Minimalis Putih'}
-              </span>
+              <Settings className="w-4 h-4" />
             </button>
 
             {/* Reset Camera View Button */}
@@ -481,8 +477,17 @@ export default function App() {
         </header>
       )}
 
-      {/* If in Agent Workspace Mode, render the dedicated 20% / 80% AgentWorkspaceView */}
-      {viewMode === 'agent_workspace' ? (
+      {/* If in Settings Page Mode, render the dedicated SettingsPageView */}
+      {viewMode === 'settings' ? (
+        <SettingsPageView
+          scenerySettings={scenerySettings}
+          onUpdateScenerySettings={handleUpdateScenerySettings}
+          agents={agents}
+          onUpdateAgentColor={handleUpdateAgentColor}
+          onSelectAvatarType={handleSelectAvatarType}
+          onBackToOffice={() => setViewMode('office')}
+        />
+      ) : viewMode === 'agent_workspace' ? (
         <AgentWorkspaceView
           agent={selectedAgent || agents[0]}
           agents={agents}
@@ -500,7 +505,7 @@ export default function App() {
               agents={agents}
               selectedAgent={selectedAgent}
               onSelectAgent={handleSelectAgent}
-              hideTooltip={isAvatarModalOpen || isCallModalOpen || isSceneryModalOpen}
+              hideTooltip={isAvatarModalOpen || isCallModalOpen}
               scenerySettings={scenerySettings}
             />
           </main>
@@ -552,16 +557,6 @@ export default function App() {
           onSelectAvatarType={handleSelectAvatarType}
           onUpdateAgentModel={handleUpdateAgentModel}
           onUpdateAgentColor={handleUpdateAgentColor}
-        />
-      )}
-
-      {/* --- SCENERY 3D VISUAL SETTINGS MODAL --- */}
-      {isSceneryModalOpen && (
-        <ScenerySettingsModal
-          isOpen={isSceneryModalOpen}
-          onClose={() => setIsSceneryModalOpen(false)}
-          scenerySettings={scenerySettings}
-          onUpdateScenerySettings={handleUpdateScenerySettings}
         />
       )}
     </div>
