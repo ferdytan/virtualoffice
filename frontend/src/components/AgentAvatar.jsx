@@ -320,7 +320,7 @@ export default function AgentAvatar({
         document.body.style.cursor = 'auto'
       }}
     >
-      {/* --- Floating Hover Badge (Name on top, role below with smaller font) --- */}
+      {/* --- Floating Hover Badge (Left-aligned status card, no color circle, status on the right, extra-small role font) --- */}
       {(hovered || isSelected) && !hideTooltip && (
         <Html
           position={[0, 1.48, 0]}
@@ -329,42 +329,50 @@ export default function AgentAvatar({
           zIndexRange={[1, 5]}
           style={{ pointerEvents: 'none' }}
         >
-          <div className="flex flex-col items-center justify-center bg-slate-950/95 text-white px-3.5 py-1.5 rounded-2xl shadow-2xl border border-slate-700/80 backdrop-blur-md whitespace-nowrap select-none animate-in fade-in zoom-in-95 duration-150 text-center">
-            {/* Top row: Status ping dot + Agent Name */}
-            <div className="flex items-center gap-1.5">
-              <span className="relative flex h-2 w-2">
-                <span
-                  className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
-                  style={{ backgroundColor: agentColor }}
-                />
-                <span
-                  className="relative inline-flex rounded-full h-2 w-2"
-                  style={{ backgroundColor: agentColor }}
-                />
-              </span>
+          {(() => {
+            const rawStatus = (agent.status || (agent.id === 'nara' ? 'working' : 'available')).toLowerCase()
+            const isWorking = rawStatus === 'working' || rawStatus === 'sibuk'
+            const isNotAvailable = rawStatus === 'not_available' || rawStatus === 'not available' || rawStatus === 'offline'
+            const statusLabel = isWorking ? 'Working' : isNotAvailable ? 'Not Available' : 'Available'
 
-              <span className="text-xs font-black tracking-tight text-white">
-                {agent.name}
-              </span>
+            return (
+              <div className="flex flex-col items-start justify-center bg-slate-950/95 text-white px-3 py-1.5 rounded-xl shadow-2xl border border-slate-700/80 backdrop-blur-md whitespace-nowrap select-none animate-in fade-in zoom-in-95 duration-150 text-left min-w-[105px]">
+                {/* Top row: Agent Name + Status Pill to the right of the name (No color circle) */}
+                <div className="flex items-center justify-between gap-2.5 w-full">
+                  <span className="text-xs font-black tracking-tight text-white leading-none">
+                    {agent.name}
+                  </span>
 
-              {avatarType === 'boxhead' && (
-                <span className="text-[8px] bg-sky-500/90 font-extrabold px-1.5 py-0.2 rounded text-white uppercase tracking-wider">
-                  BoxHead
+                  {/* Status pill on the right of the name */}
+                  <span
+                    className={`inline-flex items-center gap-1 text-[7.5px] font-extrabold uppercase px-1.5 py-0.5 rounded-md leading-none shrink-0 ${
+                      isWorking
+                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                        : isNotAvailable
+                        ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                        : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                    }`}
+                  >
+                    <span
+                      className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                        isWorking
+                          ? 'bg-amber-400 animate-ping'
+                          : isNotAvailable
+                          ? 'bg-rose-400'
+                          : 'bg-emerald-400'
+                      }`}
+                    />
+                    <span>{statusLabel}</span>
+                  </span>
+                </div>
+
+                {/* Bottom row: Jabatan (Role) below name with extra-small font size, rata kiri */}
+                <span className="text-[7.5px] font-semibold tracking-wider uppercase text-slate-400 mt-1 leading-none text-left">
+                  {agent.role_badge || agent.role || 'AGENT'}
                 </span>
-              )}
-
-              {avatarType === 'custom' && (
-                <span className="text-[8px] bg-purple-500/90 font-extrabold px-1.5 py-0.2 rounded text-white uppercase tracking-wider">
-                  Custom
-                </span>
-              )}
-            </div>
-
-            {/* Bottom row: Jabatan (Role) below name with smaller font */}
-            <span className="text-[9px] font-bold tracking-wider uppercase text-slate-400 mt-0.5">
-              {agent.role_badge || agent.role || 'AGENT'}
-            </span>
-          </div>
+              </div>
+            )
+          })()}
         </Html>
       )}
 

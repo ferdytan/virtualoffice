@@ -43,7 +43,8 @@ export default function AgentWorkspaceView({
   onSendBrief,
   onSelectAvatarType,
   onUpdateAgentModel,
-  onUpdateAgentColor
+  onUpdateAgentColor,
+  onUpdateAgentStatus
 }) {
   const [leftPanelView, setLeftPanelView] = useState('menu') // 'menu' | 'avatar_settings'
   const [copiedId, setCopiedId] = useState(null)
@@ -574,6 +575,7 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
               onSelectAvatarType={onSelectAvatarType}
               onUpdateAgentModel={onUpdateAgentModel}
               onUpdateAgentColor={onUpdateAgentColor}
+              onUpdateAgentStatus={onUpdateAgentStatus}
               onBack={() => setLeftPanelView('menu')}
             />
           ) : (
@@ -600,7 +602,43 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                         {agent.role_badge}
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-500 font-medium truncate">{agent.role}</p>
+
+                    <div className="flex items-center justify-between gap-1 mt-0.5">
+                      <p className="text-[11px] text-slate-500 font-medium truncate">{agent.role}</p>
+
+                      {/* Interactive Status Pill */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const current = (agent.status || (agent.id === 'nara' ? 'working' : 'available')).toLowerCase()
+                          const nextStatus = current === 'available' ? 'working' : current === 'working' ? 'not_available' : 'available'
+                          if (onUpdateAgentStatus) onUpdateAgentStatus(agent.id, nextStatus)
+                        }}
+                        className={`inline-flex items-center gap-1 text-[8px] font-extrabold uppercase px-1.5 py-0.2 rounded-md border shrink-0 cursor-pointer transition-all ${
+                          (agent.status || (agent.id === 'nara' ? 'working' : 'available')).toLowerCase() === 'working'
+                            ? 'bg-amber-100 text-amber-800 border-amber-300'
+                            : (agent.status || '').toLowerCase() === 'not_available'
+                            ? 'bg-rose-100 text-rose-800 border-rose-300'
+                            : 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                        }`}
+                        title="Klik untuk mengubah status agent"
+                      >
+                        <span className={`w-1.5 h-1.5 rounded-full ${
+                          (agent.status || (agent.id === 'nara' ? 'working' : 'available')).toLowerCase() === 'working'
+                            ? 'bg-amber-500 animate-ping'
+                            : (agent.status || '').toLowerCase() === 'not_available'
+                            ? 'bg-rose-500'
+                            : 'bg-emerald-500'
+                        }`} />
+                        <span>
+                          {(agent.status || (agent.id === 'nara' ? 'working' : 'available')).toLowerCase() === 'working'
+                            ? 'Working'
+                            : (agent.status || '').toLowerCase() === 'not_available'
+                            ? 'Not Available'
+                            : 'Available'}
+                        </span>
+                      </button>
+                    </div>
                   </div>
                 </div>
 

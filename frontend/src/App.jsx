@@ -19,6 +19,7 @@ const INITIAL_AGENTS = [
     name: 'Nara',
     role: 'CS & Offline Unit Reminder',
     role_badge: 'REMINDER CS',
+    status: 'working',
     color: '#38bdf8',
     color_name: 'Sky Blue',
     position: [1.08, 0, -1.89],
@@ -36,6 +37,7 @@ const INITIAL_AGENTS = [
     name: 'Velocia',
     role: 'Marketing Strategist & Lead',
     role_badge: 'MARKETING STRATEGIST',
+    status: 'available',
     color: '#ef4444',
     color_name: 'Solid Red',
     position: [1.58, 0, -3.69],
@@ -53,6 +55,7 @@ const INITIAL_AGENTS = [
     name: 'Scout',
     role: 'News Researcher & Writer',
     role_badge: 'RESEARCHER',
+    status: 'available',
     color: '#22c55e',
     color_name: 'Solid Green',
     position: [3.35, 0, -3.69],
@@ -287,6 +290,16 @@ export default function App() {
     }
   }
 
+  // Handle updating agent availability status ('available' | 'working' | 'not_available')
+  const handleUpdateAgentStatus = (agentId, status) => {
+    setAgents((prev) =>
+      prev.map((a) => (a.id === agentId ? { ...a, status } : a))
+    )
+    setSelectedAgent((prev) =>
+      prev && prev.id === agentId ? { ...prev, status } : prev
+    )
+  }
+
   // Active displayed agent in top-left panel
   const displayedAgent = selectedAgent || agents.find((a) => a.id === 'velocia') || agents[0]
 
@@ -496,6 +509,7 @@ export default function App() {
           onSelectAvatarType={handleSelectAvatarType}
           onUpdateAgentModel={handleUpdateAgentModel}
           onUpdateAgentColor={handleUpdateAgentColor}
+          onUpdateAgentStatus={handleUpdateAgentStatus}
         />
       ) : (
         <>
@@ -529,6 +543,7 @@ export default function App() {
               onSelectAvatarType={handleSelectAvatarType}
               onUpdateAgentModel={handleUpdateAgentModel}
               onUpdateAgentColor={handleUpdateAgentColor}
+              onUpdateAgentStatus={handleUpdateAgentStatus}
             />
           )}
 

@@ -31,7 +31,8 @@ export default function Sidebar({
   isLoading = false,
   onSelectAvatarType,
   onUpdateAgentModel,
-  onUpdateAgentColor
+  onUpdateAgentColor,
+  onUpdateAgentStatus
 }) {
   const [panelView, setPanelView] = useState('profile') // 'profile' | 'avatar_settings'
   const [briefInput, setBriefInput] = useState('')
@@ -63,6 +64,7 @@ export default function Sidebar({
           onSelectAvatarType={onSelectAvatarType}
           onUpdateAgentModel={onUpdateAgentModel}
           onUpdateAgentColor={onUpdateAgentColor}
+          onUpdateAgentStatus={onUpdateAgentStatus}
           onBack={() => setPanelView('profile')}
           onClose={onClose}
         />
@@ -132,10 +134,39 @@ export default function Sidebar({
                 <Cpu className="w-3 h-3 text-slate-600" />
                 {agent.model || 'gpt-4o-mini'}
               </span>
-              <span className="flex items-center gap-1 text-emerald-600 font-semibold">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-                Active
-              </span>
+
+              {/* Interactive Status Pill */}
+              <button
+                type="button"
+                onClick={() => {
+                  const current = (agent.status || (agent.id === 'nara' ? 'working' : 'available')).toLowerCase()
+                  const nextStatus = current === 'available' ? 'working' : current === 'working' ? 'not_available' : 'available'
+                  if (onUpdateAgentStatus) onUpdateAgentStatus(agent.id, nextStatus)
+                }}
+                className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-md font-bold text-[10px] uppercase border transition-all cursor-pointer ${
+                  (agent.status || (agent.id === 'nara' ? 'working' : 'available')).toLowerCase() === 'working'
+                    ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
+                    : (agent.status || '').toLowerCase() === 'not_available'
+                    ? 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100'
+                    : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                }`}
+                title="Klik untuk mengubah status agent (Available / Working / Not Available)"
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${
+                  (agent.status || (agent.id === 'nara' ? 'working' : 'available')).toLowerCase() === 'working'
+                    ? 'bg-amber-500 animate-ping'
+                    : (agent.status || '').toLowerCase() === 'not_available'
+                    ? 'bg-rose-500'
+                    : 'bg-emerald-500'
+                }`} />
+                <span>
+                  {(agent.status || (agent.id === 'nara' ? 'working' : 'available')).toLowerCase() === 'working'
+                    ? 'Working'
+                    : (agent.status || '').toLowerCase() === 'not_available'
+                    ? 'Not Available'
+                    : 'Available'}
+                </span>
+              </button>
             </div>
           </div>
         </div>
