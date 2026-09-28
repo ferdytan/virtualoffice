@@ -9,11 +9,49 @@ import SettingsPageView from './components/SettingsPageView'
 import {
   RotateCcw,
   Palette,
-  Settings
+  Settings,
+  Compass
 } from 'lucide-react'
 
-// Agent configurations matching 2x2 face-to-face collaborative office pod
+// 5-Agent Collaborative Ecosystem: Frontline (Sherloc), Escalation (Watson), CS Telemetry (Nara), Marketing (Velocia), Research (Scout)
 const INITIAL_AGENTS = [
+  {
+    id: 'sherloc',
+    name: 'Sherloc',
+    role: 'Frontline WhatsApp & Customer Face',
+    role_badge: 'FRONTLINE CS',
+    status: 'working',
+    color: '#f59e0b',
+    color_name: 'Amber Gold',
+    position: [-4.135, 0, 4.471], // Front Desk / Receptionist Counter
+    rotation: [0, Math.PI, 0], // Facing South into lobby/office
+    model: 'gpt-4o-mini',
+    description: 'Satu-satunya Frontline Voice & Face WhatsApp customer. Memvalidasi nomor telepon/email pengguna (Pelanggan Orin vs Calon), menjawab FAQ dari Knowledge Base, serta mendelegasikan issue GPS ke Nara dan eskalasi teknis ke Watson.',
+    quick_prompts: [
+      'Simulasikan chat inbound WhatsApp pelanggan Orin',
+      'Validasi nomor telepon pelanggan baru dan cek paket langganan',
+      'Delegasikan pengecekan GPS offline ke Nara',
+      'Eskalasi issue firmware anomali ke Watson'
+    ]
+  },
+  {
+    id: 'watson',
+    name: 'Watson',
+    role: 'Technical Escalation & Knowledge Loop',
+    role_badge: 'TECH ESCALATION',
+    status: 'available',
+    color: '#6366f1',
+    color_name: 'Deep Indigo',
+    position: [2.85, 0, -1.89], // Workstation 4, side-by-side with Nara
+    rotation: [0, Math.PI, 0], // Facing South (-Z)
+    model: 'gpt-4o-mini',
+    description: 'Jembatan eskalasi teknis ke WhatsApp Group Tim Manajemen & Lead internal. Menerima solusi eskalasi dan secara otomatis memanen pasangan Q&A ke Knowledge Base / RAG.',
+    quick_prompts: [
+      'Tinjau tiket eskalasi menunggu respon tim manajemen',
+      'Simulasikan balasan manajemen grup dan injeksi ke Knowledge Base',
+      'Sinkronisasi knowledge base pasangan Q&A baru ke Sherloc'
+    ]
+  },
   {
     id: 'nara',
     name: 'Nara',
@@ -25,10 +63,10 @@ const INITIAL_AGENTS = [
     position: [1.08, 0, -1.89],
     rotation: [0, Math.PI, 0], // Facing South (-Z), directly face-to-face with Velocia
     model: 'gpt-4o-mini',
-    description: 'Bertanggung jawab memantau dan memberi notifikasi unit offline secara real-time.',
+    description: 'Bertanggung jawab memantau telemetri GPS offline secara real-time dan broadcast pengingat aman anti-banned (jitter random 15-45s & typing status).',
     quick_prompts: [
       'Cek unit offline yang membutuhkan eskalasi',
-      'Kirim notifikasi pengingat ke teknisi lapangan',
+      'Kirim safe group broadcast dengan anti-banned delay',
       'Buat ringkasan status kesehatan unit hari ini'
     ]
   },
@@ -43,17 +81,17 @@ const INITIAL_AGENTS = [
     position: [1.58, 0, -3.69],
     rotation: [0, 0, 0], // Facing North (+Z), directly face-to-face with Nara
     model: 'gpt-4o-mini',
-    description: 'Bertanggung jawab merancang strategi kampanye dan mendelegasikan riset.',
+    description: 'Menelan log chat selesai dari Sherloc, menganalisis tren permintaan pasar (fuel sensor, mini GPS, promo bundling), dan merancang strategi pertumbuhan.',
     quick_prompts: [
-      'Rancang strategi kampanye peluncuran fitur baru Q4',
-      'Delegasikan brief riset kompetitor ke Scout',
-      'Buat rencana A/B testing untuk landing page'
+      'Analisis tren permintaan pasar dari log chat Sherloc',
+      'Rancang strategi bundling produk Fuel Sensor & GPS Mini',
+      'Delegasikan brief riset isu teknis berulang ke Scout'
     ]
   },
   {
     id: 'scout',
     name: 'Scout',
-    role: 'News Researcher & Writer',
+    role: 'Knowledge & Tutorial Writer',
     role_badge: 'RESEARCHER',
     status: 'available',
     color: '#22c55e',
@@ -61,47 +99,73 @@ const INITIAL_AGENTS = [
     position: [3.35, 0, -3.69],
     rotation: [0, 0, 0], // Facing North (+Z) alongside Velocia
     model: 'gpt-4o-mini',
-    description: 'Bertanggung jawab meriset tren industri dan menulis draf artikel/blog.',
+    description: 'Menganalisis isu berulang dari log chat Sherloc (lupa password, riwayat rute) dan menghasilkan draf panduan/tutorial baru untuk SOP Sherloc.',
     quick_prompts: [
-      'Riset 3 tren AI Agent terbaru minggu ini',
-      'Tulis draf artikel blog: Masa Depan Virtual Office 3D',
-      'Kompilasi studi kasus implementasi LLM di workflow industri'
+      'Analisis isu teknis berulang dari log chat customer',
+      'Tulis draf panduan SOP: Pemulihan Akun & Reset GPS',
+      'Riset 3 tren AI Agent & Autonomous Support 2026'
     ]
   }
 ]
 
+// Real-time Kanban tasks mapping matching mission brief:
+// IN PROGRESS: Sherloc responding live chat / Nara scanning units
+// ON HOLD: Watson waiting for reply from WA Group Management
+// DONE: Velocia analytics & Scout tutorial drafts complete
 const INITIAL_TASKS = [
   {
     id: 'task-1',
-    title: 'Heartbeat Ping Audit Unit Regional',
-    agent_id: 'nara',
-    agent_name: 'Nara',
+    title: 'Live Chat WhatsApp: Validasi Akun #CUST-9821',
+    agent_id: 'sherloc',
+    agent_name: 'Sherloc',
+    role_badge: 'FRONTLINE CS',
     status: 'IN PROGRESS',
     updated_at: 'Baru saja'
   },
   {
     id: 'task-2',
-    title: 'Q4 Growth Campaign Blueprint',
-    agent_id: 'velocia',
-    agent_name: 'Velocia',
-    status: 'SCHEDULED',
-    updated_at: '10 mnt lalu'
+    title: 'Eskalasi Firmware ECU #TIK-481 ke Grup Manajemen',
+    agent_id: 'watson',
+    agent_name: 'Watson',
+    role_badge: 'TECH ESCALATION',
+    status: 'ON HOLD',
+    updated_at: 'Menunggu Tim Lead'
   },
   {
     id: 'task-3',
-    title: 'Benchmark Tren AI Spatial Workspace 2026',
-    agent_id: 'scout',
-    agent_name: 'Scout',
-    status: 'DONE',
-    updated_at: '1 jam lalu'
+    title: 'Safe Broadcast Anti-Banned: Scan 48 Unit GPS',
+    agent_id: 'nara',
+    agent_name: 'Nara',
+    role_badge: 'REMINDER CS',
+    status: 'IN PROGRESS',
+    updated_at: 'Jitter 24s aktif'
   },
   {
     id: 'task-4',
-    title: 'Eskalasi Tiket #CS-8924 Unit Offline',
-    agent_id: 'nara',
-    agent_name: 'Nara',
-    status: 'ON HOLD',
-    updated_at: 'Menunggu teknisi'
+    title: 'Rekap Tren Permintaan Pasar: Fuel Sensor & Mini GPS',
+    agent_id: 'velocia',
+    agent_name: 'Velocia',
+    role_badge: 'MARKETING STRATEGIST',
+    status: 'DONE',
+    updated_at: 'Selesai dianalisis'
+  },
+  {
+    id: 'task-5',
+    title: 'Draf Tutorial SOP: Reset Password & Riwayat GPS',
+    agent_id: 'scout',
+    agent_name: 'Scout',
+    role_badge: 'RESEARCHER',
+    status: 'DONE',
+    updated_at: 'Draf terbit'
+  },
+  {
+    id: 'task-6',
+    title: 'Batch Injeksi Q&A Knowledge Harvester ke Vector DB',
+    agent_id: 'watson',
+    agent_name: 'Watson',
+    role_badge: 'TECH ESCALATION',
+    status: 'SCHEDULED',
+    updated_at: 'Terjadwal 22:00'
   }
 ]
 
@@ -145,9 +209,13 @@ export default function App() {
   }
 
   const [viewMode, setViewMode] = useState('office') // 'office' | 'agent_workspace'
+  const [cameraViewMode, setCameraViewMode] = useState('isometric') // 'isometric' | 'top_down'
+  const [cameraResetCounter, setCameraResetCounter] = useState(0)
   const [backendStatus, setBackendStatus] = useState('checking')
   const [tasks, setTasks] = useState(INITIAL_TASKS)
   const [chatHistory, setChatHistory] = useState({
+    sherloc: [],
+    watson: [],
     nara: [],
     velocia: [],
     scout: []
@@ -156,8 +224,39 @@ export default function App() {
 
   const backendUrl = ''
 
-  // Poll backend health and fetch agents / tasks
+  // Connect to SSE stream for live real-time task updates and poll health/agents
   useEffect(() => {
+    let eventSource = null
+
+    const setupSSE = () => {
+      try {
+        eventSource = new EventSource(`${backendUrl}/api/crew/tasks/stream`)
+        eventSource.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data)
+            if (data.tasks && Array.isArray(data.tasks)) {
+              setTasks(data.tasks)
+            }
+            if (data.agents && Array.isArray(data.agents)) {
+              setAgents((prev) =>
+                prev.map((a) => {
+                  const fresh = data.agents.find((fa) => fa.id === a.id)
+                  return fresh ? { ...a, ...fresh } : a
+                })
+              )
+            }
+          } catch (e) {
+            // Ignore parse errors on keepalive ping
+          }
+        }
+        eventSource.onerror = () => {
+          if (eventSource) eventSource.close()
+        }
+      } catch (err) {
+        // Fallback to normal polling if SSE is unsupported
+      }
+    }
+
     const checkBackend = async () => {
       try {
         const res = await fetch(`${backendUrl}/api/health`)
@@ -197,8 +296,13 @@ export default function App() {
     }
 
     checkBackend()
-    const timer = setInterval(checkBackend, 15000)
-    return () => clearInterval(timer)
+    setupSSE()
+    const timer = setInterval(checkBackend, 12000)
+
+    return () => {
+      clearInterval(timer)
+      if (eventSource) eventSource.close()
+    }
   }, [])
 
   // Agent selection handler
@@ -311,8 +415,8 @@ export default function App() {
     )
   }
 
-  // Active displayed agent in top-left panel
-  const displayedAgent = selectedAgent || agents.find((a) => a.id === 'velocia') || agents[0]
+  // Active displayed agent in top-left panel (default to Sherloc as Frontline Voice)
+  const displayedAgent = selectedAgent || agents.find((a) => a.id === 'sherloc') || agents[0]
 
   // Handle task brief submission
   const handleSendBrief = async (agentId, message) => {
@@ -357,12 +461,16 @@ export default function App() {
     } catch (err) {
       setTimeout(() => {
         let fallbackResponse = ''
-        if (agentId === 'nara') {
-          fallbackResponse = `🚨 [Nara Telemetry Check]\nUnit scan selesai untuk instruksi: "${message}". Sistem online mencatat 45/48 unit berfungsi stabil, notifikasi ke teknisi telah diterbitkan.`
+        if (agentId === 'sherloc') {
+          fallbackResponse = `🟡 [Sherloc Frontline Voice]\nPesan customer: "${message}" berhasil diproses.\n• Verifikasi: Pelanggan Orin Aktif\n• Status Tindakan: Dijawab via Knowledge Base SOP & tiket eskalasi sinkron dengan Watson.`
+        } else if (agentId === 'watson') {
+          fallbackResponse = `🟣 [Watson Technical Escalation & Knowledge Harvester]\nIsu: "${message}" diteruskan ke WhatsApp Group Tim Manajemen & Lead.\n• Solusi tersinkron dan pasangan Q&A baru berhasil diinjeksikan ke Vector DB / Knowledge Base.`
+        } else if (agentId === 'nara') {
+          fallbackResponse = `🚨 [Nara Telemetry Check]\nUnit scan selesai untuk instruksi: "${message}". Sistem online mencatat 45/48 unit berfungsi stabil, notifikasi ke teknisi telah diterbitkan via Safe Broadcast (anti-banned delay aktif).`
         } else if (agentId === 'velocia') {
-          fallbackResponse = `🎯 [Velocia Growth Strategy]\nBrief "${message}" telah dipetakan ke dalam rencana kampanye 4 fase. Tugas riset data telah didelegasikan ke Scout.`
+          fallbackResponse = `🎯 [Velocia Growth Strategy]\nBrief "${message}" telah dipetakan ke dalam analisis tren permintaan pasar dari log chat Sherloc (permintaan fuel sensor & GPS tracker mini melonjak).`
         } else {
-          fallbackResponse = `📰 [Scout Trend Research]\nSintesis informasi untuk "${message}" berhasil dikompilasi. Data tren dan draf artikel siap dipublikasikan.`
+          fallbackResponse = `📰 [Scout Knowledge & Tutorial Lab]\nSintesis informasi untuk "${message}" berhasil dikompilasi. Draf panduan SOP tutorial penanganan isu berulang siap ditambahkan ke knowledge base Sherloc.`
         }
 
         setChatHistory((prev) => ({
@@ -458,11 +566,36 @@ export default function App() {
               <Settings className="w-4 h-4" />
             </button>
 
+            {/* Camera View Mode Toggle Button (Perspektif Isometrik vs Tampak Atas) */}
+            <button
+              onClick={() =>
+                setCameraViewMode((prev) => (prev === 'isometric' ? 'top_down' : 'isometric'))
+              }
+              className={`p-2.5 sm:px-3.5 backdrop-blur-xl rounded-2xl shadow-lg border transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 ${
+                cameraViewMode === 'top_down'
+                  ? 'bg-sky-500 hover:bg-sky-600 text-white border-sky-400 shadow-sky-200'
+                  : 'bg-white/90 hover:bg-white text-slate-700 hover:text-slate-900 border-slate-200/80'
+              }`}
+              title={
+                cameraViewMode === 'top_down'
+                  ? 'Ganti ke Tampilan Isometrik 3D'
+                  : 'Ganti ke Tampilan Tampak Atas (Top-Down Overview)'
+              }
+            >
+              <Compass className={`w-4 h-4 ${cameraViewMode === 'top_down' ? 'animate-spin-slow' : ''}`} />
+              <span className="text-xs font-bold hidden sm:inline">
+                {cameraViewMode === 'top_down' ? 'Tampak Atas' : 'Isometrik'}
+              </span>
+            </button>
+
             {/* Reset Camera View Button */}
             <button
-              onClick={() => handleSelectAgent(null)}
+              onClick={() => {
+                handleSelectAgent(null)
+                setCameraResetCounter((c) => c + 1)
+              }}
               className="p-2.5 bg-white/90 backdrop-blur-xl hover:bg-white text-slate-600 hover:text-slate-900 rounded-2xl shadow-lg border border-slate-200/80 transition-all active:scale-95 cursor-pointer"
-              title="Reset Posisi Kamera"
+              title="Reset Posisi Kamera ke Default"
             >
               <RotateCcw className="w-4 h-4" />
             </button>
@@ -532,6 +665,8 @@ export default function App() {
               onSelectAgent={handleSelectAgent}
               hideTooltip={isCallModalOpen || isSidebarOpen}
               scenerySettings={scenerySettings}
+              cameraViewMode={cameraViewMode}
+              resetKey={cameraResetCounter}
             />
           </main>
 

@@ -4,8 +4,54 @@ from typing import Dict, Any, Optional
 
 logger = logging.getLogger("virtual_office.crew")
 
-# Metadata profile for the three agents matching 2x2 face-to-face team pod
+# Metadata profile for the 5 agents: Sherloc (Front Desk), Watson (Desk 4), Nara (Desk 3), Velocia (Desk 1), Scout (Desk 2)
 AGENTS_METADATA = {
+    "sherloc": {
+        "id": "sherloc",
+        "name": "Sherloc",
+        "role": "Frontline Voice & Customer Communicator",
+        "role_badge": "FRONTLINE CS",
+        "color": "#f59e0b",
+        "color_name": "Amber Gold",
+        "position": [-4.135, 0, 4.471],
+        "rotation": [0, 3.14159265, 0],
+        "model": os.getenv("OPENAI_MODEL_NAME", "gpt-4o-mini"),
+        "description": "Garda terdepan dan satu-satunya komunikator resmi ke WhatsApp customer. Memvalidasi pengguna, menjawab FAQ, mendelegasikan pengecekan ke Nara, dan mengeskalasi isu teknis ke Watson.",
+        "goal": "Menerima pesan WhatsApp customer, memvalidasi nomor telepon/email pengguna di database Orin, menjawab FAQ umum, mendelegasikan telemetri GPS ke Nara, dan mengeskalasikan isu teknis ke Watson.",
+        "backstory": (
+            "Sherloc adalah agen representatif utama (The Face) dari Orin Customer Care. "
+            "Dengan tutur kata yang ramah, cepat, dan terpercaya, Sherloc menangani komunikasi langsung "
+            "ke WhatsApp customer sebagai satu-satunya frontliner resmi perusahaan."
+        ),
+        "quick_prompts": [
+            "Simulasikan pesan WhatsApp inbound dari customer",
+            "Validasi status nomor telepon di database Orin",
+            "Delegasikan keluhan GPS offline plat B 1842 KZA ke Nara"
+        ]
+    },
+    "watson": {
+        "id": "watson",
+        "name": "Watson",
+        "role": "Technical Escalation & Knowledge Loop Lead",
+        "role_badge": "TECH ESCALATION",
+        "color": "#6366f1",
+        "color_name": "Deep Indigo",
+        "position": [2.85, 0, -1.89],
+        "rotation": [0, 3.14159265, 0],
+        "model": os.getenv("OPENAI_MODEL_NAME", "gpt-4o-mini"),
+        "description": "Menerima eskalasi teknis tingkat lanjut dari Sherloc, meneruskannya ke grup WhatsApp internal management, dan memanen solusi insinyur ke dalam Vector DB Knowledge Base.",
+        "goal": "Mendiagnosis kendala teknis ECU/firmware/sensor yang dieskalasikan oleh Sherloc, menjembatani komunikasi ke WhatsApp Group tim insinyur, dan mengotomatisasi Knowledge Harvester (RAG).",
+        "backstory": (
+            "Watson adalah spesialis sistem IoT dan firmware telemetri yang bertindak sebagai jembatan "
+            "antara frontline CS dan tim insinyur senior. Watson memastikan setiap solusi teknis yang "
+            "diberikan manajemen dipanen (harvested) ke Vector DB untuk pembelajaran mandiri jangka panjang."
+        ),
+        "quick_prompts": [
+            "Cek tiket eskalasi teknis yang menunggu balasan management",
+            "Forward isu error kode E-402 ke grup WhatsApp tim insinyur",
+            "Audit repositori Knowledge Harvester (Vector DB)"
+        ]
+    },
     "nara": {
         "id": "nara",
         "name": "Nara",
@@ -16,16 +62,16 @@ AGENTS_METADATA = {
         "position": [1.08, 0, -1.89],
         "rotation": [0, 3.14159265, 0],
         "model": os.getenv("OPENAI_MODEL_NAME", "gpt-4o-mini"),
-        "description": "Bertanggung jawab memantau dan memberi notifikasi unit offline secara real-time.",
-        "goal": "Memantau status perangkat dan unit sistem, mendeteksi unit yang mengalami kendala/offline, serta mengirimkan notifikasi eskalasi cepat dan ramah.",
+        "description": "Bertanggung jawab memantau dan memberi notifikasi unit offline secara real-time serta safe broadcast anti-banned.",
+        "goal": "Memantau status perangkat dan unit sistem, mendeteksi unit yang mengalami kendala/offline, serta mengirimkan notifikasi eskalasi cepat dan broadcast grup WhatsApp aman anti-banned.",
         "backstory": (
-            "Nara adalah agen Customer Support yang teliti dan waspada. Dengan pemantauan "
-            "telemetri waktu nyata, ia memastikan tidak ada unit operasional yang terabaikan "
-            "saat mengalami gangguan atau kehilangan konektivitas."
+            "Nara adalah agen Customer Support operasional yang teliti dan waspada. Dengan pemantauan "
+            "telemetri waktu nyata dan protokol anti-banned jitter, ia memastikan teknisi lapangan segera "
+            "menangani unit kendaraan yang mengalami gangguan sinyal atau catu daya."
         ),
         "quick_prompts": [
             "Cek unit offline yang membutuhkan eskalasi",
-            "Kirim notifikasi pengingat ke teknisi lapangan",
+            "Jalankan safe broadcast anti-banned ke grup teknisi",
             "Buat ringkasan status kesehatan unit hari ini"
         ]
     },
@@ -39,16 +85,16 @@ AGENTS_METADATA = {
         "position": [1.58, 0, -3.69],
         "rotation": [0, 0, 0],
         "model": os.getenv("OPENAI_MODEL_NAME", "gpt-4o-mini"),
-        "description": "Bertanggung jawab merancang strategi kampanye dan mendelegasikan riset.",
-        "goal": "Merancang strategi kampanye promosi berdaya konversi tinggi, memimpin orchestrasi pertumbuhan pasar, dan mendelegasikan analisis tren kepada tim riset.",
+        "description": "Bertanggung jawab merancang strategi kampanye, menganalisis tren dari log chat WhatsApp, dan mendelegasikan riset.",
+        "goal": "Merancang strategi kampanye promosi berdaya konversi tinggi, memimpin orchestrasi pertumbuhan pasar dari downstream chat analytics, dan mendelegasikan analisis tren kepada tim riset.",
         "backstory": (
             "Velocia adalah lead strategist yang dinamis, cepat mengambil keputusan, dan berorientasi pada data. "
             "Ia mengoordinasikan eksekusi kampanye multi-channel dan mengarahkan Scout untuk menggali data tren pendukung."
         ),
         "quick_prompts": [
+            "Analisis tren kata kunci produk dari chat log Sherloc",
             "Rancang strategi kampanye peluncuran fitur baru Q4",
-            "Delegasikan brief riset kompetitor ke Scout",
-            "Buat rencana A/B testing untuk landing page"
+            "Delegasikan brief riset kompetitor ke Scout"
         ]
     },
     "scout": {
@@ -61,16 +107,16 @@ AGENTS_METADATA = {
         "position": [3.35, 0, -3.69],
         "rotation": [0, 0, 0],
         "model": os.getenv("OPENAI_MODEL_NAME", "gpt-4o-mini"),
-        "description": "Bertanggung jawab meriset tren industri dan menulis draf artikel/blog.",
-        "goal": "Meneliti tren industri terdepan, memverifikasi wawasan teknologi & pasar terkini, dan menghasilkan draf tulisan serta artikel bernilai tinggi.",
+        "description": "Bertanggung jawab meriset tren industri, menyusun draf SOP panduan mandiri customer, dan menulis artikel.",
+        "goal": "Meneliti tren industri terdepan, memverifikasi wawasan teknologi & pasar terkini, serta menghasilkan draf panduan SOP mandiri untuk mengurangi beban CS.",
         "backstory": (
             "Scout adalah agen riset analitis yang gemar menjelajah informasi global, "
-            "menyaring sinyal pasar penting, dan merangkumnya menjadi konten editorial dan analisis mendalam."
+            "menyaring sinyal pasar penting, dan merumuskan SOP pemecahan masalah berulang dari log komplain customer."
         ),
         "quick_prompts": [
+            "Identifikasi 3 keluhan pelanggan berulang dan buatkan SOP mandiri",
             "Riset 3 tren AI Agent terbaru minggu ini",
-            "Tulis draf artikel blog: Masa Depan Virtual Office 3D",
-            "Kompilasi studi kasus implementasi LLM di workflow industri"
+            "Tulis draf artikel blog: Masa Depan Virtual Office 3D"
         ]
     }
 }
@@ -96,13 +142,15 @@ def create_crewai_agent(agent_id: str) -> Optional[Any]:
         return None
 
     try:
+        # Sherloc and Velocia are team coordinators who can delegate
+        can_delegate = agent_id.lower() in ("sherloc", "velocia")
         agent = Agent(
             role=meta["role"],
             goal=meta["goal"],
             backstory=meta["backstory"],
             verbose=True,
             memory=True,
-            allow_delegation=(agent_id.lower() == "velocia")
+            allow_delegation=can_delegate
         )
         return agent
     except Exception as e:

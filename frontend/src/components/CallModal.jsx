@@ -60,6 +60,8 @@ export default function CallModal({
       }
     } catch (err) {
       const greetings = {
+        sherloc: `Halo! Saya Sherloc, Frontline Voice Customer WhatsApp. Ada pertanyaan seputar langganan Orin GPS atau status kendaraan yang ingin divalidasi?`,
+        watson: `Halo, Watson di sini. Bridge eskalasi teknis ke tim manajemen aktif dan sistem knowledge loop siap memproses kendala.`,
         nara: `Halo, Nara di sini! Sistem pemantauan unit online dan saya siap menerima laporan unit bermasalah.`,
         velocia: `Hai, Velocia bicara! Strategi apa yang ingin kita diskusikan hari ini?`,
         scout: `Halo, Scout siap mendengarkan. Tren industri apa yang ingin kita eksplorasi?`

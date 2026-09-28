@@ -124,7 +124,7 @@ export default function AgentCloseUpAvatar({
               <circle cx="12.5" cy="32.5" r="2.2" fill="white" fillOpacity="0.35" />
               <circle cx="37.5" cy="32.5" r="2.2" fill="white" fillOpacity="0.35" />
 
-              {/* Head Accessory: Cap for Scout, Headphones for Velocia & Nara */}
+              {/* Head Accessory customized per agent */}
               {agentId === 'scout' ? (
                 <g>
                   <path
@@ -135,6 +135,46 @@ export default function AgentCloseUpAvatar({
                     d="M9 21C16 17 34 17 41 21C38 23 30 20 25 20C20 20 12 23 9 21Z"
                     fill="#166534"
                   />
+                </g>
+              ) : agentId === 'sherloc' ? (
+                /* Sherloc Frontline Customer Headset with Gold Ear Piece & Mic Boom */
+                <g>
+                  <rect x="2" y="22" width="5" height="11" rx="2.5" fill="#f59e0b" />
+                  <rect x="41" y="23" width="4.5" height="9" rx="2.2" fill="#1e293b" />
+                  <path
+                    d="M5 24C5 11 14 3 24 3C34 3 43 11 43 24"
+                    stroke="#1e293b"
+                    strokeWidth="3.2"
+                    strokeLinecap="round"
+                  />
+                  {/* Gold Mic Boom pointing towards mouth */}
+                  <path
+                    d="M5 29C5 36 12 39 17 38"
+                    stroke="#f59e0b"
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
+                  />
+                  <circle cx="17.5" cy="38" r="1.8" fill="#1e293b" />
+                </g>
+              ) : agentId === 'watson' ? (
+                /* Watson High-Tech Technical Escalation Headset */
+                <g>
+                  <rect x="2.5" y="23" width="4.5" height="10" rx="2.2" fill="#6366f1" />
+                  <rect x="41" y="23" width="4.5" height="10" rx="2.2" fill="#6366f1" />
+                  <path
+                    d="M5 24C5 11 14 3 24 3C34 3 43 11 43 24"
+                    stroke="#4338ca"
+                    strokeWidth="3.5"
+                    strokeLinecap="round"
+                  />
+                  {/* Visor Tech Accent Line */}
+                  <path
+                    d="M12 17C16 15 32 15 36 17"
+                    stroke="#818cf8"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                  <circle cx="43" cy="28" r="1.5" fill="#38bdf8" />
                 </g>
               ) : (
                 <g>

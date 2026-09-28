@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useMemo, Suspense } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { OrbitControls, useGLTF, useTexture, ContactShadows } from '@react-three/drei'
 import * as THREE from 'three'
 import AgentAvatar from './AgentAvatar'
@@ -7,27 +7,73 @@ import ScreenDisplays from './ScreenDisplays'
 import CoffeeCorner from './CoffeeCorner'
 import OfficeNPC from './OfficeNPC'
 import DeskAccessories from './DeskAccessories'
+import OfficePlants from './OfficePlants'
 
 /**
- * Camera controller that smoothly transitions focus when an agent is selected.
+ * Camera controller that smoothly transitions focus when an agent is selected,
+ * and handles transitions between Isometric Perspective and Top-Down (tampak atas) views.
  */
-function CameraRig({ selectedAgent }) {
+function CameraRig({ selectedAgent, cameraViewMode = 'isometric', resetKey = 0 }) {
   const controlsRef = useRef()
-  // Default workspace center in the 4-desk pod
+  const { camera } = useThree()
+  // Default workspace center in the 4-desk pod for Isometric view
   const defaultTarget = React.useMemo(() => new THREE.Vector3(2.21, 0.6, -2.79), [])
+  // Overhead center for Top-Down (tampak atas) view framing the 10m x 10m office
+  const topDownTarget = React.useMemo(() => new THREE.Vector3(0.5, 0, -0.8), [])
+
+  const isTopDown = cameraViewMode === 'top_down'
+  const isTransitioningRef = useRef(false)
+  const prevModeRef = useRef(cameraViewMode)
+  const prevResetKeyRef = useRef(resetKey)
+
+  useEffect(() => {
+    if (prevModeRef.current !== cameraViewMode || prevResetKeyRef.current !== resetKey) {
+      prevModeRef.current = cameraViewMode
+      prevResetKeyRef.current = resetKey
+      isTransitioningRef.current = true
+      // Smooth animated glide into the new camera angle
+      const timer = setTimeout(() => {
+        isTransitioningRef.current = false
+      }, 1200)
+      return () => clearTimeout(timer)
+    }
+  }, [cameraViewMode, resetKey])
 
   useFrame(() => {
     if (!controlsRef.current) return
-    if (selectedAgent && selectedAgent.position) {
-      const targetPos = new THREE.Vector3(
-        selectedAgent.position[0],
-        0.75,
-        selectedAgent.position[2]
-      )
-      controlsRef.current.target.lerp(targetPos, 0.06)
+
+    if (isTopDown) {
+      // In Top-Down mode (tampak atas): look straight down from above
+      let targetPos = topDownTarget
+      if (selectedAgent && selectedAgent.position) {
+        targetPos = new THREE.Vector3(selectedAgent.position[0], 0, selectedAgent.position[2])
+      }
+      controlsRef.current.target.lerp(targetPos, 0.07)
+
+      if (isTransitioningRef.current) {
+        // Small 0.001 Z offset avoids gimbal lock in OrbitControls spherical coordinates
+        const desiredCamPos = new THREE.Vector3(targetPos.x, 17.5, targetPos.z - 0.001)
+        camera.position.lerp(desiredCamPos, 0.07)
+      }
     } else {
-      controlsRef.current.target.lerp(defaultTarget, 0.05)
+      // In Isometric mode: standard 3D perspective angle
+      if (selectedAgent && selectedAgent.position) {
+        const targetPos = new THREE.Vector3(
+          selectedAgent.position[0],
+          0.75,
+          selectedAgent.position[2]
+        )
+        controlsRef.current.target.lerp(targetPos, 0.06)
+      } else {
+        controlsRef.current.target.lerp(defaultTarget, 0.05)
+      }
+
+      if (isTransitioningRef.current) {
+        const desiredCamPos = new THREE.Vector3(9, 8.5, 13)
+        camera.position.lerp(desiredCamPos, 0.06)
+      }
     }
+
     controlsRef.current.update()
   })
 
@@ -37,10 +83,10 @@ function CameraRig({ selectedAgent }) {
       makeDefault
       enableDamping
       dampingFactor={0.06}
-      minDistance={4}
-      maxDistance={25}
-      maxPolarAngle={Math.PI / 2.15}
-      minPolarAngle={Math.PI / 6}
+      minDistance={3}
+      maxDistance={35}
+      maxPolarAngle={isTopDown ? Math.PI / 2.3 : Math.PI / 2.15}
+      minPolarAngle={isTopDown ? 0.001 : Math.PI / 6}
     />
   )
 }
@@ -427,11 +473,12 @@ function DelegationOffice({ scenerySettings }) {
               roughness: 0.3
             })
           }
-          // --- 11. PRESENTATION / KANBAN BOARD ---
+          // --- 11. PRESENTATION / KANBAN BOARD: NEUTRAL OFFICE WHITEBOARD GRAY (ABU-ABU) ---
           else if (name.includes('board') || parentName.includes('board') || name === 'cube.005') {
             child.material = new THREE.MeshStandardMaterial({
-              color: new THREE.Color('#0284c7'),
-              roughness: 0.4
+              color: new THREE.Color('#cbd5e1'), // Neutral light office whiteboard gray
+              roughness: 0.35,
+              metalness: 0.08
             })
           }
           // --- 12. BORDER GLOW LINE ---
@@ -510,7 +557,9 @@ export default function OfficeScene({
     floorType: 'parquet',
     showNPC: true,
     showCoffeeCorner: true
-  }
+  },
+  cameraViewMode = 'isometric',
+  resetKey = 0
 }) {
   const isColorful = scenerySettings?.theme === 'colorful'
 
@@ -566,6 +615,9 @@ export default function OfficeScene({
             <CoffeeCorner isColorful={isColorful} />
           )}
 
+          {/* Lush Greenery & Floor / Desktop Plants */}
+          <OfficePlants isColorful={isColorful} />
+
           {/* Autonomous NPC Cleaning & Coffee Delivery Robot */}
           {scenerySettings?.showNPC && (
             <OfficeNPC isColorful={isColorful} />
@@ -606,8 +658,12 @@ export default function OfficeScene({
           far={5}
         />
 
-        {/* Dynamic Camera Orbit & Lerping Controls */}
-        <CameraRig selectedAgent={selectedAgent} />
+        {/* Dynamic Camera Orbit & Lerping Controls (Supports Isometric & Top-Down / Tampak Atas) */}
+        <CameraRig
+          selectedAgent={selectedAgent}
+          cameraViewMode={cameraViewMode}
+          resetKey={resetKey}
+        />
       </Canvas>
     </div>
   )

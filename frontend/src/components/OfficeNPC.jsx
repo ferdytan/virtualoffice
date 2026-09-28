@@ -5,7 +5,7 @@ import * as THREE from 'three'
 
 // Waypoints forming a smooth, safe patrol route around the office
 const PATROL_ROUTE = [
-  new THREE.Vector3(1.8, 0.08, -0.6),    // In front of 4-desk pod
+  new THREE.Vector3(2.0, 0.08, -0.2),    // In front of breakroom cabinet & refreshment bar
   new THREE.Vector3(0.3, 0.08, 0.8),     // Center corridor
   new THREE.Vector3(2.2, 0.08, 1.8),     // Meeting & whiteboard zone
   new THREE.Vector3(1.6, 0.08, 3.0),     // Boardroom corner

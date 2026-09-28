@@ -66,6 +66,10 @@ export default function KanbanBar({
 
   const getAgentColor = (agentId) => {
     switch (agentId?.toLowerCase()) {
+      case 'sherloc':
+        return '#f59e0b'
+      case 'watson':
+        return '#6366f1'
       case 'nara':
         return '#38bdf8'
       case 'velocia':

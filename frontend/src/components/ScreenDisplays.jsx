@@ -15,6 +15,8 @@ function createBrowserTexture(type) {
 
   // 1. Browser Window Background
   const bgColors = {
+    sherloc: '#161309', // Dark amber obsidian
+    watson: '#0d1127',  // Deep electric indigo
     velocia: '#0f172a', // Deep slate navy
     scout: '#051b14',   // Cyber emerald
     nara: '#07162c',    // Electric midnight blue
@@ -34,12 +36,16 @@ function createBrowserTexture(type) {
 
   // Tab Header
   const tabTitles = {
+    sherloc: '🟢 Sherloc — WhatsApp Live Frontline Desk',
+    watson: '⚡ Watson — Escalation Bridge & Knowledge Loop',
     velocia: '📊 Growth Analytics & Campaigns',
     scout: '🔍 Tech Trends & AI Radar',
-    nara: '🚨 Unit Telemetry & CS Escalations',
+    nara: '🚨 Unit Telemetry & Safe Broadcast',
     team: '💻 agent_pipeline.py — IDE'
   }
   const tabColors = {
+    sherloc: '#f59e0b',
+    watson: '#6366f1',
     velocia: '#ef4444',
     scout: '#22c55e',
     nara: '#38bdf8',
@@ -49,7 +55,7 @@ function createBrowserTexture(type) {
   // Active Tab
   ctx.fillStyle = '#334155'
   ctx.beginPath()
-  ctx.roundRect(120, 12, 320, 44, [8, 8, 0, 0])
+  ctx.roundRect(120, 12, 360, 44, [8, 8, 0, 0])
   ctx.fill()
 
   // Tab dot indicator
@@ -57,7 +63,7 @@ function createBrowserTexture(type) {
   ctx.fillStyle = tabColors[type] || '#38bdf8'
   ctx.fill()
 
-  ctx.font = 'bold 18px "Inter", -apple-system, sans-serif'
+  ctx.font = 'bold 17px "Inter", -apple-system, sans-serif'
   ctx.fillStyle = '#f8fafc'
   ctx.fillText(tabTitles[type] || 'Dashboard', 160, 40)
 
@@ -65,7 +71,7 @@ function createBrowserTexture(type) {
   ctx.fillStyle = '#1e293b'
   ctx.font = '16px "Inter", sans-serif'
   ctx.fillStyle = '#64748b'
-  ctx.fillText('+ New Tab', 460, 40)
+  ctx.fillText('+ New Tab', 500, 40)
 
   // 3. Browser Address / URL Bar
   ctx.fillStyle = '#0f172a'
@@ -77,9 +83,11 @@ function createBrowserTexture(type) {
   ctx.fill()
 
   const urls = {
+    sherloc: '🔒 https://wa.virtualoffice.ai/sherloc/frontline-inbox/live-webhook',
+    watson: '🔒 https://ops.virtualoffice.ai/watson/escalation-bridge/rag-loop',
     velocia: '🔒 https://marketing.virtualoffice.ai/growth/campaigns/live',
     scout: '🔒 https://research.virtualoffice.ai/ai-agents/radar/trends',
-    nara: '🔒 https://ops.virtualoffice.ai/cs/telemetry/live-monitor',
+    nara: '🔒 https://ops.virtualoffice.ai/cs/telemetry/safe-broadcast',
     team: '🔒 https://github.com/ferdytan/virtualoffice'
   }
   ctx.font = '15px "Courier New", monospace'
@@ -297,15 +305,15 @@ function createBrowserTexture(type) {
 
   } else if (type === 'nara') {
     // === NARA: UNIT TELEMETRY & CS ESCALATIONS MONITOR ===
-    ctx.font = 'bold 26px "Inter", sans-serif'
+    ctx.font = 'bold 24px "Inter", sans-serif'
     ctx.fillStyle = '#ffffff'
-    ctx.fillText('UNIT HEALTH TELEMETRY & CS ESCALATIONS', 40, 160)
+    ctx.fillText('NARA ENGINE • OFFLINE TELEMETRY & SMART DISPATCH', 40, 160)
 
     // Healthy badge
-    ctx.fillStyle = '#10b981'
-    ctx.beginPath(); ctx.roundRect(800, 136, 180, 32, 16); ctx.fill()
-    ctx.font = 'bold 14px "Inter", sans-serif'; ctx.fillStyle = '#022c22'
-    ctx.fillText('● ALL UNITS ONLINE', 818, 157)
+    ctx.fillStyle = '#0ea5e9'
+    ctx.beginPath(); ctx.roundRect(750, 136, 230, 32, 16); ctx.fill()
+    ctx.font = 'bold 13px "Inter", sans-serif'; ctx.fillStyle = '#ffffff'
+    ctx.fillText('● CAM RULE & WATSON DISPATCH', 765, 157)
 
     // Left Column: Server Cluster Matrix
     ctx.fillStyle = '#0c2242'
@@ -315,15 +323,16 @@ function createBrowserTexture(type) {
 
     ctx.font = 'bold 18px "Inter", sans-serif'
     ctx.fillStyle = '#38bdf8'
-    ctx.fillText('🖥️ Active Device Fleet (32 Units)', 65, 225)
+    ctx.fillText('📡 Orin Telemetry Fleet (Live API)', 65, 225)
 
     // 4x8 Grid of colorful server node status pills
     for (let row = 0; row < 4; row++) {
       for (let col = 0; col < 6; col++) {
         const nx = 65 + col * 68
         const ny = 250 + row * 60
-        const isAmber = (row === 1 && col === 3) || (row === 3 && col === 1)
-        const nodeColor = isAmber ? '#f59e0b' : '#10b981'
+        const isCam = (row === 0 && col === 2) || (row === 2 && col === 4)
+        const isOffline = (row === 1 && col === 1) || (row === 3 && col === 0)
+        const nodeColor = isOffline ? '#ef4444' : isCam ? '#a855f7' : '#10b981'
 
         ctx.fillStyle = '#15325b'
         ctx.beginPath()
@@ -333,15 +342,15 @@ function createBrowserTexture(type) {
         ctx.beginPath(); ctx.arc(nx + 18, ny + 23, 6, 0, Math.PI * 2)
         ctx.fillStyle = nodeColor; ctx.fill()
 
-        ctx.font = 'bold 12px "Courier New", monospace'
+        ctx.font = 'bold 11px "Courier New", monospace'
         ctx.fillStyle = '#93c5fd'
-        ctx.fillText(`U-${row * 6 + col + 1}`, nx + 28, ny + 27)
+        ctx.fillText(isCam ? 'CAM' : `U-${row * 6 + col + 1}`, nx + 28, ny + 27)
       }
     }
 
     // Status Summary at bottom of cluster
-    ctx.font = 'bold 15px "Inter", sans-serif'; ctx.fillStyle = '#e2e8f0'
-    ctx.fillText('System Health: 99.8%  •  Offline: 0  •  Latency: 18ms', 65, 545)
+    ctx.font = 'bold 14px "Inter", sans-serif'; ctx.fillStyle = '#e2e8f0'
+    ctx.fillText('API Total: 1.050  •  Qualified: 9  •  CAM Grace: 1  •  Jitter: 15-45s', 65, 545)
 
     // Right Column: Heartbeat Waveform & CS Escalation Tickets
     ctx.fillStyle = '#0c2242'
@@ -351,7 +360,7 @@ function createBrowserTexture(type) {
 
     ctx.font = 'bold 18px "Inter", sans-serif'
     ctx.fillStyle = '#38bdf8'
-    ctx.fillText('Live Heartbeat Pulse (Telemetry Stream)', 540, 225)
+    ctx.fillText('Watson Anti-Ban Dispatch & Feedback Loop', 540, 225)
 
     // Heartbeat ECG Line
     ctx.beginPath()
@@ -377,12 +386,12 @@ function createBrowserTexture(type) {
     // Recent CS Escalation Action Log
     ctx.font = 'bold 17px "Inter", sans-serif'
     ctx.fillStyle = '#f8fafc'
-    ctx.fillText('Recent Automated Escalations & Reminders', 540, 365)
+    ctx.fillText('Customer PRO WhatsApp Group Dispatch', 540, 365)
 
     const tickets = [
-      { id: '#4821', unit: 'Unit B-12', action: 'WhatsApp Reminder: Payment', badge: 'SENT', badgeColor: '#38bdf8' },
-      { id: '#4822', unit: 'Unit C-04', action: 'Offline Auto-Reboot Trigger', badge: 'RESOLVED', badgeColor: '#10b981' },
-      { id: '#4823', unit: 'Unit A-09', action: 'Firmware sync verified', badge: 'SUCCESS', badgeColor: '#10b981' }
+      { id: 'PT RAMA', unit: 'Fleet Ops Support', action: 'Full Audit (Tanggal 1)', badge: 'SENT', badgeColor: '#38bdf8' },
+      { id: 'LOGISTIK', unit: 'B 1842 KZA', action: 'Inbound Teknisi Tiket', badge: 'RESOLVED', badgeColor: '#10b981' },
+      { id: 'EXPRESS', unit: 'D 9912 ABE', action: 'Delta Report (0 Flags)', badge: 'DELIVERED', badgeColor: '#10b981' }
     ]
 
     tickets.forEach((t, i) => {
@@ -392,26 +401,224 @@ function createBrowserTexture(type) {
       ctx.roundRect(540, ty, 420, 44, 8)
       ctx.fill()
 
-      ctx.font = 'bold 13px "Courier New", monospace'
+      ctx.font = 'bold 12px "Courier New", monospace'
       ctx.fillStyle = '#38bdf8'
       ctx.fillText(t.id, 555, ty + 27)
 
-      ctx.font = '14px "Inter", sans-serif'
+      ctx.font = '13px "Inter", sans-serif'
       ctx.fillStyle = '#f1f5f9'
-      ctx.fillText(`${t.unit} • ${t.action}`, 615, ty + 27)
+      ctx.fillText(`${t.unit} • ${t.action}`, 645, ty + 27)
 
       ctx.fillStyle = t.badgeColor
       ctx.beginPath()
-      ctx.roundRect(875, ty + 10, 75, 24, 6)
+      ctx.roundRect(865, ty + 10, 85, 24, 6)
       ctx.fill()
 
-      ctx.font = 'bold 11px "Inter", sans-serif'
-      ctx.fillStyle = '#000000'
-      ctx.fillText(t.badge, 885, ty + 26)
+      ctx.font = 'bold 10px "Inter", sans-serif'
+      ctx.fillStyle = '#ffffff'
+      ctx.fillText(t.badge, 875, ty + 26)
+    })
+
+  } else if (type === 'watson') {
+    // === WATSON: TECHNICAL ESCALATION & KNOWLEDGE LOOP ===
+    ctx.font = 'bold 24px "Inter", sans-serif'
+    ctx.fillStyle = '#ffffff'
+    ctx.fillText('TECHNICAL ESCALATION & KNOWLEDGE HARVESTER', 40, 160)
+
+    // Bridge Status Badge
+    ctx.fillStyle = '#6366f1'
+    ctx.beginPath(); ctx.roundRect(750, 136, 230, 32, 16); ctx.fill()
+    ctx.font = 'bold 13px "Inter", sans-serif'; ctx.fillStyle = '#ffffff'
+    ctx.fillText('● WA MANAGEMENT BRIDGE', 768, 157)
+
+    // 3 KPI Cards
+    const cards = [
+      { label: 'ESCALATED TICKETS', value: '12 Tiket', sub: '3 Pending Management', grad: ['#4f46e5', '#6366f1'] },
+      { label: 'INTERNAL WA GROUP', value: 'Connected', sub: '24 Lead Engineers', grad: ['#7c3aed', '#a855f7'] },
+      { label: 'HARVESTED Q&A', value: '148 Pairs', sub: 'Vector DB Synced', grad: ['#0284c7', '#38bdf8'] }
+    ]
+
+    cards.forEach((c, i) => {
+      const x = 40 + i * 315
+      const grad = ctx.createLinearGradient(x, 185, x + 300, 305)
+      grad.addColorStop(0, c.grad[0])
+      grad.addColorStop(1, c.grad[1])
+
+      ctx.fillStyle = grad
+      ctx.beginPath()
+      ctx.roundRect(x, 185, 300, 110, 14)
+      ctx.fill()
+
+      ctx.font = 'bold 13px "Inter", sans-serif'; ctx.fillStyle = '#ffffff'
+      ctx.fillText(c.label, x + 18, 216)
+
+      ctx.font = 'bold 32px "Inter", sans-serif'
+      ctx.fillText(c.value, x + 18, 258)
+
+      ctx.font = '13px "Inter", sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.85)'
+      ctx.fillText(c.sub, x + 18, 282)
+    })
+
+    // Left Panel: WhatsApp Group Internal Stream
+    ctx.fillStyle = '#151733'
+    ctx.beginPath()
+    ctx.roundRect(40, 315, 520, 275, 14)
+    ctx.fill()
+
+    ctx.font = 'bold 17px "Inter", sans-serif'; ctx.fillStyle = '#a5b4fc'
+    ctx.fillText('💬 Internal WA Group: "Orin Lead Engineers"', 65, 350)
+
+    const chatItems = [
+      { sender: 'Watson', msg: '🚨 #TIK-481: Anomali sinyal ECU error E-402 unit JKT-402', role: 'Watson Escalation', time: '14:20', col: '#818cf8' },
+      { sender: 'Dimas (Lead)', msg: 'Gunakan protokol SMS restart: kirim "RESTART#402" ke no SIM unit.', role: 'Engineering Lead', time: '14:22', col: '#34d399' },
+      { sender: 'Watson', msg: '✅ Jawaban diteruskan ke Sherloc & disuntikkan ke RAG Knowledge Base!', role: 'Watson Loop', time: '14:23', col: '#a5b4fc' }
+    ]
+
+    chatItems.forEach((item, idx) => {
+      const cy = 370 + idx * 68
+      ctx.fillStyle = '#1e2246'
+      ctx.beginPath(); ctx.roundRect(60, cy, 480, 58, 10); ctx.fill()
+
+      ctx.font = 'bold 12px "Inter", sans-serif'; ctx.fillStyle = item.col
+      ctx.fillText(item.sender, 75, cy + 22)
+      ctx.font = '10px "Inter", sans-serif'; ctx.fillStyle = '#94a3b8'
+      ctx.fillText(`• ${item.role} (${item.time})`, 135, cy + 22)
+
+      ctx.font = '13px "Inter", sans-serif'; ctx.fillStyle = '#f1f5f9'
+      ctx.fillText(item.msg, 75, cy + 44)
+    })
+
+    // Right Panel: Knowledge Harvester / Vector DB Loop
+    ctx.fillStyle = '#151733'
+    ctx.beginPath()
+    ctx.roundRect(585, 315, 395, 275, 14)
+    ctx.fill()
+
+    ctx.font = 'bold 17px "Inter", sans-serif'; ctx.fillStyle = '#a5b4fc'
+    ctx.fillText('🧠 Knowledge Ingestion Vector Store', 610, 350)
+
+    const vectors = [
+      { q: 'Solusi Lampu Merah Kedip E-402', cat: 'FIRMWARE', score: '0.96 Sim' },
+      { q: 'Verifikasi Pelanggan Orin Pasca Bayar', cat: 'BILLING', score: '0.94 Sim' },
+      { q: 'Sinkronisasi Ulang Geofence Radar', cat: 'TELEMETRY', score: '0.91 Sim' }
+    ]
+
+    vectors.forEach((v, idx) => {
+      const vy = 375 + idx * 64
+      ctx.fillStyle = '#1e2246'
+      ctx.beginPath(); ctx.roundRect(605, vy, 355, 52, 10); ctx.fill()
+
+      ctx.font = 'bold 11px "Courier New", monospace'; ctx.fillStyle = '#c084fc'
+      ctx.fillText(`[${v.cat}]`, 620, vy + 22)
+
+      ctx.font = 'bold 13px "Inter", sans-serif'; ctx.fillStyle = '#ffffff'
+      ctx.fillText(v.q, 620, vy + 42)
+
+      ctx.font = 'bold 12px "Inter", sans-serif'; ctx.fillStyle = '#34d399'
+      ctx.fillText(v.score, 885, vy + 32)
+    })
+
+  } else if (type === 'sherloc') {
+    // === SHERLOC: FRONTLINE WHATSAPP & CUSTOMER DESK ===
+    ctx.font = 'bold 24px "Inter", sans-serif'
+    ctx.fillStyle = '#ffffff'
+    ctx.fillText('WHATSAPP CUSTOMER FRONTLINE & LIVE DISPATCH', 40, 160)
+
+    // Single Communicator Badge
+    ctx.fillStyle = '#f59e0b'
+    ctx.beginPath(); ctx.roundRect(740, 136, 240, 32, 16); ctx.fill()
+    ctx.font = 'bold 13px "Inter", sans-serif'; ctx.fillStyle = '#000000'
+    ctx.fillText('● SINGLE COMMUNICATOR', 760, 157)
+
+    // 3 KPI Cards
+    const cards = [
+      { label: 'ACTIVE INBOUND CHATS', value: '38 Sesi', sub: 'Avg Reply: 3.8s', grad: ['#d97706', '#f59e0b'] },
+      { label: 'VERIFIED USERS', value: '96.2%', sub: 'Pelanggan Orin Aktif', grad: ['#b45309', '#ea580c'] },
+      { label: 'DELEGATION RATE', value: '18 Tiket', sub: 'Nara (GPS) & Watson', grad: ['#c2410c', '#e11d48'] }
+    ]
+
+    cards.forEach((c, i) => {
+      const x = 40 + i * 315
+      const grad = ctx.createLinearGradient(x, 185, x + 300, 305)
+      grad.addColorStop(0, c.grad[0])
+      grad.addColorStop(1, c.grad[1])
+
+      ctx.fillStyle = grad
+      ctx.beginPath()
+      ctx.roundRect(x, 185, 300, 110, 14)
+      ctx.fill()
+
+      ctx.font = 'bold 13px "Inter", sans-serif'; ctx.fillStyle = '#ffffff'
+      ctx.fillText(c.label, x + 18, 216)
+
+      ctx.font = 'bold 32px "Inter", sans-serif'
+      ctx.fillText(c.value, x + 18, 258)
+
+      ctx.font = '13px "Inter", sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.85)'
+      ctx.fillText(c.sub, x + 18, 282)
+    })
+
+    // Left Panel: Real-Time WhatsApp Inbound Feed
+    ctx.fillStyle = '#221a08'
+    ctx.beginPath()
+    ctx.roundRect(40, 315, 520, 275, 14)
+    ctx.fill()
+
+    ctx.font = 'bold 17px "Inter", sans-serif'; ctx.fillStyle = '#fde68a'
+    ctx.fillText('📲 WhatsApp Customer Live Stream', 65, 350)
+
+    const chats = [
+      { name: 'Budi Santoso', phone: '+62 812-8899-1234', text: 'Unit B-1842-KZA offline dari kemarin, tolong dicek!', tag: 'ORIN USER', tagCol: '#10b981' },
+      { name: 'Siti Rahma', phone: '+62 813-7766-5544', text: 'Tanya diskon paket 5 unit armada truk ekspedisi...', tag: 'CALON', tagCol: '#38bdf8' },
+      { name: 'Hendra W.', phone: '+62 856-1122-3344', text: 'Lampu GPS kedip merah cepat error code E-402', tag: 'ESKALASI', tagCol: '#f43f5e' }
+    ]
+
+    chats.forEach((c, idx) => {
+      const cy = 370 + idx * 68
+      ctx.fillStyle = '#2f240e'
+      ctx.beginPath(); ctx.roundRect(60, cy, 480, 58, 10); ctx.fill()
+
+      ctx.font = 'bold 13px "Inter", sans-serif'; ctx.fillStyle = '#ffffff'
+      ctx.fillText(`${c.name} (${c.phone})`, 75, cy + 22)
+
+      ctx.fillStyle = c.tagCol
+      ctx.beginPath(); ctx.roundRect(430, cy + 8, 95, 20, 5); ctx.fill()
+      ctx.font = 'bold 10px "Inter", sans-serif'; ctx.fillStyle = '#000000'
+      ctx.fillText(c.tag, 442, cy + 22)
+
+      ctx.font = '13px "Inter", sans-serif'; ctx.fillStyle = '#fef08a'
+      ctx.fillText(c.text, 75, cy + 45)
+    })
+
+    // Right Panel: Frontline Dispatch Pipeline
+    ctx.fillStyle = '#221a08'
+    ctx.beginPath()
+    ctx.roundRect(585, 315, 395, 275, 14)
+    ctx.fill()
+
+    ctx.font = 'bold 17px "Inter", sans-serif'; ctx.fillStyle = '#fde68a'
+    ctx.fillText('⚡ Dispatch & Delegation Actions', 610, 350)
+
+    const actions = [
+      { act: 'FAQ Knowledge Match', sub: 'Paket Orin Fleets 2026 (98% confidence)', icon: '📖', col: '#10b981' },
+      { act: 'Delegasi ke Nara', sub: 'Scan Telemetri Unit B-1842-KZA', icon: '📡', col: '#38bdf8' },
+      { act: 'Eskalasi ke Watson', sub: 'Tiket Firmware ECU Error E-402', icon: '⚡', col: '#a855f7' }
+    ]
+
+    actions.forEach((a, idx) => {
+      const ay = 375 + idx * 64
+      ctx.fillStyle = '#2f240e'
+      ctx.beginPath(); ctx.roundRect(605, ay, 355, 52, 10); ctx.fill()
+
+      ctx.font = '16px "Inter", sans-serif'; ctx.fillText(a.icon, 620, ay + 33)
+      ctx.font = 'bold 13px "Inter", sans-serif'; ctx.fillStyle = a.col
+      ctx.fillText(a.act, 650, ay + 23)
+      ctx.font = '11px "Inter", sans-serif'; ctx.fillStyle = '#e2e8f0'
+      ctx.fillText(a.sub, 650, ay + 42)
     })
 
   } else {
-    // === TEAM DESK 4: CODE IDE & SYNTAX HIGHLIGHTED WORKSPACE ===
+    // === TEAM / DEFAULT BACKUP: CODE IDE ===
     ctx.font = 'bold 26px "Inter", sans-serif'
     ctx.fillStyle = '#ffffff'
     ctx.fillText('DEV WORKSPACE — VIRTUAL OFFICE CLUSTER', 40, 160)
@@ -421,7 +628,6 @@ function createBrowserTexture(type) {
     ctx.roundRect(40, 185, 940, 405, 14)
     ctx.fill()
 
-    // File Tabs
     ctx.fillStyle = '#2b2d4f'
     ctx.fillRect(40, 185, 940, 40)
     ctx.font = '14px "Inter", sans-serif'; ctx.fillStyle = '#f8fafc'
@@ -429,47 +635,6 @@ function createBrowserTexture(type) {
     ctx.fillStyle = '#94a3b8'
     ctx.fillText('OfficeScene.jsx', 230, 210)
     ctx.fillText('terminal', 380, 210)
-
-    // Code lines
-    const codeLines = [
-      { num: '1', tokens: [{ t: 'from ', c: '#c678dd' }, { t: 'crewai ', c: '#e5c07b' }, { t: 'import ', c: '#c678dd' }, { t: 'Agent, Crew, Task', c: '#61afef' }] },
-      { num: '2', tokens: [{ t: 'from ', c: '#c678dd' }, { t: 'virtual_office.agents ', c: '#e5c07b' }, { t: 'import ', c: '#c678dd' }, { t: 'NARA, VELOCIA, SCOUT', c: '#98c379' }] },
-      { num: '3', tokens: [{ t: '' }] },
-      { num: '4', tokens: [{ t: '# 2x2 Collaborative Face-to-Face Office Pod', c: '#5c6370' }] },
-      { num: '5', tokens: [{ t: 'office_pod = ', c: '#e06c75' }, { t: 'VirtualOfficePod(', c: '#61afef' }, { t: 'layout="2x2_island"', c: '#98c379' }, { t: ')', c: '#abb2bf' }] },
-      { num: '6', tokens: [{ t: 'office_pod.dock_agent(', c: '#61afef' }, { t: '"nara", ', c: '#98c379' }, { t: 'role="Reminder CS"', c: '#d19a66' }, { t: ')', c: '#abb2bf' }] },
-      { num: '7', tokens: [{ t: 'office_pod.dock_agent(', c: '#61afef' }, { t: '"velocia", ', c: '#98c379' }, { t: 'role="Marketing Strategist"', c: '#d19a66' }, { t: ')', c: '#abb2bf' }] },
-      { num: '8', tokens: [{ t: 'office_pod.dock_agent(', c: '#61afef' }, { t: '"scout", ', c: '#98c379' }, { t: 'role="Tech Researcher"', c: '#d19a66' }, { t: ')', c: '#abb2bf' }] },
-      { num: '9', tokens: [{ t: 'await office_pod.start_autonomous_collaboration()', c: '#61afef' }] }
-    ]
-
-    codeLines.forEach((line, i) => {
-      const ly = 258 + i * 24
-      ctx.font = '14px "Courier New", monospace'
-      ctx.fillStyle = '#5c6370'
-      ctx.fillText(line.num, 60, ly)
-
-      let lx = 100
-      if (line.tokens) {
-        line.tokens.forEach(tok => {
-          ctx.fillStyle = tok.c || '#abb2bf'
-          ctx.fillText(tok.t, lx, ly)
-          lx += ctx.measureText(tok.t).width
-        })
-      }
-    })
-
-    // Mini Terminal at bottom of editor
-    ctx.fillStyle = '#111222'
-    ctx.beginPath()
-    ctx.roundRect(55, 490, 910, 85, 8)
-    ctx.fill()
-
-    ctx.font = 'bold 13px "Courier New", monospace'
-    ctx.fillStyle = '#10b981'
-    ctx.fillText('● [vite:dev] HMR active — Virtual Office 3D Pod synchronized', 75, 520)
-    ctx.fillStyle = '#38bdf8'
-    ctx.fillText('● [backend] FastAPI crew server healthy at 127.0.0.1:8000 (status 200)', 75, 545)
   }
 
   const texture = new THREE.CanvasTexture(canvas)
@@ -489,13 +654,46 @@ function createBrowserTexture(type) {
 export default function ScreenDisplays({ onSelectAgent, agents = [] }) {
   const groupRef = useRef()
 
-  // Generate textures for the 4 desks
+  // Generate textures for all 5 agent workstations & frontline
+  const sherlocTexture = useMemo(() => createBrowserTexture('sherloc'), [])
+  const watsonTexture = useMemo(() => createBrowserTexture('watson'), [])
   const velociaTexture = useMemo(() => createBrowserTexture('velocia'), [])
   const scoutTexture = useMemo(() => createBrowserTexture('scout'), [])
   const naraTexture = useMemo(() => createBrowserTexture('nara'), [])
-  const teamTexture = useMemo(() => createBrowserTexture('team'), [])
 
-  // Create glowing emissive materials with polygonOffset to guarantee visibility in front of monitor mesh
+  // Create glowing emissive materials with polygonOffset to guarantee visibility in front of monitor/laptop mesh
+  const sherlocMat = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        map: sherlocTexture,
+        emissiveMap: sherlocTexture,
+        emissive: new THREE.Color('#ffffff'),
+        emissiveIntensity: 0.85,
+        roughness: 0.15,
+        metalness: 0.05,
+        polygonOffset: true,
+        polygonOffsetFactor: -4,
+        polygonOffsetUnits: -4
+      }),
+    [sherlocTexture]
+  )
+
+  const watsonMat = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        map: watsonTexture,
+        emissiveMap: watsonTexture,
+        emissive: new THREE.Color('#ffffff'),
+        emissiveIntensity: 0.85,
+        roughness: 0.15,
+        metalness: 0.05,
+        polygonOffset: true,
+        polygonOffsetFactor: -4,
+        polygonOffsetUnits: -4
+      }),
+    [watsonTexture]
+  )
+
   const velociaMat = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
@@ -544,31 +742,19 @@ export default function ScreenDisplays({ onSelectAgent, agents = [] }) {
     [naraTexture]
   )
 
-  // Powered-off / blank monitor material for the empty workstation (Desk 4)
-  const emptyDeskMat = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
-        color: new THREE.Color('#0a0c10'),
-        roughness: 0.88,
-        metalness: 0.12,
-        emissive: new THREE.Color('#000000'),
-        emissiveIntensity: 0,
-        polygonOffset: true,
-        polygonOffsetFactor: -4,
-        polygonOffsetUnits: -4
-      }),
-    []
-  )
-
   // Gentle, subtle emissive screen glow oscillation to make the active screens feel alive
   useFrame((state) => {
     const pulse = 0.85 + Math.sin(state.clock.elapsedTime * 2.5) * 0.06
+    if (sherlocMat) sherlocMat.emissiveIntensity = pulse
+    if (watsonMat) watsonMat.emissiveIntensity = pulse
     if (velociaMat) velociaMat.emissiveIntensity = pulse
     if (scoutMat) scoutMat.emissiveIntensity = pulse
     if (naraMat) naraMat.emissiveIntensity = pulse
   })
 
   // Quick lookup helper for selecting agents on screen click
+  const sherlocAgent = agents.find((a) => a.id === 'sherloc')
+  const watsonAgent = agents.find((a) => a.id === 'watson')
   const velociaAgent = agents.find((a) => a.id === 'velocia')
   const scoutAgent = agents.find((a) => a.id === 'scout')
   const naraAgent = agents.find((a) => a.id === 'nara')
@@ -577,9 +763,12 @@ export default function ScreenDisplays({ onSelectAgent, agents = [] }) {
   // Desk 1 (Velocia): PC at [1.588, 0.504, -3.212], rot [0, Math.PI, 0] -> screen at [1.580, 0.805, -3.210]
   // Desk 2 (Scout):   PC at [3.359, 0.504, -3.212], rot [0, Math.PI, 0] -> screen at [3.351, 0.805, -3.210]
   // Desk 3 (Nara):    PC at [1.070, 0.504, -2.370], rot [0, 0, 0]       -> screen at [1.078, 0.805, -2.370]
-  // Desk 4 (Empty):   PC at [2.840, 0.504, -2.370], rot [0, 0, 0]       -> screen at [2.848, 0.805, -2.370]
+  // Desk 4 (Watson):  PC at [2.840, 0.504, -2.370], rot [0, 0, 0]       -> screen at [2.848, 0.805, -2.370]
+  // Front Desk (Sherloc): Laptop at [-4.164, 0.548, 3.995], rot [0, Math.PI, 0] -> screen at [-4.164, 0.725, 4.08]
   const screenWidth = 0.38
   const screenHeight = 0.25
+  const laptopWidth = 0.34
+  const laptopHeight = 0.22
 
   return (
     <group ref={groupRef}>
@@ -622,13 +811,30 @@ export default function ScreenDisplays({ onSelectAgent, agents = [] }) {
         <planeGeometry args={[screenWidth, screenHeight]} />
       </mesh>
 
-      {/* 4. Empty Desk Screen (Desk 4, opposite Scout) - Powered Off / Blank */}
+      {/* 4. Watson's Screen (Desk 4, alongside Nara) - Escalation & Knowledge Harvester */}
       <mesh
         position={[2.848, 0.805, -2.370]}
         rotation={[0, 0, 0]}
-        material={emptyDeskMat}
+        material={watsonMat}
+        onClick={(e) => {
+          e.stopPropagation()
+          if (watsonAgent && onSelectAgent) onSelectAgent(watsonAgent)
+        }}
       >
         <planeGeometry args={[screenWidth, screenHeight]} />
+      </mesh>
+
+      {/* 5. Sherloc's Front Desk Laptop Screen (Meja Resepsionis Utama) */}
+      <mesh
+        position={[-4.164, 0.725, 4.08]}
+        rotation={[0.18, 0, 0]}
+        material={sherlocMat}
+        onClick={(e) => {
+          e.stopPropagation()
+          if (sherlocAgent && onSelectAgent) onSelectAgent(sherlocAgent)
+        }}
+      >
+        <planeGeometry args={[laptopWidth, laptopHeight]} />
       </mesh>
     </group>
   )
