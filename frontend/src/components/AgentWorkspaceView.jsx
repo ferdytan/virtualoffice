@@ -50,6 +50,7 @@ import {
   X,
   Edit,
   Edit3,
+  Pencil,
   Plus,
   ArrowUpDown,
   ArrowUp,
@@ -2725,7 +2726,7 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                                 </div>
                               </td>
 
-                              {/* 3. Akun Pelanggan + Quick Add / Edit WhatsApp Group Menu */}
+                              {/* 3. Akun Pelanggan + Quick Pencil Edit WhatsApp Group */}
                               <td className="py-3 px-4 whitespace-nowrap">
                                 <div className="flex items-center justify-between gap-3">
                                   <div>
@@ -2733,31 +2734,23 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                                     <div className="text-[10px] text-slate-400 font-mono">ID: {dev.customer_id || 'PRO'}</div>
                                   </div>
 
-                                  {/* Menu Add / Edit Nama WhatsApp Group di sebelah kanan akun */}
-                                  <div>
-                                    {waGroup ? (
-                                      <button
-                                        type="button"
-                                        onClick={() => handleOpenGroupModal(dev.customer_id, cust, waGroup, dev.wa_group_id)}
-                                        className="group flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/90 rounded-lg text-[11px] font-semibold text-emerald-800 transition-all cursor-pointer shadow-2xs"
-                                        title={`Grup WA: ${waGroup} (Klik untuk ubah mapping akun '${cust}')`}
-                                      >
-                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                                        <span className="truncate max-w-[130px] font-medium">{waGroup}</span>
-                                        <Edit3 className="w-3 h-3 text-emerald-600 opacity-60 group-hover:opacity-100 shrink-0 ml-0.5" />
-                                      </button>
-                                    ) : (
-                                      <button
-                                        type="button"
-                                        onClick={() => handleOpenGroupModal(dev.customer_id, cust, '', '')}
-                                        className="flex items-center gap-1 px-2.5 py-1 bg-slate-50 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300 border border-slate-200 rounded-lg text-[11px] font-bold text-slate-600 transition-all cursor-pointer shadow-2xs active:scale-95"
-                                        title={`Tambah Nama WhatsApp Group untuk akun '${cust}'`}
-                                      >
-                                        <Plus className="w-3 h-3 text-emerald-600" />
-                                        <span>Add Grup WA</span>
-                                      </button>
-                                    )}
-                                  </div>
+                                  {/* Icon pencil untuk input / ubah nama WhatsApp Group (tanpa badge teks) */}
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenGroupModal(dev.customer_id, cust, waGroup, dev.wa_group_id)}
+                                    className={`p-1.5 rounded-lg border transition-all cursor-pointer active:scale-90 ${
+                                      waGroup
+                                        ? 'text-emerald-600 hover:text-emerald-700 bg-emerald-50/70 hover:bg-emerald-100 border-emerald-200/80 shadow-2xs'
+                                        : 'text-slate-400 hover:text-slate-700 bg-slate-50 hover:bg-slate-100 border-slate-200'
+                                    }`}
+                                    title={
+                                      waGroup
+                                        ? `Grup WA: ${waGroup} (Klik untuk ubah mapping)`
+                                        : `Tambah / Petakan Nama WhatsApp Group untuk '${cust}'`
+                                    }
+                                  >
+                                    <Pencil className="w-3.5 h-3.5" />
+                                  </button>
                                 </div>
                               </td>
 
