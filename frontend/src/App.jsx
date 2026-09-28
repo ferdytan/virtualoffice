@@ -502,34 +502,43 @@ export default function App() {
     <div className="relative w-screen h-screen overflow-hidden bg-[#eef2f6]">
       {/* --- TOP HEADER OVERLAY (OFFICE VIEW ONLY) --- */}
       {viewMode === 'office' && (
-        <header className="fixed top-0 left-0 right-0 z-30 pointer-events-none p-4 sm:p-6 flex items-center justify-between">
-          {/* Top-Left Panel with Large Close-Up Avatar */}
-          <div className="pointer-events-auto flex items-center gap-3.5 bg-white/95 backdrop-blur-xl p-2.5 pr-5 rounded-2xl shadow-xl border border-slate-200/80 hover:shadow-2xl transition-all">
-            <AgentCloseUpAvatar
-              agent={displayedAgent}
-              size={52}
-              showStatus={true}
-              onClick={handleCycleAgent}
-            />
+        <header className="fixed top-0 left-0 right-0 z-30 pointer-events-none p-4 sm:p-6 flex items-start justify-between">
+          {/* Top-Left Stack: AI Agent Card + Vertical Collapsible Kanban Bar (Shared exact width) */}
+          <div className="flex flex-col items-start gap-2.5 w-80 sm:w-[350px] pointer-events-none">
+            {/* Top-Left Panel with Large Close-Up Avatar */}
+            <div className="pointer-events-auto w-full flex items-center gap-3.5 bg-white/95 backdrop-blur-xl p-2.5 pr-4 rounded-2xl shadow-xl border border-slate-200/80 hover:shadow-2xl transition-all">
+              <AgentCloseUpAvatar
+                agent={displayedAgent}
+                size={52}
+                showStatus={true}
+                onClick={handleCycleAgent}
+              />
 
-            <div className="flex flex-col justify-center">
-              <div className="flex items-center gap-2">
-                <h1 className="text-sm font-black text-slate-900 tracking-tight">
-                  VIRTUAL OFFICE AI
-                </h1>
-                <span
-                  className="text-[10px] font-extrabold px-1.5 py-0.5 rounded text-white shadow-2xs tracking-wide"
-                  style={{ backgroundColor: displayedAgent.color }}
-                >
-                  {displayedAgent.name}
-                </span>
+              <div className="flex flex-col justify-center min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-sm font-black text-slate-900 tracking-tight truncate">
+                    VIRTUAL OFFICE AI
+                  </h1>
+                  <span
+                    className="text-[10px] font-extrabold px-1.5 py-0.5 rounded text-white shadow-2xs tracking-wide shrink-0"
+                    style={{ backgroundColor: displayedAgent.color }}
+                  >
+                    {displayedAgent.name}
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 font-semibold flex items-center gap-1.5 mt-0.5 truncate">
+                  <span className="truncate">{displayedAgent.role_badge || displayedAgent.role}</span>
+                  <span className="text-slate-300">&bull;</span>
+                  <span className="text-slate-400 font-normal shrink-0">Klik avatar untuk rotasi</span>
+                </p>
               </div>
-              <p className="text-[11px] text-slate-500 font-semibold flex items-center gap-1.5 mt-0.5">
-                <span>{displayedAgent.role_badge || displayedAgent.role}</span>
-                <span className="text-slate-300">&bull;</span>
-                <span className="text-slate-400 font-normal">Klik avatar untuk rotasi</span>
-              </p>
             </div>
+
+            {/* Vertical Collapsible Kanban Bar directly underneath */}
+            <KanbanBar
+              tasks={tasks}
+              onSelectAgentById={handleSelectAgentById}
+            />
           </div>
 
           {/* Quick Agent Jump & Status */}
@@ -686,12 +695,6 @@ export default function App() {
               onUpdateAgentStatus={handleUpdateAgentStatus}
             />
           )}
-
-          {/* --- KANBAN STATUS BAR (BOTTOM) --- */}
-          <KanbanBar
-            tasks={tasks}
-            onSelectAgentById={handleSelectAgentById}
-          />
         </>
       )}
 
