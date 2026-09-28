@@ -6,11 +6,11 @@ import CallModal from './components/CallModal'
 import AgentWorkspaceView from './components/AgentWorkspaceView'
 import AgentCloseUpAvatar from './components/AgentCloseUpAvatar'
 import SettingsPageView from './components/SettingsPageView'
+import { GoogleMapsCompassIcon, GoogleMapsFloatingWidget } from './components/GoogleMapsViewControl'
 import {
   RotateCcw,
   Palette,
-  Settings,
-  Compass
+  Settings
 } from 'lucide-react'
 
 // 5-Agent Collaborative Ecosystem: Frontline (Sherloc), Escalation (Watson), CS Telemetry (Nara), Marketing (Velocia), Research (Scout)
@@ -211,6 +211,7 @@ export default function App() {
   const [viewMode, setViewMode] = useState('office') // 'office' | 'agent_workspace'
   const [cameraViewMode, setCameraViewMode] = useState('isometric') // 'isometric' | 'top_down'
   const [cameraResetCounter, setCameraResetCounter] = useState(0)
+  const [zoomTrigger, setZoomTrigger] = useState(null)
   const [backendStatus, setBackendStatus] = useState('checking')
   const [tasks, setTasks] = useState(INITIAL_TASKS)
   const [chatHistory, setChatHistory] = useState({
@@ -566,26 +567,34 @@ export default function App() {
               <Settings className="w-4 h-4" />
             </button>
 
-            {/* Camera View Mode Toggle Button (Perspektif Isometrik vs Tampak Atas) */}
+            {/* Google Maps Style 2D / 3D View Mode Toggle Button */}
             <button
               onClick={() =>
                 setCameraViewMode((prev) => (prev === 'isometric' ? 'top_down' : 'isometric'))
               }
-              className={`p-2.5 sm:px-3.5 backdrop-blur-xl rounded-2xl shadow-lg border transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 ${
-                cameraViewMode === 'top_down'
-                  ? 'bg-sky-500 hover:bg-sky-600 text-white border-sky-400 shadow-sky-200'
-                  : 'bg-white/90 hover:bg-white text-slate-700 hover:text-slate-900 border-slate-200/80'
-              }`}
+              className="flex items-center gap-2 p-1.5 sm:pr-3.5 bg-slate-900/95 hover:bg-slate-800 text-white backdrop-blur-xl rounded-2xl shadow-lg border border-slate-700/80 transition-all active:scale-95 cursor-pointer group"
               title={
                 cameraViewMode === 'top_down'
-                  ? 'Ganti ke Tampilan Isometrik 3D'
-                  : 'Ganti ke Tampilan Tampak Atas (Top-Down Overview)'
+                  ? 'Beralih ke Perspektif 3D (Isometrik)'
+                  : 'Beralih ke Tampilan 2D (Tampak Atas)'
               }
             >
-              <Compass className={`w-4 h-4 ${cameraViewMode === 'top_down' ? 'animate-spin-slow' : ''}`} />
-              <span className="text-xs font-bold hidden sm:inline">
-                {cameraViewMode === 'top_down' ? 'Tampak Atas' : 'Isometrik'}
-              </span>
+              <GoogleMapsCompassIcon
+                className="w-6 h-6 shrink-0 group-hover:scale-105 transition-transform"
+                is3D={cameraViewMode === 'isometric'}
+              />
+              <div className="flex items-center gap-1.5">
+                <span className={`px-1.5 py-0.5 rounded-lg text-[11px] font-black tracking-wider transition-colors ${
+                  cameraViewMode === 'top_down'
+                    ? 'bg-sky-500 text-white shadow-2xs'
+                    : 'bg-white/15 text-white border border-white/10'
+                }`}>
+                  {cameraViewMode === 'top_down' ? '3D' : '2D'}
+                </span>
+                <span className="text-xs font-bold text-slate-200 hidden sm:inline">
+                  {cameraViewMode === 'top_down' ? 'Tampak Atas' : 'Isometrik'}
+                </span>
+              </div>
             </button>
 
             {/* Reset Camera View Button */}
@@ -667,6 +676,21 @@ export default function App() {
               scenerySettings={scenerySettings}
               cameraViewMode={cameraViewMode}
               resetKey={cameraResetCounter}
+              zoomTrigger={zoomTrigger}
+            />
+
+            {/* --- GOOGLE MAPS FLOATING CONTROLS (RIGHT SIDE) --- */}
+            <GoogleMapsFloatingWidget
+              cameraViewMode={cameraViewMode}
+              onToggleViewMode={() =>
+                setCameraViewMode((prev) => (prev === 'isometric' ? 'top_down' : 'isometric'))
+              }
+              onResetCamera={() => {
+                handleSelectAgent(null)
+                setCameraResetCounter((c) => c + 1)
+              }}
+              onZoomIn={() => setZoomTrigger({ action: 'in', id: Date.now() })}
+              onZoomOut={() => setZoomTrigger({ action: 'out', id: Date.now() })}
             />
           </main>
 

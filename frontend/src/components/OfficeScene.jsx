@@ -12,8 +12,16 @@ import OfficePlants from './OfficePlants'
 /**
  * Camera controller that smoothly transitions focus when an agent is selected,
  * and handles transitions between Isometric Perspective and Top-Down (tampak atas) views.
+ * When in Top-Down mode:
+ * - Rotations & panning are strictly disabled so the view never tilts sideways back into 3D.
+ * - Only smooth Zoom In and Zoom Out are allowed (via mouse wheel, pinch, or UI buttons).
  */
-function CameraRig({ selectedAgent, cameraViewMode = 'isometric', resetKey = 0 }) {
+function CameraRig({
+  selectedAgent,
+  cameraViewMode = 'isometric',
+  resetKey = 0,
+  zoomTrigger = null
+}) {
   const controlsRef = useRef()
   const { camera } = useThree()
   // Default workspace center in the 4-desk pod for Isometric view
@@ -25,6 +33,7 @@ function CameraRig({ selectedAgent, cameraViewMode = 'isometric', resetKey = 0 }
   const isTransitioningRef = useRef(false)
   const prevModeRef = useRef(cameraViewMode)
   const prevResetKeyRef = useRef(resetKey)
+  const prevZoomTriggerRef = useRef(zoomTrigger)
 
   useEffect(() => {
     if (prevModeRef.current !== cameraViewMode || prevResetKeyRef.current !== resetKey) {
@@ -39,21 +48,45 @@ function CameraRig({ selectedAgent, cameraViewMode = 'isometric', resetKey = 0 }
     }
   }, [cameraViewMode, resetKey])
 
+  // Respond to on-screen Zoom In / Zoom Out triggers from Google Maps floating control
+  useEffect(() => {
+    if (!controlsRef.current || !zoomTrigger || zoomTrigger === prevZoomTriggerRef.current) return
+    prevZoomTriggerRef.current = zoomTrigger
+
+    const isZoomIn = zoomTrigger.action === 'in'
+    if (isTopDown) {
+      const step = isZoomIn ? -2.6 : 2.6
+      camera.position.y = THREE.MathUtils.clamp(camera.position.y + step, 4.5, 28)
+    } else {
+      const dir = new THREE.Vector3().subVectors(controlsRef.current.target, camera.position).normalize()
+      const step = isZoomIn ? 2.5 : -2.5
+      const currentDist = camera.position.distanceTo(controlsRef.current.target)
+      if ((isZoomIn && currentDist > 4.5) || (!isZoomIn && currentDist < 30)) {
+        camera.position.addScaledVector(dir, step)
+      }
+    }
+    controlsRef.current.update()
+  }, [zoomTrigger, isTopDown, camera])
+
   useFrame(() => {
     if (!controlsRef.current) return
 
     if (isTopDown) {
-      // In Top-Down mode (tampak atas): look straight down from above
+      // In Top-Down mode (tampak atas): strictly lock overhead, only allowing zoom in/out
       let targetPos = topDownTarget
       if (selectedAgent && selectedAgent.position) {
         targetPos = new THREE.Vector3(selectedAgent.position[0], 0, selectedAgent.position[2])
       }
-      controlsRef.current.target.lerp(targetPos, 0.07)
+      controlsRef.current.target.lerp(targetPos, 0.08)
 
       if (isTransitioningRef.current) {
-        // Small 0.001 Z offset avoids gimbal lock in OrbitControls spherical coordinates
+        // Smoothly glide camera directly overhead
         const desiredCamPos = new THREE.Vector3(targetPos.x, 17.5, targetPos.z - 0.001)
-        camera.position.lerp(desiredCamPos, 0.07)
+        camera.position.lerp(desiredCamPos, 0.08)
+      } else {
+        // Enforce pure vertical alignment over the target, preserving current user zoom (Y)
+        camera.position.x = targetPos.x
+        camera.position.z = targetPos.z - 0.001
       }
     } else {
       // In Isometric mode: standard 3D perspective angle
@@ -83,10 +116,15 @@ function CameraRig({ selectedAgent, cameraViewMode = 'isometric', resetKey = 0 }
       makeDefault
       enableDamping
       dampingFactor={0.06}
-      minDistance={3}
-      maxDistance={35}
-      maxPolarAngle={isTopDown ? Math.PI / 2.3 : Math.PI / 2.15}
-      minPolarAngle={isTopDown ? 0.001 : Math.PI / 6}
+      minDistance={3.5}
+      maxDistance={32}
+      enableRotate={!isTopDown}
+      enablePan={false}
+      enableZoom={true}
+      maxPolarAngle={isTopDown ? 0.001 : Math.PI / 2.15}
+      minPolarAngle={isTopDown ? 0 : Math.PI / 6}
+      maxAzimuthAngle={isTopDown ? 0 : Infinity}
+      minAzimuthAngle={isTopDown ? 0 : -Infinity}
     />
   )
 }
@@ -559,7 +597,8 @@ export default function OfficeScene({
     showCoffeeCorner: true
   },
   cameraViewMode = 'isometric',
-  resetKey = 0
+  resetKey = 0,
+  zoomTrigger = null
 }) {
   const isColorful = scenerySettings?.theme === 'colorful'
 
@@ -663,6 +702,7 @@ export default function OfficeScene({
           selectedAgent={selectedAgent}
           cameraViewMode={cameraViewMode}
           resetKey={resetKey}
+          zoomTrigger={zoomTrigger}
         />
       </Canvas>
     </div>
