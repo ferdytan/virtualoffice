@@ -6,7 +6,7 @@ import CallModal from './components/CallModal'
 import AgentWorkspaceView from './components/AgentWorkspaceView'
 import AgentCloseUpAvatar from './components/AgentCloseUpAvatar'
 import SettingsPageView from './components/SettingsPageView'
-import { GoogleMapsCompassIcon, GoogleMapsFloatingWidget } from './components/GoogleMapsViewControl'
+import { GoogleMapsFloatingWidget } from './components/GoogleMapsViewControl'
 import {
   RotateCcw,
   Palette,
@@ -565,36 +565,6 @@ export default function App() {
               title="Buka Pengaturan Sistem & Workspace"
             >
               <Settings className="w-4 h-4" />
-            </button>
-
-            {/* Google Maps Style 2D / 3D View Mode Toggle Button */}
-            <button
-              onClick={() =>
-                setCameraViewMode((prev) => (prev === 'isometric' ? 'top_down' : 'isometric'))
-              }
-              className="flex items-center gap-2 p-1.5 sm:pr-3.5 bg-slate-900/95 hover:bg-slate-800 text-white backdrop-blur-xl rounded-2xl shadow-lg border border-slate-700/80 transition-all active:scale-95 cursor-pointer group"
-              title={
-                cameraViewMode === 'top_down'
-                  ? 'Beralih ke Perspektif 3D (Isometrik)'
-                  : 'Beralih ke Tampilan 2D (Tampak Atas)'
-              }
-            >
-              <GoogleMapsCompassIcon
-                className="w-6 h-6 shrink-0 group-hover:scale-105 transition-transform"
-                is3D={cameraViewMode === 'isometric'}
-              />
-              <div className="flex items-center gap-1.5">
-                <span className={`px-1.5 py-0.5 rounded-lg text-[11px] font-black tracking-wider transition-colors ${
-                  cameraViewMode === 'top_down'
-                    ? 'bg-sky-500 text-white shadow-2xs'
-                    : 'bg-white/15 text-white border border-white/10'
-                }`}>
-                  {cameraViewMode === 'top_down' ? '3D' : '2D'}
-                </span>
-                <span className="text-xs font-bold text-slate-200 hidden sm:inline">
-                  {cameraViewMode === 'top_down' ? 'Tampak Atas' : 'Isometrik'}
-                </span>
-              </div>
             </button>
 
             {/* Reset Camera View Button */}
