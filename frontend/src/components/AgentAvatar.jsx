@@ -376,13 +376,80 @@ export default function AgentAvatar({
         </Html>
       )}
 
-      {/* --- Floor Selection Glow Ring --- */}
-      <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.55, 0.72, 32]} />
+      {/* --- Generous 3D Click & Hover Hitbox Volume (1.9m Diameter cylinder around agent and desk) --- */}
+      <mesh
+        position={[0, 1.0, 0]}
+        onClick={(e) => {
+          e.stopPropagation()
+          onSelect(agent)
+        }}
+        onPointerOver={(e) => {
+          e.stopPropagation()
+          setHovered(true)
+          document.body.style.cursor = 'pointer'
+        }}
+        onPointerOut={() => {
+          setHovered(false)
+          document.body.style.cursor = 'auto'
+        }}
+      >
+        <cylinderGeometry args={[0.95, 0.95, 2.0, 16]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+      </mesh>
+
+      {/* --- Generous Ground Click Hitbox Disc --- */}
+      <mesh
+        position={[0, 0.015, 0]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        onClick={(e) => {
+          e.stopPropagation()
+          onSelect(agent)
+        }}
+        onPointerOver={(e) => {
+          e.stopPropagation()
+          setHovered(true)
+          document.body.style.cursor = 'pointer'
+        }}
+        onPointerOut={() => {
+          setHovered(false)
+          document.body.style.cursor = 'auto'
+        }}
+      >
+        <circleGeometry args={[0.95, 32]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+      </mesh>
+
+      {/* --- Visual Floor Interactive Area Disc (Soft Glow + Perimeter Ring + Core) --- */}
+      {/* 1. Filled Soft Area Disc */}
+      <mesh position={[0, 0.018, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[0.92, 32]} />
         <meshBasicMaterial
           color={agentColor}
           transparent
-          opacity={isSelected ? 0.9 : hovered ? 0.45 : 0.12}
+          opacity={isSelected ? 0.28 : hovered ? 0.16 : 0.05}
+          depthWrite={false}
+        />
+      </mesh>
+
+      {/* 2. Outer Area Perimeter Ring */}
+      <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.84, 0.94, 32]} />
+        <meshBasicMaterial
+          color={agentColor}
+          transparent
+          opacity={isSelected ? 0.95 : hovered ? 0.7 : 0.22}
+          depthWrite={false}
+        />
+      </mesh>
+
+      {/* 3. Inner Workstation Ring */}
+      <mesh position={[0, 0.022, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.42, 0.52, 32]} />
+        <meshBasicMaterial
+          color={agentColor}
+          transparent
+          opacity={isSelected ? 0.9 : hovered ? 0.55 : 0.15}
+          depthWrite={false}
         />
       </mesh>
 
