@@ -179,8 +179,8 @@ export default function App() {
       const saved = localStorage.getItem('virtual_office_scenery_settings')
       if (saved) {
         const parsed = JSON.parse(saved)
-        // Granite was removed per user request; sanitize to 'parquet' or 'white'
-        const cleanFloor = parsed.floorType === 'white' ? 'white' : 'parquet'
+        // Granite was removed per user request; default is 'white', or 'parquet'
+        const cleanFloor = parsed.floorType === 'parquet' ? 'parquet' : 'white'
         return {
           theme: parsed.theme || 'colorful',
           floorType: cleanFloor,
@@ -193,7 +193,7 @@ export default function App() {
     }
     return {
       theme: 'colorful', // 'colorful' | 'minimalist'
-      floorType: 'parquet', // 'parquet' | 'white'
+      floorType: 'white', // Default floor is now 'white' per user request
       showNPC: true,
       showCoffeeCorner: true
     }

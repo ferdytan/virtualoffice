@@ -21,6 +21,8 @@ from services.offline_tracker import (
     OfflineStateTracker,
     get_customer_group_mapping,
     save_customer_group_mapping,
+    save_telemetry_cache,
+    get_telemetry_cache,
     PRO_CUSTOMER_GROUPS,
     init_nara_storage,
     get_db_connection
@@ -38,6 +40,8 @@ class TestNaraEngine(unittest.TestCase):
                 conn.execute("DELETE FROM device_states")
                 conn.execute("DELETE FROM dispatch_logs")
                 conn.execute("DELETE FROM customer_feedback")
+                conn.execute("DELETE FROM customer_group_mappings")
+                conn.execute("DELETE FROM telemetry_cache")
         finally:
             conn.close()
         self.now = datetime(2026, 9, 29, 10, 0, 0)
@@ -256,10 +260,10 @@ class TestNaraEngine(unittest.TestCase):
         lnj_meta = get_customer_group_mapping("LNJ", "LNJ")
         self.assertEqual(lnj_meta["wa_group_name"], "ONB LNJ")
 
-        # Dynamic fallback test
+        # Unmapped customer test: should return empty group and has_wa_group False (+ icon in UI)
         unknown_meta = get_customer_group_mapping(99999, "PT Maju Terus")
-        self.assertIn("Grup Orin Fleet - PT Maju Terus", unknown_meta["wa_group_name"])
-        self.assertTrue(unknown_meta["wa_group_id"].endswith("@g.us"))
+        self.assertEqual(unknown_meta["wa_group_name"], "")
+        self.assertFalse(unknown_meta["has_wa_group"])
 
     def test_07_watson_dispatch_simulation(self):
         """Validates simulated dispatch with anti-ban jitter (15-45s) and composing status."""
@@ -325,6 +329,86 @@ class TestNaraEngine(unittest.TestCase):
         self.assertEqual(res["intent_category"], "BATTERY_DISCONNECTED")
         self.assertIn("saklar aki (cut-off) dimatikan / aki dilepas", res["nara_reply"])
         self.assertIn("backup battery", res["nara_reply"])
+
+    def test_11_nara_api_key_alias_and_crlf_sanitization(self):
+        """Validates that NARA_API_KEY with Windows CRLF is properly cleaned."""
+        test_key = "20639|AwZwUDmpoUa2E8XeVwTvzDNB7glEckVl2uyRPYl9"
+        os.environ["NARA_API_KEY"] = f"{test_key}\r\n"
+        try:
+            client = OrinTelemetryClient()
+            self.assertEqual(client.bearer_token, test_key)
+            self.assertFalse(client.bearer_token.endswith("\r"))
+            self.assertFalse(client.bearer_token.endswith("\n"))
+        finally:
+            os.environ.pop("NARA_API_KEY", None)
+
+    def test_12_modular_api_endpoints(self):
+        """Validates that the refactored modular FastAPI app works properly."""
+        from fastapi.testclient import TestClient
+        from server import app
+
+        client = TestClient(app)
+        res = client.get("/api/health")
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(res.json()["status"] == "ok")
+
+        agents_res = client.get("/api/agents")
+        self.assertEqual(agents_res.status_code, 200)
+        self.assertEqual(len(agents_res.json()["agents"]), 5)
+
+    def test_13_telemetry_cache_and_db_persistence(self):
+        """
+        Validates:
+        1. Telemetry report caching in SQLite database.
+        2. Customer name and WA group name stored in database overrides API load.
+        3. Updating customer group mapping syncs cached report dynamically.
+        """
+        sample_report = {
+            "status": "success",
+            "report_mode": "DELTA",
+            "calendar_day": 29,
+            "valid_devices": [
+                {
+                    "id": 8801,
+                    "customer_id": 9901,
+                    "customer_name": "API Name PT Alpha",
+                    "nopol": "B 1234 ABC",
+                    "wa_group_name": "",
+                    "has_wa_group": False
+                }
+            ],
+            "customer_reports": [
+                {
+                    "customer_id": 9901,
+                    "customer_name": "API Name PT Alpha",
+                    "wa_group_name": "",
+                    "has_wa_group": False
+                }
+            ]
+        }
+
+        # 1. Save to cache
+        save_telemetry_cache(sample_report)
+        cached = get_telemetry_cache()
+        self.assertIsNotNone(cached)
+        self.assertTrue(cached.get("from_cache"))
+        self.assertEqual(cached["valid_devices"][0]["customer_name"], "API Name PT Alpha")
+        self.assertFalse(cached["valid_devices"][0]["has_wa_group"])
+
+        # 2. Save custom customer name & WA group name in DB
+        save_customer_group_mapping(
+            customer_id=9901,
+            customer_name="PT Alpha Custom Fleet",
+            wa_group_name="ONB Alpha Fleet Support"
+        )
+
+        # 3. Retrieve from cache: should reflect updated customer name and wa_group_name!
+        updated_cached = get_telemetry_cache()
+        self.assertIsNotNone(updated_cached)
+        cached_dev = updated_cached["valid_devices"][0]
+        self.assertEqual(cached_dev["customer_name"], "PT Alpha Custom Fleet")
+        self.assertEqual(cached_dev["wa_group_name"], "ONB Alpha Fleet Support")
+        self.assertTrue(cached_dev["has_wa_group"])
 
 
 if __name__ == "__main__":

@@ -17,8 +17,10 @@ import {
   Server,
   Radio,
   Clock,
-  UserCheck
+  UserCheck,
+  Network
 } from 'lucide-react'
+import AgentFlowchartView from './AgentFlowchartView'
 
 export default function SettingsPageView({
   scenerySettings,
@@ -62,7 +64,7 @@ export default function SettingsPageView({
   const handleResetScenery = () => {
     onUpdateScenerySettings({
       theme: 'colorful',
-      floorType: 'parquet',
+      floorType: 'white', // Default is white per user request
       showNPC: true,
       showCoffeeCorner: true
     })
@@ -160,7 +162,25 @@ export default function SettingsPageView({
             </div>
           </button>
 
-          {/* Tab 3: Telemetri & Notifikasi */}
+          {/* Tab 3: Alur Kerja & Koneksi Antar Agent */}
+          <button
+            onClick={() => setActiveTab('workflow')}
+            className={`w-full p-3 rounded-2xl text-left transition-all cursor-pointer flex items-center gap-3 ${
+              activeTab === 'workflow'
+                ? 'bg-slate-900 text-white shadow-xs font-bold'
+                : 'text-slate-600 hover:bg-slate-50 font-medium'
+            }`}
+          >
+            <Network className={`w-4 h-4 ${activeTab === 'workflow' ? 'text-indigo-400' : 'text-slate-400'}`} />
+            <div className="text-xs">
+              <div className="font-bold">Alur Kerja & Koneksi Agent</div>
+              <div className={`text-[10px] ${activeTab === 'workflow' ? 'text-slate-300' : 'text-slate-400'}`}>
+                Flowchart kolaborasi Sherloc, Nara & Watson
+              </div>
+            </div>
+          </button>
+
+          {/* Tab 4: Telemetri & Notifikasi */}
           <button
             onClick={() => setActiveTab('telemetry')}
             className={`w-full p-3 rounded-2xl text-left transition-all cursor-pointer flex items-center gap-3 ${
@@ -305,17 +325,56 @@ export default function SettingsPageView({
                     </div>
 
                     <span className="text-[10px] font-mono font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 uppercase">
-                      {scenerySettings.floorType || 'parquet'}
+                      {scenerySettings.floorType || 'white'}
                     </span>
                   </div>
 
-                  {/* Floor Option Cards: Parquet / White */}
+                  {/* Floor Option Cards: White (Default) / Parquet */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-                    {/* Option 1: Parket Kayu Hangat (Oak Wood Parquet) */}
+                    {/* Option 1: Putih Bersih (Clean Studio White - Default) */}
+                    <div
+                      onClick={() => handleSelectFloor('white')}
+                      className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
+                        (scenerySettings.floorType || 'white') === 'white'
+                          ? 'border-slate-900 bg-slate-50 shadow-sm ring-2 ring-slate-900/10'
+                          : 'border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50'
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-2.5">
+                          <span className="text-xl">⚪</span>
+                          {(scenerySettings.floorType || 'white') === 'white' ? (
+                            <span className="flex items-center gap-1 text-[9px] font-extrabold text-slate-900 bg-slate-200/90 px-2 py-0.5 rounded-full">
+                              <Check className="w-3 h-3 text-slate-900" />
+                              Aktif (Default)
+                            </span>
+                          ) : (
+                            <span className="text-[8px] font-extrabold bg-slate-100 text-slate-700 px-1.5 py-0.2 rounded border border-slate-200">
+                              Default Sistem
+                            </span>
+                          )}
+                        </div>
+                        <h4 className="text-xs font-black text-slate-900 mb-1">
+                          Putih Studio Bersih
+                        </h4>
+                        <p className="text-[11px] text-slate-500 leading-relaxed">
+                          Ubin studio putih bersih dengan garis nat halus minimalis, memberikan kesan lapang, terang, dan modern.
+                        </p>
+                      </div>
+
+                      {/* Swatch Preview */}
+                      <div className="mt-3.5 pt-2 border-t border-slate-100 flex items-center gap-1.5">
+                        <span className="w-3 h-3 rounded-full bg-[#f8fafc] border border-slate-300" />
+                        <span className="w-3 h-3 rounded-full bg-[#e2e8f0]" />
+                        <span className="text-[10px] font-semibold text-slate-400 ml-1">Studio White Tiles</span>
+                      </div>
+                    </div>
+
+                    {/* Option 2: Parket Kayu Hangat (Oak Wood Parquet) */}
                     <div
                       onClick={() => handleSelectFloor('parquet')}
                       className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
-                        (scenerySettings.floorType || 'parquet') === 'parquet'
+                        scenerySettings.floorType === 'parquet'
                           ? 'border-slate-900 bg-amber-50/40 shadow-sm ring-2 ring-slate-900/10'
                           : 'border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50'
                       }`}
@@ -323,14 +382,14 @@ export default function SettingsPageView({
                       <div>
                         <div className="flex items-center justify-between mb-2.5">
                           <span className="text-xl">🪵</span>
-                          {(scenerySettings.floorType || 'parquet') === 'parquet' ? (
+                          {scenerySettings.floorType === 'parquet' ? (
                             <span className="flex items-center gap-1 text-[9px] font-extrabold text-slate-900 bg-slate-200/90 px-2 py-0.5 rounded-full">
                               <Check className="w-3 h-3 text-slate-900" />
                               Aktif
                             </span>
                           ) : (
                             <span className="text-[8px] font-extrabold bg-amber-100 text-amber-800 px-1.5 py-0.2 rounded">
-                              Rekomendasi
+                              Pilihan Hangat
                             </span>
                           )}
                         </div>
@@ -348,41 +407,6 @@ export default function SettingsPageView({
                         <span className="w-3 h-3 rounded-full bg-[#b88448]" />
                         <span className="w-3 h-3 rounded-full bg-[#d4a367]" />
                         <span className="text-[10px] font-semibold text-slate-400 ml-1">Oak Parquet Planks</span>
-                      </div>
-                    </div>
-
-                    {/* Option 2: Putih Bersih (Clean Studio White) */}
-                    <div
-                      onClick={() => handleSelectFloor('white')}
-                      className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
-                        scenerySettings.floorType === 'white'
-                          ? 'border-slate-900 bg-slate-50 shadow-sm ring-2 ring-slate-900/10'
-                          : 'border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50'
-                      }`}
-                    >
-                      <div>
-                        <div className="flex items-center justify-between mb-2.5">
-                          <span className="text-xl">⚪</span>
-                          {scenerySettings.floorType === 'white' && (
-                            <span className="flex items-center gap-1 text-[9px] font-extrabold text-slate-900 bg-slate-200/90 px-2 py-0.5 rounded-full">
-                              <Check className="w-3 h-3 text-slate-900" />
-                              Aktif
-                            </span>
-                          )}
-                        </div>
-                        <h4 className="text-xs font-black text-slate-900 mb-1">
-                          Putih Studio Bersih
-                        </h4>
-                        <p className="text-[11px] text-slate-500 leading-relaxed">
-                          Ubin studio putih bersih dengan garis nat halus minimalis, memberikan kesan lapang, terang, dan modern.
-                        </p>
-                      </div>
-
-                      {/* Swatch Preview */}
-                      <div className="mt-3.5 pt-2 border-t border-slate-100 flex items-center gap-1.5">
-                        <span className="w-3 h-3 rounded-full bg-[#f8fafc] border border-slate-300" />
-                        <span className="w-3 h-3 rounded-full bg-[#e2e8f0]" />
-                        <span className="text-[10px] font-semibold text-slate-400 ml-1">Studio White Tiles</span>
                       </div>
                     </div>
                   </div>
@@ -585,7 +609,14 @@ export default function SettingsPageView({
             )}
 
             {/* ======================================================== */}
-            {/* TAB 3: TELEMETRI & NOTIFIKASI                            */}
+            {/* TAB 3: ALUR KERJA & KONEKSI ANTAR AGENT (FLOWCHART)      */}
+            {/* ======================================================== */}
+            {activeTab === 'workflow' && (
+              <AgentFlowchartView />
+            )}
+
+            {/* ======================================================== */}
+            {/* TAB 4: TELEMETRI & NOTIFIKASI                            */}
             {/* ======================================================== */}
             {activeTab === 'telemetry' && (
               <div className="space-y-6 animate-in fade-in duration-200">

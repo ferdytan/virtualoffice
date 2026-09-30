@@ -7,11 +7,26 @@ from typing import Dict, Any, List, Optional, Tuple
 import httpx
 from dateutil import parser as date_parser
 
+try:
+    from dotenv import load_dotenv
+    # Look for .env in current and parent directories
+    load_dotenv()
+    _backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    load_dotenv(os.path.join(_backend_dir, ".env"))
+except ImportError:
+    pass
+
 logger = logging.getLogger("virtual_office.orin_telemetry")
 
 DEFAULT_ORIN_API_URL = "https://admin-api.orin.id/api/devices/offline"
 DEFAULT_ORIN_BEARER_TOKEN = "20639|AwZwUDmpoUa2E8XeVwTvzDNB7glEckVl2uyRPYl9"
 CAM_OFFLINE_THRESHOLD_HOURS = 72.0  # 3 days
+
+
+def _sanitize_env_val(val: Optional[str]) -> str:
+    if not val:
+        return ""
+    return val.strip().strip("'\"").rstrip("\r")
 
 
 class OrinTelemetryClient:
@@ -21,8 +36,24 @@ class OrinTelemetryClient:
     """
 
     def __init__(self, api_url: Optional[str] = None, bearer_token: Optional[str] = None):
-        self.api_url = api_url or os.getenv("ORIN_API_URL", DEFAULT_ORIN_API_URL)
-        self.bearer_token = bearer_token or os.getenv("ORIN_API_TOKEN", DEFAULT_ORIN_BEARER_TOKEN)
+        # Resolve token, checking NARA_API_KEY and ORIN_API_TOKEN aliases
+        raw_token = (
+            bearer_token
+            or os.getenv("NARA_API_KEY")
+            or os.getenv("ORIN_API_TOKEN")
+            or os.getenv("ORIN_API_KEY")
+            or os.getenv("NARA_TOKEN")
+            or DEFAULT_ORIN_BEARER_TOKEN
+        )
+        self.bearer_token = _sanitize_env_val(raw_token)
+
+        raw_url = (
+            api_url
+            or os.getenv("ORIN_API_URL")
+            or os.getenv("NARA_API_URL")
+            or DEFAULT_ORIN_API_URL
+        )
+        self.api_url = _sanitize_env_val(raw_url)
 
     def _get_headers(self) -> Dict[str, str]:
         return {
@@ -209,9 +240,17 @@ def filter_nara_devices(
         hours_offline, parsed_dt, duration_str = calculate_offline_duration(dev, now)
 
         user = dev.get("user") or {}
-        customer_id = user.get("id") or 0
-        customer_name = user.get("name") or "Pelanggan Umum"
+        raw_cust_id = user.get("id") or 0
+        raw_cust_name = user.get("name") or "Pelanggan Umum"
         customer_phone = user.get("whatsapp_number") or user.get("phone_number") or ""
+
+        # Fetch local DB customer mapping (Database override takes precedence)
+        from services.offline_tracker import get_customer_group_mapping
+        group_meta = get_customer_group_mapping(raw_cust_id, raw_cust_name)
+        effective_customer_name = group_meta.get("customer_name") or raw_cust_name
+        wa_group_name = group_meta.get("wa_group_name") or ""
+        wa_group_id = group_meta.get("wa_group_id") or ""
+        has_wa_group = group_meta.get("has_wa_group", False)
 
         enriched_device = {
             "id": dev.get("id"),
@@ -225,8 +264,11 @@ def filter_nara_devices(
             "offline_days": round(hours_offline / 24.0, 1),
             "offline_duration_str": duration_str,
             "offline_since": parsed_dt.strftime("%Y-%m-%d %H:%M:%S") if parsed_dt else "-",
-            "customer_id": customer_id,
-            "customer_name": customer_name,
+            "customer_id": raw_cust_id,
+            "customer_name": effective_customer_name,
+            "wa_group_name": wa_group_name,
+            "wa_group_id": wa_group_id,
+            "has_wa_group": has_wa_group,
             "customer_phone": customer_phone,
             "raw_last_update": dev.get("last_status_update")
         }

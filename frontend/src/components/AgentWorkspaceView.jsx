@@ -140,6 +140,8 @@ export default function AgentWorkspaceView({
   const [customDraftTexts, setCustomDraftTexts] = useState({})
   const [singleCustomerDispatching, setSingleCustomerDispatching] = useState(false)
   const [singleDispatchFeedback, setSingleDispatchFeedback] = useState(null)
+  const [dispatchSearchQuery, setDispatchSearchQuery] = useState('')
+  const [dispatchGroupFilter, setDispatchGroupFilter] = useState('ALL') // 'ALL' | 'MAPPED' | 'UNMAPPED'
 
   // Sherloc Interactive State
   const [selectedChatId, setSelectedChatId] = useState('chat-1')
@@ -972,10 +974,10 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
   }
 
   // --- NARA ENGINE API HANDLERS ---
-  const fetchNaraEngineData = async (forceAudit = naraAuditMode, dayOverride = naraDayOverride) => {
+  const fetchNaraEngineData = async (forceAudit = naraAuditMode, dayOverride = naraDayOverride, refresh = false) => {
     setNaraLoading(true)
     try {
-      let url = `/api/nara/test-run?limit=100&force_audit=${forceAudit}`
+      let url = `/api/nara/test-run?limit=100&force_audit=${forceAudit}&refresh=${refresh}`
       if (dayOverride !== null && dayOverride !== undefined) {
         url += `&day_override=${dayOverride}`
       }
@@ -994,7 +996,8 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
 
   useEffect(() => {
     if (agentId === 'nara') {
-      fetchNaraEngineData(naraAuditMode, naraDayOverride)
+      // Load from database cache on initial mount without hitting external API
+      fetchNaraEngineData(naraAuditMode, naraDayOverride, false)
     }
   }, [agentId, naraAuditMode, naraDayOverride])
 
@@ -2355,9 +2358,15 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
               {/* Telemetry Header Bar */}
               <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full border bg-emerald-50 text-emerald-700 border-emerald-200">
-                      ORIN API LIVE TELEMETRY
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full border ${
+                      naraLiveReport?.from_cache
+                        ? 'bg-amber-50 text-amber-700 border-amber-200'
+                        : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    }`}>
+                      {naraLiveReport?.from_cache
+                        ? `DATABASE CACHE (${naraLiveReport.cached_at || 'Tersimpan'})`
+                        : 'ORIN API LIVE TELEMETRY'}
                     </span>
                     <span className="text-[10px] font-bold text-slate-400">
                       https://admin-api.orin.id/api/devices/offline
@@ -2379,7 +2388,7 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                       type="button"
                       onClick={() => {
                         setNaraAuditMode(false)
-                        fetchNaraEngineData(false, null)
+                        fetchNaraEngineData(false, null, false)
                       }}
                       className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                         !naraAuditMode
@@ -2395,7 +2404,7 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                       type="button"
                       onClick={() => {
                         setNaraAuditMode(true)
-                        fetchNaraEngineData(true, 1)
+                        fetchNaraEngineData(true, 1, false)
                       }}
                       className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                         naraAuditMode
@@ -2420,15 +2429,16 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                     <span>Atur Grup WA Akun</span>
                   </button>
 
-                  {/* Refresh Button */}
+                  {/* Request API Orin Button (Menggantikan button refresh) */}
                   <button
                     type="button"
-                    onClick={() => fetchNaraEngineData(naraAuditMode, naraDayOverride)}
+                    onClick={() => fetchNaraEngineData(naraAuditMode, naraDayOverride, true)}
                     disabled={naraLoading}
-                    className="p-2 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white rounded-xl shadow-2xs transition-all cursor-pointer disabled:opacity-50"
-                    title="Tarik telemetri terkini dari API Orin"
+                    className="py-1.5 px-3.5 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-2xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                    title="Tarik telemetri terkini langsung dari API Orin dan simpan ke database"
                   >
-                    <RefreshCw className={`w-4 h-4 ${naraLoading ? 'animate-spin text-sky-400' : 'text-slate-300'}`} />
+                    <RefreshCw className={`w-3.5 h-3.5 ${naraLoading ? 'animate-spin text-white' : 'text-blue-100'}`} />
+                    <span>{naraLoading ? 'Mengambil API...' : 'Request API Orin'}</span>
                   </button>
                 </div>
               </div>
@@ -2734,22 +2744,26 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                                     <div className="text-[10px] text-slate-400 font-mono">ID: {dev.customer_id || 'PRO'}</div>
                                   </div>
 
-                                  {/* Icon pencil untuk input / ubah nama WhatsApp Group (tanpa badge teks) */}
+                                  {/* Icon pencil jika sudah ada WA Group, icon + jika belum ada */}
                                   <button
                                     type="button"
                                     onClick={() => handleOpenGroupModal(dev.customer_id, cust, waGroup, dev.wa_group_id)}
                                     className={`p-1.5 rounded-lg border transition-all cursor-pointer active:scale-90 ${
                                       waGroup
                                         ? 'text-emerald-600 hover:text-emerald-700 bg-emerald-50/70 hover:bg-emerald-100 border-emerald-200/80 shadow-2xs'
-                                        : 'text-slate-400 hover:text-slate-700 bg-slate-50 hover:bg-slate-100 border-slate-200'
+                                        : 'text-sky-600 hover:text-sky-700 bg-sky-50/70 hover:bg-sky-100 border-sky-200 shadow-2xs'
                                     }`}
                                     title={
                                       waGroup
-                                        ? `Grup WA: ${waGroup} (Klik untuk ubah mapping)`
+                                        ? `Grup WA: ${waGroup} (Klik pensil untuk ubah mapping)`
                                         : `Tambah / Petakan Nama WhatsApp Group untuk '${cust}'`
                                     }
                                   >
-                                    <Pencil className="w-3.5 h-3.5" />
+                                    {waGroup ? (
+                                      <Pencil className="w-3.5 h-3.5" />
+                                    ) : (
+                                      <Plus className="w-3.5 h-3.5" />
+                                    )}
                                   </button>
                                 </div>
                               </td>
@@ -2861,67 +2875,36 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                 )}
               </div>
 
-              {/* Customer Account Selection Tabs with Group Name Badges */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                    <Users className="w-3.5 h-3.5 text-slate-500" />
-                    Pilih Akun Pelanggan &bull; 1 Akun = 1 Grup WA:
-                  </span>
-                  <span className="text-[11px] text-slate-400">
-                    {(naraLiveReport?.customer_reports || []).length} Akun Pelanggan Terdeteksi
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-                  {(naraLiveReport?.customer_reports || []).map((rep) => {
-                    const isSelected = String(naraSelectedCustomerTab) === String(rep.customer_id)
-                    return (
-                      <div
-                        key={rep.customer_id}
-                        className={`px-3.5 py-2 rounded-xl text-left whitespace-nowrap transition-all cursor-pointer border flex items-center gap-2.5 ${
-                          isSelected
-                            ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
-                            : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
-                        }`}
-                        onClick={() => setNaraSelectedCustomerTab(rep.customer_id)}
-                      >
-                        <div>
-                          <div className="text-xs font-black truncate max-w-[150px]">{rep.customer_name}</div>
-                          <div className={`text-[10px] font-mono truncate max-w-[150px] ${isSelected ? 'text-sky-300' : 'text-slate-500'}`}>
-                            {rep.wa_group_name}
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-1 shrink-0">
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${isSelected ? 'bg-sky-400 text-slate-900 font-bold' : 'bg-slate-100 text-slate-600'}`}>
-                            {rep.counts.total_offline}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleOpenGroupModal(rep.customer_id, rep.customer_name, rep.wa_group_name, rep.wa_group_id)
-                            }}
-                            className={`p-1 rounded-md transition-colors ${isSelected ? 'hover:bg-white/20 text-slate-300 hover:text-white' : 'hover:bg-slate-100 text-slate-400 hover:text-slate-700'}`}
-                            title={`Atur nama WhatsApp Group untuk akun '${rep.customer_name}'`}
-                          >
-                            <Settings className="w-3 h-3" />
-                          </button>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-
-              {/* Detail Selected Customer Report Preview (Draft Chat Studio) */}
+              {/* Draft Chat & Group Dispatch Studio (Split Studio Layout) */}
               {(() => {
-                const currentReport = (naraLiveReport?.customer_reports || []).find(
-                  (r) => String(r.customer_id) === String(naraSelectedCustomerTab)
-                ) || (naraLiveReport?.customer_reports || [])[0]
+                const allCustomerReports = naraLiveReport?.customer_reports || []
 
-                if (!currentReport) {
+                // Filtering based on search query & mapped/unmapped tab
+                const filteredCustomerReports = allCustomerReports.filter((rep) => {
+                  const query = dispatchSearchQuery.toLowerCase().trim()
+                  const matchesQuery =
+                    !query ||
+                    String(rep.customer_name || '').toLowerCase().includes(query) ||
+                    String(rep.wa_group_name || '').toLowerCase().includes(query)
+                  if (!matchesQuery) return false
+
+                  const hasGroup = Boolean(rep.has_wa_group || (rep.wa_group_name && rep.wa_group_name.trim()))
+                  if (dispatchGroupFilter === 'MAPPED') return hasGroup
+                  if (dispatchGroupFilter === 'UNMAPPED') return !hasGroup
+                  return true
+                })
+
+                const mappedCount = allCustomerReports.filter((r) => Boolean(r.has_wa_group || (r.wa_group_name && r.wa_group_name.trim()))).length
+                const unmappedCount = allCustomerReports.length - mappedCount
+
+                const currentReport =
+                  allCustomerReports.find(
+                    (r) => String(r.customer_id) === String(naraSelectedCustomerTab)
+                  ) ||
+                  filteredCustomerReports[0] ||
+                  allCustomerReports[0]
+
+                if (allCustomerReports.length === 0) {
                   return (
                     <div className="p-12 bg-white rounded-2xl border border-slate-200 text-center space-y-3">
                       <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
@@ -2934,7 +2917,7 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                       <button
                         type="button"
                         onClick={() => handleOpenGroupModal()}
-                        className="py-2 px-4 bg-slate-900 text-white font-bold text-xs rounded-xl shadow-xs"
+                        className="py-2 px-4 bg-slate-900 text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer"
                       >
                         Atur Pemetaan Grup WhatsApp Akun
                       </button>
@@ -2942,261 +2925,393 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                   )
                 }
 
-                const effectiveMessageText = customDraftTexts[currentReport.customer_id] ?? currentReport.message_text
-                const isCustomized = customDraftTexts[currentReport.customer_id] !== undefined && customDraftTexts[currentReport.customer_id] !== currentReport.message_text
+                const effectiveMessageText = currentReport
+                  ? (customDraftTexts[currentReport.customer_id] ?? currentReport.message_text)
+                  : ''
+                const isCustomized = currentReport
+                  ? (customDraftTexts[currentReport.customer_id] !== undefined && customDraftTexts[currentReport.customer_id] !== currentReport.message_text)
+                  : false
+                const currentHasGroup = currentReport
+                  ? Boolean(currentReport.has_wa_group || (currentReport.wa_group_name && currentReport.wa_group_name.trim()))
+                  : false
 
                 return (
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-                    {/* Left 2 Cols: WhatsApp Chat Bubble & Action Controls */}
-                    <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden flex flex-col">
-                      {/* WhatsApp Window Header */}
-                      <div className="p-4 bg-emerald-700 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold text-base shrink-0">
-                            💬
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h4 className="text-sm font-bold text-white tracking-tight">{currentReport.wa_group_name}</h4>
-                              <button
-                                type="button"
-                                onClick={() => handleOpenGroupModal(currentReport.customer_id, currentReport.customer_name, currentReport.wa_group_name, currentReport.wa_group_id)}
-                                className="p-1 rounded-md bg-white/10 hover:bg-white/20 text-emerald-100 hover:text-white transition-colors cursor-pointer"
-                                title="Ubah nama WhatsApp Group untuk akun pelanggan ini"
-                              >
-                                <Edit className="w-3 h-3" />
-                              </button>
-                            </div>
-                            <p className="text-[11px] text-emerald-200 font-mono">
-                              Akun: <span className="font-bold text-white">{currentReport.customer_name}</span> &bull; {currentReport.wa_group_id}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2 self-start sm:self-auto">
-                          <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-emerald-800 text-emerald-100 border border-emerald-600">
-                            {currentReport.report_mode === 'FULL_AUDIT' ? 'Mode Tanggal 1 (Audit Lengkap)' : 'Mode Delta'}
-                          </span>
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                    {/* Left Pane (Col 1-4): Searchable Customer Accounts List (Master) */}
+                    <div className="lg:col-span-4 bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden flex flex-col">
+                      {/* Left Column Header & Search Controls */}
+                      <div className="p-3.5 border-b border-slate-100 bg-slate-50/70 space-y-2.5">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                            <Users className="w-3.5 h-3.5 text-slate-600" />
+                            <span>Daftar Akun ({allCustomerReports.length})</span>
+                          </h3>
                           <button
                             type="button"
-                            onClick={() => handleOpenGroupModal(currentReport.customer_id, currentReport.customer_name, currentReport.wa_group_name, currentReport.wa_group_id)}
-                            className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white text-emerald-900 hover:bg-emerald-50 transition-colors cursor-pointer shadow-2xs"
+                            onClick={() => handleOpenGroupModal()}
+                            className="text-[11px] font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 cursor-pointer"
+                            title="Atur / Petakan Akun Pelanggan Baru"
                           >
-                            Ubah Grup WA
+                            <Plus className="w-3 h-3" />
+                            <span>Atur Grup</span>
                           </button>
                         </div>
-                      </div>
 
-                      {/* Chat Canvas Preview */}
-                      <div className="p-5 bg-slate-100/90 flex-1 space-y-4">
-                        <div className="max-w-2xl bg-white p-4.5 rounded-2xl rounded-tl-xs shadow-xs border border-slate-200/90 space-y-3">
-                          <div className="flex items-center justify-between border-b border-slate-100 pb-2 text-[10px] text-slate-400">
-                            <span className="font-bold text-emerald-600 flex items-center gap-1.5">
-                              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                              Draft Pesan WhatsApp &bull; Watson AI Gateway
-                            </span>
-                            <span>{new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB</span>
-                          </div>
-
-                          {/* Message Content: Static Preview or Editable Textarea */}
-                          {isEditingDraft ? (
-                            <div className="space-y-2">
-                              <textarea
-                                value={effectiveMessageText}
-                                onChange={(e) => {
-                                  const val = e.target.value
-                                  setCustomDraftTexts((prev) => ({ ...prev, [currentReport.customer_id]: val }))
-                                }}
-                                rows={14}
-                                className="w-full p-3 bg-emerald-50/20 border-2 border-emerald-400 rounded-xl text-xs font-mono text-slate-800 leading-relaxed focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-inner"
-                                placeholder="Edit pesan draf WhatsApp..."
-                              />
-                              <p className="text-[11px] text-slate-500 flex items-center justify-between">
-                                <span>✏️ Mode edit aktif: Perubahan Anda akan disalin atau dikirim ke WhatsApp Group ini.</span>
-                                {isCustomized && (
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setCustomDraftTexts((prev) => {
-                                        const next = { ...prev }
-                                        delete next[currentReport.customer_id]
-                                        return next
-                                      })
-                                    }}
-                                    className="text-rose-600 hover:underline text-[10px] font-bold"
-                                  >
-                                    Reset ke Teks Asli
-                                  </button>
-                                )}
-                              </p>
-                            </div>
-                          ) : (
-                            <pre className="text-xs text-slate-800 whitespace-pre-wrap font-sans leading-relaxed selection:bg-emerald-100">
-                              {effectiveMessageText}
-                            </pre>
+                        {/* Search Input */}
+                        <div className="relative">
+                          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                          <input
+                            type="text"
+                            value={dispatchSearchQuery}
+                            onChange={(e) => setDispatchSearchQuery(e.target.value)}
+                            placeholder="Cari akun pelanggan / grup WA..."
+                            className="w-full pl-8.5 pr-7 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                          />
+                          {dispatchSearchQuery && (
+                            <button
+                              type="button"
+                              onClick={() => setDispatchSearchQuery('')}
+                              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
                           )}
                         </div>
 
-                        {/* --- DRAFT CHAT MAIN ACTION BUTTONS --- */}
-                        <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                          <div className="flex flex-wrap items-center gap-2">
-                            {/* 1. BUTTON FOR HUMAN AGENT: COPY DRAFT TO CLIPBOARD */}
-                            <button
-                              type="button"
-                              onClick={() => handleCopyDraftChat(effectiveMessageText, currentReport.wa_group_name)}
-                              className="py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer"
-                              title="Salin draft pesan ke clipboard untuk dipaste ke WhatsApp Web / Desktop"
-                            >
-                              <Copy className="w-4 h-4" />
-                              <span>Copy Draft Pesan</span>
-                            </button>
-
-                            {/* 2. TOGGLE EDIT DRAFT */}
-                            <button
-                              type="button"
-                              onClick={() => setIsEditingDraft(!isEditingDraft)}
-                              className={`py-2.5 px-3.5 rounded-xl font-bold text-xs transition-all cursor-pointer border flex items-center gap-1.5 ${
-                                isEditingDraft
-                                  ? 'bg-amber-100 text-amber-900 border-amber-300'
-                                  : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
-                              }`}
-                              title="Edit teks pesan secara manual sebelum dikirim atau disalin"
-                            >
-                              <Edit className="w-3.5 h-3.5 text-slate-600" />
-                              <span>{isEditingDraft ? 'Selesai Edit' : 'Edit Draf'}</span>
-                            </button>
-                          </div>
-
-                          {/* 3. BUTTON FOR WATSON: SEND TO WHATSAPP GROUP */}
+                        {/* Filter Tabs: Semua / Ada Grup / Belum Ada Grup */}
+                        <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl text-[10px] font-bold">
                           <button
                             type="button"
-                            onClick={() => handleDispatchSingleCustomer(currentReport.customer_id, currentReport.wa_group_name)}
-                            disabled={singleCustomerDispatching}
-                            className="py-2.5 px-5 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-black text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
-                            title="Kirim pesan ini langsung ke grup WhatsApp customer melalui bot Watson"
+                            onClick={() => setDispatchGroupFilter('ALL')}
+                            className={`flex-1 py-1 rounded-lg transition-all cursor-pointer text-center ${
+                              dispatchGroupFilter === 'ALL'
+                                ? 'bg-white text-slate-900 shadow-2xs'
+                                : 'text-slate-500 hover:text-slate-800'
+                            }`}
                           >
-                            <Send className={`w-3.5 h-3.5 ${singleCustomerDispatching ? 'animate-spin' : 'text-emerald-400'}`} />
-                            <span>{singleCustomerDispatching ? 'Watson Mengirim...' : 'Kirim via Watson ke Group WA'}</span>
+                            Semua ({allCustomerReports.length})
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setDispatchGroupFilter('MAPPED')}
+                            className={`flex-1 py-1 rounded-lg transition-all cursor-pointer text-center ${
+                              dispatchGroupFilter === 'MAPPED'
+                                ? 'bg-white text-emerald-700 shadow-2xs'
+                                : 'text-slate-500 hover:text-slate-800'
+                            }`}
+                          >
+                            Ada Grup ({mappedCount})
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setDispatchGroupFilter('UNMAPPED')}
+                            className={`flex-1 py-1 rounded-lg transition-all cursor-pointer text-center ${
+                              dispatchGroupFilter === 'UNMAPPED'
+                                ? 'bg-white text-amber-700 shadow-2xs'
+                                : 'text-slate-500 hover:text-slate-800'
+                            }`}
+                          >
+                            Belum ({unmappedCount})
                           </button>
                         </div>
                       </div>
 
-                      {/* Bottom Footer bar */}
-                      <div className="p-3 bg-white border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500">
-                        <span className="text-[11px] font-mono truncate">
-                          Hash Idempotency: <code className="bg-slate-100 px-1 py-0.5 rounded">{currentReport.notification_hash}</code>
-                        </span>
-                        <span className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                          Anti-Spam &amp; Jitter Validated
-                        </span>
+                      {/* Scrollable Customer List Cards */}
+                      <div className="p-2 space-y-1.5 max-h-[580px] overflow-y-auto divide-y-0">
+                        {filteredCustomerReports.length === 0 ? (
+                          <div className="p-8 text-center text-xs text-slate-400">
+                            Tidak ada akun yang sesuai dengan filter.
+                          </div>
+                        ) : (
+                          filteredCustomerReports.map((rep) => {
+                            const isSelected = currentReport && String(currentReport.customer_id) === String(rep.customer_id)
+                            const hasGroup = Boolean(rep.has_wa_group || (rep.wa_group_name && rep.wa_group_name.trim()))
+
+                            return (
+                              <div
+                                key={rep.customer_id}
+                                onClick={() => setNaraSelectedCustomerTab(rep.customer_id)}
+                                className={`p-3 rounded-xl transition-all cursor-pointer border flex items-center justify-between gap-2.5 ${
+                                  isSelected
+                                    ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
+                                    : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-150 hover:border-slate-300'
+                                }`}
+                              >
+                                <div className="min-w-0 flex-1">
+                                  <div className={`text-xs font-black truncate mb-1 ${isSelected ? 'text-white' : 'text-slate-900'}`}>
+                                    {rep.customer_name}
+                                  </div>
+
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    {hasGroup ? (
+                                      <span className={`text-[10px] font-medium px-2 py-0.5 rounded-md truncate max-w-[170px] inline-block ${
+                                        isSelected
+                                          ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                                          : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                      }`}>
+                                        {rep.wa_group_name}
+                                      </span>
+                                    ) : (
+                                      <span className={`text-[10px] font-medium px-2 py-0.5 rounded-md ${
+                                        isSelected
+                                          ? 'bg-amber-950 text-amber-300 border border-amber-800'
+                                          : 'bg-amber-50 text-amber-700 border border-amber-200'
+                                      }`}>
+                                        Belum Ada Grup WA
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full font-mono ${
+                                    isSelected ? 'bg-sky-400 text-slate-950' : 'bg-slate-100 text-slate-700'
+                                  }`}>
+                                    {rep.counts.total_offline}
+                                  </span>
+
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      handleOpenGroupModal(
+                                        rep.customer_id,
+                                        rep.customer_name,
+                                        rep.wa_group_name || '',
+                                        rep.wa_group_id || ''
+                                      )
+                                    }}
+                                    className={`p-1.5 rounded-lg border transition-all cursor-pointer ${
+                                      isSelected
+                                        ? 'bg-white/10 hover:bg-white/20 text-white border-white/20'
+                                        : hasGroup
+                                          ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200'
+                                          : 'bg-sky-50 hover:bg-sky-100 text-sky-700 border-sky-200'
+                                    }`}
+                                    title={hasGroup ? `Ubah Nama Grup WA untuk '${rep.customer_name}'` : `Tambah Nama Grup WA untuk '${rep.customer_name}'`}
+                                  >
+                                    {hasGroup ? <Pencil className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+                                  </button>
+                                </div>
+                              </div>
+                            )
+                          })
+                        )}
                       </div>
                     </div>
 
-                    {/* Right 1 Col: Summary & Actions Guide */}
-                    <div className="space-y-4">
-                      {/* Human Agent & Watson Guide Card */}
-                      <div className="p-5 bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl shadow-2xs space-y-3">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-black text-sky-400 uppercase tracking-wider">
-                            PANDUAN OPERASIONAL CS
-                          </span>
-                          <span className="text-[10px] px-2 py-0.5 rounded bg-white/10 text-white font-mono">
-                            2 Metode
-                          </span>
-                        </div>
-                        <h4 className="text-sm font-black text-white">Cara Pengiriman Draft Chat</h4>
-                        <div className="space-y-2.5 text-xs text-slate-300">
-                          <div className="p-2.5 bg-white/10 rounded-xl space-y-1">
-                            <div className="font-bold text-emerald-300 flex items-center gap-1.5">
-                              <Copy className="w-3 h-3" />
-                              <span>1. Kirim Manual (Human Agent)</span>
+                    {/* Right Pane (Col 5-12): WhatsApp Preview & Dispatch Studio (Detail) */}
+                    <div className="lg:col-span-8 space-y-4">
+                      {currentReport ? (
+                        <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden flex flex-col">
+                          {/* WhatsApp Top Header Bar */}
+                          <div className="p-4 bg-emerald-700 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold text-lg shrink-0">
+                                💬
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <h4 className="text-sm font-bold text-white tracking-tight">
+                                    {currentReport.wa_group_name || '[Belum Ada Nama Grup WA]'}
+                                  </h4>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenGroupModal(currentReport.customer_id, currentReport.customer_name, currentReport.wa_group_name, currentReport.wa_group_id)}
+                                    className="p-1 rounded-md bg-white/10 hover:bg-white/20 text-emerald-100 hover:text-white transition-colors cursor-pointer"
+                                    title="Ubah nama WhatsApp Group untuk akun pelanggan ini"
+                                  >
+                                    {currentHasGroup ? <Pencil className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+                                  </button>
+                                </div>
+                                <p className="text-[11px] text-emerald-200 font-mono">
+                                  Akun: <span className="font-bold text-white">{currentReport.customer_name}</span> &bull; {currentReport.wa_group_id || 'Belum terpetakan'}
+                                </p>
+                              </div>
                             </div>
-                            <p className="text-[11px] text-slate-300 leading-relaxed">
-                              Klik tombol <strong>"Copy Draft Pesan"</strong> lalu tempelkan (paste) langsung ke WhatsApp Web / Desktop di grup <strong>{currentReport.wa_group_name}</strong>.
-                            </p>
-                          </div>
 
-                          <div className="p-2.5 bg-white/10 rounded-xl space-y-1">
-                            <div className="font-bold text-sky-300 flex items-center gap-1.5">
-                              <Send className="w-3 h-3" />
-                              <span>2. Otomatis via Watson</span>
+                            <div className="flex items-center gap-2 self-start sm:self-auto">
+                              <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-emerald-800 text-emerald-100 border border-emerald-600">
+                                {currentReport.report_mode === 'FULL_AUDIT' ? 'Mode Tanggal 1 (Audit Lengkap)' : 'Mode Delta'}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleOpenGroupModal(currentReport.customer_id, currentReport.customer_name, currentReport.wa_group_name, currentReport.wa_group_id)}
+                                className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white text-emerald-900 hover:bg-emerald-50 transition-colors cursor-pointer shadow-2xs"
+                              >
+                                {currentHasGroup ? 'Ubah Grup WA' : '+ Tambah Grup WA'}
+                              </button>
                             </div>
-                            <p className="text-[11px] text-slate-300 leading-relaxed">
-                              Klik <strong>"Kirim via Watson ke Group WA"</strong>. Bot Watson mengirim dengan simulasi mengetik 3–5s dan anti-ban jitter acak tanpa risiko blokir nomor.
-                            </p>
+                          </div>
+
+                          {/* Chat Canvas Preview */}
+                          <div className="p-5 bg-slate-100/90 flex-1 space-y-4">
+                            <div className="bg-white p-4.5 rounded-2xl rounded-tl-xs shadow-xs border border-slate-200/90 space-y-3">
+                              <div className="flex items-center justify-between border-b border-slate-100 pb-2 text-[10px] text-slate-400">
+                                <span className="font-bold text-emerald-600 flex items-center gap-1.5">
+                                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                  Draft Pesan WhatsApp &bull; Watson AI Gateway
+                                </span>
+                                <span>{new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB</span>
+                              </div>
+
+                              {/* Message Content: Static Preview or Editable Textarea */}
+                              {isEditingDraft ? (
+                                <div className="space-y-2">
+                                  <textarea
+                                    value={effectiveMessageText}
+                                    onChange={(e) => {
+                                      const val = e.target.value
+                                      setCustomDraftTexts((prev) => ({ ...prev, [currentReport.customer_id]: val }))
+                                    }}
+                                    rows={14}
+                                    className="w-full p-3 bg-emerald-50/20 border-2 border-emerald-400 rounded-xl text-xs font-mono text-slate-800 leading-relaxed focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-inner"
+                                    placeholder="Edit pesan draf WhatsApp..."
+                                  />
+                                  <div className="text-[11px] text-slate-500 flex items-center justify-between">
+                                    <span>✏️ Mode edit aktif: Perubahan Anda akan disalin atau dikirim ke WhatsApp Group ini.</span>
+                                    {isCustomized && (
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setCustomDraftTexts((prev) => {
+                                            const next = { ...prev }
+                                            delete next[currentReport.customer_id]
+                                            return next
+                                          })
+                                        }}
+                                        className="text-rose-600 hover:underline text-[10px] font-bold cursor-pointer"
+                                      >
+                                        Reset ke Teks Asli
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                              ) : (
+                                <pre className="text-xs text-slate-800 whitespace-pre-wrap font-sans leading-relaxed selection:bg-emerald-100">
+                                  {effectiveMessageText}
+                                </pre>
+                              )}
+                            </div>
+
+                            {/* --- DRAFT CHAT MAIN ACTION BUTTONS --- */}
+                            <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                              <div className="flex flex-wrap items-center gap-2">
+                                {/* 1. BUTTON FOR HUMAN AGENT: COPY DRAFT TO CLIPBOARD */}
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopyDraftChat(effectiveMessageText, currentReport.wa_group_name || currentReport.customer_name)}
+                                  className="py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer"
+                                  title="Salin draft pesan ke clipboard untuk dipaste ke WhatsApp Web / Desktop"
+                                >
+                                  <Copy className="w-4 h-4" />
+                                  <span>Copy Draft Pesan</span>
+                                </button>
+
+                                {/* 2. TOGGLE EDIT DRAFT */}
+                                <button
+                                  type="button"
+                                  onClick={() => setIsEditingDraft(!isEditingDraft)}
+                                  className={`py-2.5 px-3.5 rounded-xl font-bold text-xs transition-all cursor-pointer border flex items-center gap-1.5 ${
+                                    isEditingDraft
+                                      ? 'bg-amber-100 text-amber-900 border-amber-300'
+                                      : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
+                                  }`}
+                                  title="Edit teks pesan secara manual sebelum dikirim atau disalin"
+                                >
+                                  <Edit className="w-3.5 h-3.5 text-slate-600" />
+                                  <span>{isEditingDraft ? 'Selesai Edit' : 'Edit Draf'}</span>
+                                </button>
+                              </div>
+
+                              {/* 3. BUTTON FOR WATSON: SEND TO WHATSAPP GROUP */}
+                              <button
+                                type="button"
+                                onClick={() => handleDispatchSingleCustomer(currentReport.customer_id, currentReport.wa_group_name || currentReport.customer_name)}
+                                disabled={singleCustomerDispatching}
+                                className="py-2.5 px-5 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-black text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                                title="Kirim pesan ini langsung ke grup WhatsApp customer melalui bot Watson"
+                              >
+                                <Send className={`w-3.5 h-3.5 ${singleCustomerDispatching ? 'animate-spin' : 'text-emerald-400'}`} />
+                                <span>{singleCustomerDispatching ? 'Watson Mengirim...' : 'Kirim via Watson ke Group WA'}</span>
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Bottom Footer bar */}
+                          <div className="p-3 bg-white border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500">
+                            <span className="text-[11px] font-mono truncate">
+                              Hash Idempotency: <code className="bg-slate-100 px-1 py-0.5 rounded">{currentReport.notification_hash}</code>
+                            </span>
+                            <span className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                              Anti-Spam &amp; Jitter Validated
+                            </span>
                           </div>
                         </div>
-                      </div>
+                      ) : null}
 
-                      {/* Customer Account Info & WA Group Card */}
-                      <div className="p-5 bg-white rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-                        <div className="flex items-center justify-between">
-                          <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">
-                            Aturan Grup WA Akun
-                          </h4>
-                          <button
-                            type="button"
-                            onClick={() => handleOpenGroupModal(currentReport.customer_id, currentReport.customer_name, currentReport.wa_group_name, currentReport.wa_group_id)}
-                            className="text-[11px] font-bold text-emerald-600 hover:text-emerald-700 hover:underline cursor-pointer"
-                          >
-                            Ubah
-                          </button>
+                      {/* Supporting Cards: Offline Units List & Anti-Ban Protocol */}
+                      {currentReport && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {/* Unit Offline Breakdown for this Customer */}
+                          <div className="p-4.5 bg-white rounded-2xl border border-slate-200 shadow-2xs space-y-3">
+                            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                              <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                                <Radio className="w-3.5 h-3.5 text-rose-500" />
+                                <span>Rincian Unit Offline ({currentReport.counts.total_offline})</span>
+                              </h4>
+                              <span className="text-[10px] font-bold text-slate-400">{currentReport.customer_name}</span>
+                            </div>
+
+                            <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                              {(currentReport.new_offline_items || []).concat(currentReport.still_offline_items || []).length > 0 ? (
+                                (currentReport.new_offline_items || []).concat(currentReport.still_offline_items || []).map((dev, idx) => (
+                                  <div key={idx} className="p-2 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between text-xs">
+                                    <div>
+                                      <div className="font-bold text-slate-900">{dev.nopol || dev.device_name}</div>
+                                      <div className="text-[10px] text-slate-500">{dev.device_type || 'GPS'}</div>
+                                    </div>
+                                    <div className="text-right">
+                                      <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-100 block">
+                                        {dev.offline_duration_str || 'Offline'}
+                                      </span>
+                                    </div>
+                                  </div>
+                                ))
+                              ) : (
+                                <p className="text-xs text-slate-400 py-3 text-center">Unit dalam status pemeliharaan atau normal.</p>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Watson Safety Protocol Card */}
+                          <div className="p-4.5 bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl shadow-2xs space-y-3">
+                            <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                              <h4 className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-1.5">
+                                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                                <span>Watson Anti-Ban Protocol</span>
+                              </h4>
+                              <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono font-bold">ACTIVE</span>
+                            </div>
+
+                            <ul className="text-xs text-slate-300 space-y-2">
+                              <li className="flex items-start gap-2">
+                                <span className="text-emerald-400 font-bold">&bull;</span>
+                                <span><strong>Jitter Dinamis:</strong> Jeda 15–45s acak antar pengiriman grup.</span>
+                              </li>
+                              <li className="flex items-start gap-2">
+                                <span className="text-emerald-400 font-bold">&bull;</span>
+                                <span><strong>Typing Simulator:</strong> Simulasi status <code>composing</code> 3–5 detik.</span>
+                              </li>
+                              <li className="flex items-start gap-2">
+                                <span className="text-emerald-400 font-bold">&bull;</span>
+                                <span><strong>Rotasi Diksi:</strong> Sapaan otomatis berganti menurut jam pelaporan.</span>
+                              </li>
+                            </ul>
+                          </div>
                         </div>
-
-                        <div className="space-y-2 text-xs">
-                          <div className="flex justify-between py-1 border-b border-slate-100">
-                            <span className="text-slate-500">Akun Pelanggan:</span>
-                            <span className="font-bold text-slate-900">{currentReport.customer_name}</span>
-                          </div>
-                          <div className="flex justify-between py-1 border-b border-slate-100">
-                            <span className="text-slate-500">Grup WhatsApp:</span>
-                            <span className="font-bold text-emerald-700">{currentReport.wa_group_name}</span>
-                          </div>
-                          <div className="flex justify-between py-1 border-b border-slate-100">
-                            <span className="text-slate-500">Mode Kalender:</span>
-                            <span className="font-bold text-indigo-600">{currentReport.report_mode}</span>
-                          </div>
-                          <div className="flex justify-between py-1 border-b border-slate-100">
-                            <span className="text-slate-500">Unit Baru Mati:</span>
-                            <span className="font-bold text-rose-600">{currentReport.counts.new_offline} unit</span>
-                          </div>
-                          <div className="flex justify-between py-1 border-b border-slate-100">
-                            <span className="text-slate-500">Unit Masih Offline:</span>
-                            <span className="font-bold text-amber-600">{currentReport.counts.still_offline} unit</span>
-                          </div>
-                          <div className="flex justify-between py-1 border-b border-slate-100">
-                            <span className="text-slate-500">Unit Kembali Pulih:</span>
-                            <span className="font-bold text-emerald-600">{currentReport.counts.recovered_online} unit</span>
-                          </div>
-                        </div>
-
-                        <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200/80 text-[11px] text-slate-600">
-                          <span className="font-bold text-slate-800">1 Akun = 1 Grup:</span> Semua unit kendaraan milik akun <strong>{currentReport.customer_name}</strong> secara otomatis terpetakan ke grup <strong>{currentReport.wa_group_name}</strong>.
-                        </div>
-                      </div>
-
-                      {/* Anti-Ban Safeguards Card */}
-                      <div className="p-5 bg-white rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
-                        <span className="text-[10px] font-black text-sky-600 uppercase tracking-wider block">
-                          WATSON SAFETY PROTOCOL
-                        </span>
-                        <h4 className="text-xs font-black text-slate-900">Proteksi Anti-Ban Meta</h4>
-                        <ul className="text-xs text-slate-600 space-y-2">
-                          <li className="flex items-start gap-2">
-                            <span className="text-emerald-500 font-bold">&bull;</span>
-                            <span><strong>Jitter Dinamis:</strong> Jeda 15–45s acak antar-grup mencegah pola bot kaku.</span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="text-emerald-500 font-bold">&bull;</span>
-                            <span><strong>Typing Simulator:</strong> Paket <code>composing</code> aktif 3–5s sebelum kirim.</span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="text-emerald-500 font-bold">&bull;</span>
-                            <span><strong>Template Rotator:</strong> Diksi sapaan bervariasi sesuai waktu agar hash berbeda.</span>
-                          </li>
-                        </ul>
-                      </div>
+                      )}
                     </div>
                   </div>
                 )

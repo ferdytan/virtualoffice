@@ -334,7 +334,7 @@ function colorizeCabinetMesh(mesh) {
 function DelegationOffice({ scenerySettings }) {
   const { scene } = useGLTF('/models/office.glb', '/draco/')
   const theme = scenerySettings?.theme || 'colorful'
-  const floorType = scenerySettings?.floorType === 'white' ? 'white' : 'parquet'
+  const floorType = scenerySettings?.floorType === 'parquet' ? 'parquet' : 'white'
   const isColorful = theme === 'colorful'
 
   const textures = useTexture({
@@ -342,7 +342,7 @@ function DelegationOffice({ scenerySettings }) {
     white: '/textures/white_tiles.png'
   })
 
-  const floorTex = textures[floorType] || textures.parquet
+  const floorTex = textures[floorType] || textures.white
 
   useEffect(() => {
     if (!scene || !floorTex) return
@@ -592,7 +592,7 @@ export default function OfficeScene({
   hideTooltip = false,
   scenerySettings = {
     theme: 'colorful',
-    floorType: 'parquet',
+    floorType: 'white',
     showNPC: true,
     showCoffeeCorner: true
   },

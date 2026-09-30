@@ -120,12 +120,130 @@ def init_nara_storage():
                     updated_at TEXT
                 )
             """)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS telemetry_cache (
+                    cache_key TEXT PRIMARY KEY,
+                    payload_json TEXT,
+                    updated_at TEXT
+                )
+            """)
     finally:
         conn.close()
 
 
 # Ensure tables are initialized upon module load
 init_nara_storage()
+
+
+def save_telemetry_cache(report: Dict[str, Any], cache_key: str = "latest_offline_report"):
+    """
+    Saves the offline telemetry report into SQLite database cache.
+    Allows instant loading upon opening Nara without repetitive external API calls.
+    """
+    conn = get_db_connection()
+    try:
+        now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with conn:
+            conn.execute("""
+                INSERT INTO telemetry_cache (cache_key, payload_json, updated_at)
+                VALUES (?, ?, ?)
+                ON CONFLICT(cache_key) DO UPDATE SET
+                    payload_json = excluded.payload_json,
+                    updated_at = excluded.updated_at
+            """, (cache_key, json.dumps(report), now_str))
+        logger.info(f"Saved telemetry report to SQLite cache '{cache_key}' ({len(report.get('valid_devices', []))} valid devices)")
+    except Exception as e:
+        logger.error(f"Failed to save telemetry cache: {e}")
+    finally:
+        conn.close()
+
+
+def get_telemetry_cache(cache_key: str = "latest_offline_report") -> Optional[Dict[str, Any]]:
+    """
+    Retrieves cached telemetry report from SQLite and ensures custom customer names
+    and WhatsApp groups from customer_group_mappings are dynamically applied.
+    """
+    conn = get_db_connection()
+    try:
+        cursor = conn.execute("SELECT payload_json, updated_at FROM telemetry_cache WHERE cache_key = ?", (cache_key,))
+        row = cursor.fetchone()
+        if not row:
+            return None
+        report = json.loads(row["payload_json"])
+        report["from_cache"] = True
+        report["cached_at"] = row["updated_at"]
+        return sync_report_with_db_mappings(report)
+    except Exception as e:
+        logger.error(f"Failed to read telemetry cache: {e}")
+        return None
+    finally:
+        conn.close()
+
+
+def sync_report_with_db_mappings(report: Dict[str, Any]) -> Dict[str, Any]:
+    """Ensures device records and customer reports reflect the latest database mappings."""
+    if not report:
+        return report
+
+    all_mappings = {str(m["customer_id"]): m for m in get_all_customer_group_mappings()}
+
+    def apply_to_dev(dev: Dict[str, Any]):
+        cid = str(dev.get("customer_id") or "")
+        cname = str(dev.get("customer_name") or "")
+        mapping = all_mappings.get(cid)
+        if not mapping:
+            mapping = get_customer_group_mapping(cid, cname)
+        if mapping:
+            if mapping.get("customer_name"):
+                dev["customer_name"] = mapping["customer_name"]
+            dev["wa_group_name"] = mapping.get("wa_group_name") or ""
+            dev["wa_group_id"] = mapping.get("wa_group_id") or ""
+            dev["has_wa_group"] = bool(dev["wa_group_name"] and dev["wa_group_name"].strip())
+
+    for dev in report.get("valid_devices", []):
+        apply_to_dev(dev)
+
+    for dev in report.get("suppressed_cam_devices", []):
+        apply_to_dev(dev)
+
+    for rep in report.get("customer_reports", []):
+        cid = str(rep.get("customer_id") or "")
+        cname = str(rep.get("customer_name") or "")
+        mapping = all_mappings.get(cid)
+        if not mapping:
+            mapping = get_customer_group_mapping(cid, cname)
+        if mapping:
+            if mapping.get("customer_name"):
+                rep["customer_name"] = mapping["customer_name"]
+            rep["wa_group_name"] = mapping.get("wa_group_name") or ""
+            rep["wa_group_id"] = mapping.get("wa_group_id") or ""
+            rep["has_wa_group"] = bool(rep["wa_group_name"] and rep["wa_group_name"].strip())
+
+    return report
+
+
+def sync_all_cached_reports():
+    """Updates all rows in telemetry_cache so they reflect latest database mappings."""
+    conn = get_db_connection()
+    try:
+        cursor = conn.execute("SELECT cache_key, payload_json FROM telemetry_cache")
+        rows = cursor.fetchall()
+        for row in rows:
+            cache_key = row["cache_key"]
+            try:
+                data = json.loads(row["payload_json"])
+                synced = sync_report_with_db_mappings(data)
+                conn.execute(
+                    "UPDATE telemetry_cache SET payload_json = ? WHERE cache_key = ?",
+                    (json.dumps(synced), cache_key)
+                )
+            except Exception as err:
+                logger.error(f"Error syncing cache {cache_key}: {err}")
+        conn.commit()
+    except Exception as e:
+        logger.error(f"Error in sync_all_cached_reports: {e}")
+    finally:
+        conn.close()
 
 
 def save_customer_group_mapping(
@@ -136,9 +254,8 @@ def save_customer_group_mapping(
     pic: Optional[str] = None
 ) -> Dict[str, Any]:
     """
-    Saves or updates WhatsApp Group mapping for a customer account.
-    Applies at the Customer Account level: all units belonging to this customer
-    automatically inherit this WhatsApp group name and ID.
+    Saves or updates custom Customer Name and WhatsApp Group mapping in SQLite database.
+    Values stored here take precedence over raw data from the Orin API.
     """
     safe_name = customer_name.strip() or f"Pelanggan #{customer_id}"
     clean_group = wa_group_name.strip()
@@ -176,16 +293,17 @@ def save_customer_group_mapping(
             # Cascade update to all device states for this customer account
             cursor = conn.execute("""
                 UPDATE device_states
-                SET wa_group_name = ?, wa_group_id = ?, updated_at = ?
+                SET customer_name = ?, wa_group_name = ?, wa_group_id = ?, updated_at = ?
                 WHERE customer_id = ? OR customer_id = ? OR LOWER(customer_name) = LOWER(?)
-            """, (clean_group, wa_group_id, now_str, numeric_cust_id, str(customer_id), safe_name))
+            """, (safe_name, clean_group, wa_group_id, now_str, numeric_cust_id, str(customer_id), safe_name))
             units_updated = cursor.rowcount
 
     finally:
         conn.close()
 
     export_state_to_json()
-    logger.info(f"Updated WhatsApp group for Customer {safe_name} (ID: {customer_id}) to '{clean_group}' (Units affected: {units_updated})")
+    sync_all_cached_reports()
+    logger.info(f"Updated WhatsApp group and Customer Name for {safe_name} (ID: {customer_id}) to '{clean_group}' (Units affected: {units_updated})")
 
     return {
         "status": "success",
@@ -194,6 +312,7 @@ def save_customer_group_mapping(
         "wa_group_name": clean_group,
         "wa_group_id": wa_group_id,
         "pic": clean_pic,
+        "has_wa_group": bool(clean_group),
         "units_updated": units_updated,
         "updated_at": now_str
     }
@@ -202,25 +321,32 @@ def save_customer_group_mapping(
 def get_all_customer_group_mappings() -> List[Dict[str, Any]]:
     """Retrieves all custom and PRO customer group mappings."""
     conn = get_db_connection()
-    mappings_dict = dict(PRO_CUSTOMER_GROUPS)
+    mappings_dict = {}
+    for cid, reg in PRO_CUSTOMER_GROUPS.items():
+        item = dict(reg)
+        item["customer_id"] = cid
+        item["has_wa_group"] = bool(item.get("wa_group_name"))
+        mappings_dict[str(cid)] = item
+
     try:
         cursor = conn.execute("SELECT * FROM customer_group_mappings")
         for row in cursor.fetchall():
             r = dict(row)
-            mappings_dict[r["customer_id"]] = r
+            r["has_wa_group"] = bool(r.get("wa_group_name") and r["wa_group_name"].strip())
+            mappings_dict[str(r["customer_id"])] = r
     finally:
         conn.close()
 
     return list(mappings_dict.values())
 
 
-def get_customer_group_mapping(customer_id: Union[int, str], customer_name: str) -> Dict[str, str]:
+def get_customer_group_mapping(customer_id: Union[int, str], customer_name: Optional[str] = None) -> Dict[str, Any]:
     """
     Returns mapped WhatsApp group metadata for a customer.
     Priority:
-    1. Custom mapping in database (customer_group_mappings)
+    1. Custom mapping in database (customer_group_mappings) - custom name & custom group
     2. PRO_CUSTOMER_GROUPS predefined registry
-    3. Dynamic fallback: 'Grup Orin Fleet - {customer_name}'
+    3. Unmapped customer: wa_group_name="", wa_group_id="", has_wa_group=False
     """
     conn = get_db_connection()
     try:
@@ -229,13 +355,19 @@ def get_customer_group_mapping(customer_id: Union[int, str], customer_name: str)
         except (ValueError, TypeError):
             num_id = None
 
+        clean_name = (customer_name or "").strip()
         cursor = conn.execute(
-            "SELECT * FROM customer_group_mappings WHERE customer_id = ? OR customer_id = ? OR LOWER(customer_name) = LOWER(?)",
-            (num_id if num_id is not None else -1, str(customer_id), (customer_name or "").strip())
+            """SELECT * FROM customer_group_mappings 
+               WHERE (customer_id = ? AND ? IS NOT NULL) 
+                  OR customer_id = ? 
+                  OR (? != '' AND LOWER(customer_name) = LOWER(?))""",
+            (num_id, num_id, str(customer_id), clean_name, clean_name)
         )
         row = cursor.fetchone()
         if row:
-            return dict(row)
+            res = dict(row)
+            res["has_wa_group"] = bool(res.get("wa_group_name") and res["wa_group_name"].strip())
+            return res
     except Exception as e:
         logger.error(f"Error querying customer_group_mappings: {e}")
     finally:
@@ -244,24 +376,32 @@ def get_customer_group_mapping(customer_id: Union[int, str], customer_name: str)
     try:
         numeric_id = int(customer_id)
         if numeric_id in PRO_CUSTOMER_GROUPS:
-            return PRO_CUSTOMER_GROUPS[numeric_id]
+            res = dict(PRO_CUSTOMER_GROUPS[numeric_id])
+            res["customer_id"] = numeric_id
+            res["has_wa_group"] = bool(res.get("wa_group_name") and res["wa_group_name"].strip())
+            return res
     except (ValueError, TypeError):
         pass
 
     # Check case-insensitive name match in registry
-    for _, reg in PRO_CUSTOMER_GROUPS.items():
-        if reg["customer_name"].lower() == customer_name.lower():
-            return reg
+    if customer_name:
+        clean_name_lower = customer_name.strip().lower()
+        for cid, reg in PRO_CUSTOMER_GROUPS.items():
+            if reg["customer_name"].lower() == clean_name_lower:
+                res = dict(reg)
+                res["customer_id"] = cid
+                res["has_wa_group"] = bool(res.get("wa_group_name") and res["wa_group_name"].strip())
+                return res
 
-    # Dynamic fallback for active customer
-    safe_name = customer_name.strip() or f"Pelanggan #{customer_id}"
-    pseudo_gid = abs(hash(f"{customer_id}_{customer_name}")) % 900000000 + 100000000
+    # Unmapped customer (wa_group_name empty, has_wa_group=False so UI shows '+' icon)
+    safe_name = (customer_name or "").strip() or f"Pelanggan #{customer_id}"
     return {
         "customer_id": customer_id,
         "customer_name": safe_name,
-        "wa_group_name": f"Grup Orin Fleet - {safe_name}",
-        "wa_group_id": f"120363{pseudo_gid}@g.us",
-        "pic": "PIC Operasional"
+        "wa_group_name": "",
+        "wa_group_id": "",
+        "pic": "PIC Operasional",
+        "has_wa_group": False
     }
 
 
@@ -344,13 +484,15 @@ class OfflineStateTracker:
                 for dev in valid_offline_devices:
                     dev_id = str(dev["id"])
                     group_meta = get_customer_group_mapping(dev["customer_id"], dev["customer_name"])
+                    dev["customer_name"] = group_meta.get("customer_name") or dev.get("customer_name")
+                    dev["wa_group_name"] = group_meta.get("wa_group_name") or ""
+                    dev["wa_group_id"] = group_meta.get("wa_group_id") or ""
+                    dev["has_wa_group"] = group_meta.get("has_wa_group", False)
 
                     if dev_id not in known_devices:
                         # Brand new device in system, discovered as offline
                         status_type = "NEW_OFFLINE"
                         dev["transition_type"] = status_type
-                        dev["wa_group_name"] = group_meta["wa_group_name"]
-                        dev["wa_group_id"] = group_meta["wa_group_id"]
                         new_offline.append(dev)
 
                         conn.execute("""
@@ -367,8 +509,6 @@ class OfflineStateTracker:
                         ))
                     else:
                         prev = known_devices[dev_id]
-                        dev["wa_group_name"] = prev.get("wa_group_name") or group_meta["wa_group_name"]
-                        dev["wa_group_id"] = prev.get("wa_group_id") or group_meta["wa_group_id"]
                         dev["is_in_maintenance"] = prev.get("is_in_maintenance", 0)
 
                         if prev.get("status") == "ONLINE":
@@ -522,6 +662,7 @@ class OfflineStateTracker:
                 "customer_name": bucket["customer_name"],
                 "wa_group_id": bucket["wa_group_id"],
                 "wa_group_name": bucket["wa_group_name"],
+                "has_wa_group": bool(bucket["wa_group_name"] and bucket["wa_group_name"].strip()),
                 "report_mode": report_mode,
                 "counts": {
                     "new_offline": len(active_new),
