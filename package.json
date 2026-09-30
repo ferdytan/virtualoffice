@@ -5,8 +5,10 @@
   "description": "Virtual Office 3D with CrewAI Backend Integration",
   "scripts": {
     "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"cyan,magenta\" \"bash backend/run.sh\" \"npm run dev --prefix frontend\"",
+    "dev:win": "concurrently -n \"BACKEND,FRONTEND\" -c \"cyan,magenta\" \"backend\\run.bat\" \"npm run dev --prefix frontend\"",
     "dev:frontend": "npm run dev --prefix frontend",
     "dev:backend": "bash backend/run.sh",
+    "dev:backend:win": "backend\\run.bat",
     "install:all": "npm install && npm install --prefix frontend",
     "build": "npm run build --prefix frontend"
   },
