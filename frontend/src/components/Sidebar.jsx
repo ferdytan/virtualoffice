@@ -10,7 +10,13 @@ import {
   ChevronRight,
   Bot,
   Settings,
-  LayoutDashboard
+  LayoutDashboard,
+  FileText,
+  Copy,
+  Check,
+  ExternalLink,
+  Compass,
+  Eye
 } from 'lucide-react'
 import AgentCloseUpAvatar from './AgentCloseUpAvatar'
 import AgentAvatarSettingsView from './AgentAvatarSettingsView'
@@ -27,6 +33,7 @@ export default function Sidebar({
   onOpenCall,
   onOpenDashboardModal,
   onSendBrief,
+  onScoutGenerateArticle,
   chatHistory = [],
   isLoading = false,
   onSelectAvatarType,
@@ -36,6 +43,15 @@ export default function Sidebar({
 }) {
   const [panelView, setPanelView] = useState('profile') // 'profile' | 'avatar_settings'
   const [briefInput, setBriefInput] = useState('')
+  const [copiedIdx, setCopiedIdx] = useState(null)
+  const [readerArticle, setReaderArticle] = useState(null)
+
+  const copyText = (text, id) => {
+    if (!text) return
+    navigator.clipboard?.writeText(text)
+    setCopiedIdx(id)
+    setTimeout(() => setCopiedIdx(null), 2000)
+  }
 
   useEffect(() => {
     setPanelView('profile')
@@ -211,6 +227,105 @@ export default function Sidebar({
           <Bot className="w-3.5 h-3.5" /> Brief & Task Execution Log
         </div>
 
+        {/* --- Scout Strategic Article Quick Actions (Only for Scout) --- */}
+        {agent.id === 'scout' && (
+          <div className="p-3.5 bg-emerald-50/70 border border-emerald-200/90 rounded-2xl space-y-2.5 mb-2 shadow-2xs">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-black tracking-wider text-emerald-800 uppercase flex items-center gap-1.5">
+                <Compass className="w-3.5 h-3.5 text-emerald-600" />
+                Scout Copywriting Engine (Soft-Selling Orin)
+              </span>
+              <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
+                Pilar Orin 2026
+              </span>
+            </div>
+
+            <p className="text-[11px] text-emerald-900/80 leading-snug">
+              Pilih pilar topik riset untuk memanen berita aktual dan membuat draf artikel berstruktur 5 babak:
+            </p>
+
+            <div className="flex flex-col gap-1.5">
+              <button
+                type="button"
+                disabled={isLoading}
+                onClick={() => {
+                  if (onScoutGenerateArticle) {
+                    onScoutGenerateArticle('curanmor', 'fokus perbandingan kunci ganda fisik vs GPS Tracker Orin')
+                  } else {
+                    onSendBrief(agent.id, 'Riset kasus curanmor terbaru & buat artikel kunci ganda vs GPS Tracker Orin')
+                  }
+                }}
+                className="p-2.5 bg-white hover:bg-emerald-50 text-slate-800 hover:text-emerald-900 border border-emerald-200/80 rounded-xl text-left text-xs font-bold transition-all shadow-2xs flex items-center justify-between cursor-pointer group disabled:opacity-50"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="text-base shrink-0">🚨</span>
+                  <div className="min-w-0">
+                    <div className="font-extrabold text-slate-900 group-hover:text-emerald-900 text-xs truncate">
+                      Curanmor & Kunci Ganda
+                    </div>
+                    <div className="text-[10px] text-slate-500 font-normal truncate">
+                      Riset berita kriminal & soft-selling remote cut-off
+                    </div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all shrink-0" />
+              </button>
+
+              <button
+                type="button"
+                disabled={isLoading}
+                onClick={() => {
+                  if (onScoutGenerateArticle) {
+                    onScoutGenerateArticle('fuel_management', 'fokus kebocoran kencing solar rest area dan sensor BBM Orin')
+                  } else {
+                    onSendBrief(agent.id, 'Buat artikel soft-selling kebocoran BBM armada dan solusi Fuel Sensor Orin')
+                  }
+                }}
+                className="p-2.5 bg-white hover:bg-emerald-50 text-slate-800 hover:text-emerald-900 border border-emerald-200/80 rounded-xl text-left text-xs font-bold transition-all shadow-2xs flex items-center justify-between cursor-pointer group disabled:opacity-50"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="text-base shrink-0">⛽</span>
+                  <div className="min-w-0">
+                    <div className="font-extrabold text-slate-900 group-hover:text-emerald-900 text-xs truncate">
+                      Kebocoran BBM & Kencing Solar
+                    </div>
+                    <div className="text-[10px] text-slate-500 font-normal truncate">
+                      Audit nota manual vs sensor solar presisi Orin
+                    </div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all shrink-0" />
+              </button>
+
+              <button
+                type="button"
+                disabled={isLoading}
+                onClick={() => {
+                  if (onScoutGenerateArticle) {
+                    onScoutGenerateArticle('logistics_tips', 'fokus preventive maintenance berbasis engine hour')
+                  } else {
+                    onSendBrief(agent.id, 'Susun artikel strategi preventive maintenance vs risiko downtime armada truk')
+                  }
+                }}
+                className="p-2.5 bg-white hover:bg-emerald-50 text-slate-800 hover:text-emerald-900 border border-emerald-200/80 rounded-xl text-left text-xs font-bold transition-all shadow-2xs flex items-center justify-between cursor-pointer group disabled:opacity-50"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="text-base shrink-0">🚛</span>
+                  <div className="min-w-0">
+                    <div className="font-extrabold text-slate-900 group-hover:text-emerald-900 text-xs truncate">
+                      Preventive Maintenance Armada
+                    </div>
+                    <div className="text-[10px] text-slate-500 font-normal truncate">
+                      Pola servis berkala vs telemetri Engine Hours
+                    </div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all shrink-0" />
+              </button>
+            </div>
+          </div>
+        )}
+
         {chatHistory.length === 0 ? (
           <div className="text-center py-8 px-4 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
             <Sparkles className="w-8 h-8 text-slate-300 mx-auto mb-2" />
@@ -218,48 +333,135 @@ export default function Sidebar({
               Belum ada interaksi dengan {agent.name}
             </p>
             <p className="text-[11px] text-slate-400 mt-1">
-              Kirimkan brief tugas atau gunakan quick prompt di bawah untuk memulai delegasi.
+              Kirimkan brief tugas atau gunakan tombol generator di atas untuk memulai riset artikel.
             </p>
           </div>
         ) : (
           <div className="space-y-3.5">
-            {chatHistory.map((item, idx) => (
-              <div key={idx} className="space-y-2">
-                {/* User Prompt */}
-                <div className="flex items-start justify-end gap-2">
-                  <div className="bg-slate-900 text-white text-xs p-3 rounded-2xl rounded-tr-xs max-w-[85%] shadow-sm">
-                    {item.message}
-                  </div>
-                </div>
+            {chatHistory.map((item, idx) => {
+              const isArticle = item.article || item.response?.includes('### 🎯') || item.response?.includes('📰 **Scout Engine')
+              const rawText = item.article?.content_markdown || item.response || ''
 
-                {/* Agent Response */}
-                <div className="flex items-start gap-2.5">
-                  <div
-                    className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-black shrink-0 shadow-sm mt-0.5"
-                    style={{ backgroundColor: agentColor }}
-                  >
-                    {agent.name.charAt(0)}
+              return (
+                <div key={idx} className="space-y-2">
+                  {/* User Prompt */}
+                  <div className="flex items-start justify-end gap-2">
+                    <div className="bg-slate-900 text-white text-xs p-3 rounded-2xl rounded-tr-xs max-w-[85%] shadow-sm">
+                      {item.message || item.user}
+                    </div>
                   </div>
-                  <div className="bg-slate-100 text-slate-800 text-xs p-3.5 rounded-2xl rounded-tl-xs max-w-[90%] border border-slate-200/60 leading-relaxed shadow-xs">
-                    <p className="whitespace-pre-line">{item.response}</p>
-                    <span className="text-[9px] font-medium text-slate-400 mt-2 block text-right">
-                      {item.timestamp || 'Baru saja'}
-                    </span>
+
+                  {/* Agent Response */}
+                  <div className="flex items-start gap-2.5">
+                    <div
+                      className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-black shrink-0 shadow-sm mt-0.5"
+                      style={{ backgroundColor: agentColor }}
+                    >
+                      {agent.name.charAt(0)}
+                    </div>
+                    <div className="bg-slate-100 text-slate-800 text-xs p-3.5 rounded-2xl rounded-tl-xs max-w-[92%] border border-slate-200/60 leading-relaxed shadow-xs relative">
+                      {isArticle ? (
+                        <div className="space-y-2.5">
+                          {/* Article Header Card */}
+                          <div className="flex items-center justify-between pb-2 border-b border-emerald-200/80">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-emerald-600 text-white uppercase tracking-wider">
+                                {item.article?.category || 'Strategi Konten Orin'}
+                              </span>
+                              <span className="text-[10px] text-slate-500 font-medium">
+                                {item.article?.read_time || '5 mnt baca'}
+                              </span>
+                            </div>
+                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                              5 Babak Narasi
+                            </span>
+                          </div>
+
+                          {/* Title */}
+                          <h4 className="text-xs font-black text-slate-900 leading-snug">
+                            {item.article?.title || 'Draf Copywriting Strategis Scout'}
+                          </h4>
+
+                          {/* Excerpt / Hook Preview */}
+                          <p className="text-[11px] text-slate-600 italic bg-white/80 p-2.5 rounded-xl border border-slate-200/70 leading-relaxed">
+                            "{item.article?.excerpt || item.article?.hook || item.response?.slice(0, 140)}..."
+                          </p>
+
+                          {/* 5-Babak Flow Badges */}
+                          <div className="grid grid-cols-2 gap-1 text-[9px] font-semibold text-slate-600">
+                            <span className="bg-white/60 px-2 py-1 rounded border border-slate-200/50">1. Hook & Realita</span>
+                            <span className="bg-white/60 px-2 py-1 rounded border border-slate-200/50">2. Bedah Masalah</span>
+                            <span className="bg-white/60 px-2 py-1 rounded border border-slate-200/50">3. Edukasi Preventif</span>
+                            <span className="bg-white/60 px-2 py-1 rounded border border-slate-200/50 text-emerald-700 font-bold">4. Soft-Selling Orin</span>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex items-center gap-1.5 pt-1">
+                            <button
+                              type="button"
+                              onClick={() => setReaderArticle(item.article || { title: item.article?.title || 'Draf Naskah Scout', content_markdown: rawText })}
+                              className="flex-1 flex items-center justify-center gap-1.5 py-2 px-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-[11px] font-bold rounded-xl shadow-xs transition-all cursor-pointer shrink-0 whitespace-nowrap"
+                            >
+                              <Eye className="w-3.5 h-3.5 shrink-0" />
+                              <span className="whitespace-nowrap">Baca Lengkap</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => copyText(rawText, `chat-copy-${idx}`)}
+                              className="flex items-center justify-center gap-1 py-2 px-2.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-[11px] font-bold rounded-xl transition-all cursor-pointer shrink-0 whitespace-nowrap"
+                              title="Salin Naskah Markdown"
+                            >
+                              {copiedIdx === `chat-copy-${idx}` ? (
+                                <>
+                                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                                  <span className="text-emerald-700 whitespace-nowrap">Tersalin</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                                  <span className="whitespace-nowrap">Salin</span>
+                                </>
+                              )}
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={onOpenDashboardModal}
+                              className="p-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl transition-all cursor-pointer shrink-0"
+                              title="Buka di Dashboard Penuh"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="whitespace-pre-line">{item.response}</p>
+                      )}
+
+                      <span className="text-[9px] font-medium text-slate-400 mt-2 block text-right">
+                        {item.timestamp || item.time || 'Baru saja'}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
 
         {/* Loading Spinner during task delegation */}
         {isLoading && (
-          <div className="flex items-center gap-2 text-slate-500 text-xs bg-slate-50 p-3 rounded-xl border border-slate-200 animate-pulse">
+          <div className="flex items-center gap-2 text-slate-600 text-xs bg-emerald-50/80 p-3 rounded-xl border border-emerald-200 animate-pulse">
             <div
               className="w-3.5 h-3.5 border-2 border-t-transparent rounded-full animate-spin shrink-0"
               style={{ borderColor: agentColor, borderTopColor: 'transparent' }}
             />
-            <span>{agent.name} sedang memproses brief dan menganalisis tugas...</span>
+            <span>
+              {agent.id === 'scout'
+                ? 'Scout sedang memindai berita aktual (Detik, Suara Surabaya, Pilar Media) dan meracik draf copywriting 5 babak...'
+                : `${agent.name} sedang memproses brief dan menganalisis tugas...`}
+            </span>
           </div>
         )}
       </div>
@@ -308,6 +510,80 @@ export default function Sidebar({
           </button>
         </form>
       </div>
+
+      {/* --- Full Article Reader Modal --- */}
+      {readerArticle && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[85vh] flex flex-col border border-slate-200 animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 uppercase tracking-wide">
+                  {readerArticle.category || 'Artikel Edukatif Scout'}
+                </span>
+                <span className="text-xs text-slate-400 font-medium">
+                  {readerArticle.read_time || '5 menit baca'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => copyText(readerArticle.content_markdown || readerArticle.title, 'modal-copy')}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all cursor-pointer shrink-0 whitespace-nowrap"
+                >
+                  {copiedIdx === 'modal-copy' ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span className="whitespace-nowrap">Tersalin!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                      <span className="whitespace-nowrap">Salin Naskah</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setReaderArticle(null)}
+                  className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer shrink-0"
+                >
+                  <X className="w-5 h-5 shrink-0" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto space-y-4">
+              <h2 className="text-lg font-black text-slate-900 leading-snug">
+                {readerArticle.title}
+              </h2>
+              {readerArticle.excerpt && (
+                <p className="text-xs font-medium text-slate-600 italic bg-slate-50 p-3.5 rounded-2xl border border-slate-100 leading-relaxed">
+                  "{readerArticle.excerpt}"
+                </p>
+              )}
+              <div className="prose prose-slate max-w-none text-xs leading-relaxed space-y-3 pt-2 text-slate-800 whitespace-pre-line">
+                {readerArticle.content_markdown || readerArticle.response}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 border-t border-slate-100 bg-slate-50/70 flex items-center justify-between text-xs rounded-b-3xl shrink-0">
+              <span className="text-[11px] text-slate-400 font-medium">
+                Draf copywriting terstruktur 5-babak dengan soft-selling Orin
+              </span>
+              <button
+                type="button"
+                onClick={() => setReaderArticle(null)}
+                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-xs transition-all cursor-pointer shrink-0 whitespace-nowrap"
+              >
+                <span className="whitespace-nowrap">Selesai Membaca</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
         </>
       )}
     </div>

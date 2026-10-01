@@ -10,7 +10,10 @@ import { GoogleMapsFloatingWidget } from './components/GoogleMapsViewControl'
 import {
   RotateCcw,
   Palette,
-  Settings
+  Settings,
+  Layers,
+  Zap,
+  Bot
 } from 'lucide-react'
 
 // 5-Agent Collaborative Ecosystem: Frontline (Sherloc), Escalation (Watson), CS Telemetry (Nara), Marketing (Velocia), Research (Scout)
@@ -91,19 +94,37 @@ const INITIAL_AGENTS = [
   {
     id: 'scout',
     name: 'Scout',
-    role: 'Knowledge & Tutorial Writer',
-    role_badge: 'RESEARCHER',
+    role: 'Content Creator Manager & Strategic Copywriter',
+    role_badge: 'CONTENT STRATEGIST',
     status: 'available',
     color: '#22c55e',
     color_name: 'Solid Green',
     position: [3.35, 0, -3.69],
     rotation: [0, 0, 0], // Facing North (+Z) alongside Velocia
     model: 'gpt-4o-mini',
-    description: 'Menganalisis isu berulang dari log chat Sherloc (lupa password, riwayat rute) dan menghasilkan draf panduan/tutorial baru untuk SOP Sherloc.',
+    description: 'Content Creator Manager & Strategic Copywriter di ekosistem Orin. Meriset berita kriminalitas & logistik, menyusun strategi tema, dan menulis artikel berdaya konversi tinggi dengan soft-selling Orin yang elegan.',
     quick_prompts: [
-      'Analisis isu teknis berulang dari log chat customer',
-      'Tulis draf panduan SOP: Pemulihan Akun & Reset GPS',
-      'Riset 3 tren AI Agent & Autonomous Support 2026'
+      'Riset berita curanmor terkini & buat artikel: Mengapa Kunci Ganda Tak Lagi Cukup',
+      'Buat artikel soft-selling: Kebocoran BBM armada logistik & solusi Fuel Sensor Orin',
+      'Susun strategi artikel: Preventive maintenance vs risiko downtime armada truk'
+    ]
+  },
+  {
+    id: 'coo',
+    name: 'COO',
+    role: 'Chief Operating Officer & Executive Orchestrator',
+    role_badge: 'COO - Executive Orchestrator',
+    status: 'working',
+    color: '#334155',
+    color_name: 'Executive Charcoal',
+    position: [-1.8, 0, 0.8],
+    rotation: [0, Math.PI, 0],
+    model: 'gpt-4o-mini',
+    description: 'Pimpinan operasional & master delegator Virtual Office Orin. Menerima instruksi Direktur via Telegram Bot pribadi, memecah tugas, mendelegasikannya ke spesialis (Nara, Scout, Watson, Sherloc, Velocia), memantau latar belakang, dan melapor kembali secara proaktif.',
+    quick_prompts: [
+      'Cek status Nara dan suruh Scout cari bahan artikel curanmor',
+      'Instruksikan audit telemetri unit offline & evaluasi aturan CAM',
+      'Minta Velocia kaji tren pasar dan Scout siapkan draf promosi BBM'
     ]
   }
 ]
@@ -151,10 +172,10 @@ const INITIAL_TASKS = [
   },
   {
     id: 'task-5',
-    title: 'Draf Tutorial SOP: Reset Password & Riwayat GPS',
+    title: 'Artikel: Maraknya Curanmor & Mengapa Kunci Ganda Tak Cukup',
     agent_id: 'scout',
     agent_name: 'Scout',
-    role_badge: 'RESEARCHER',
+    role_badge: 'CONTENT STRATEGIST',
     status: 'DONE',
     updated_at: 'Draf terbit'
   },
@@ -214,6 +235,7 @@ export default function App() {
   const [zoomTrigger, setZoomTrigger] = useState(null)
   const [backendStatus, setBackendStatus] = useState('checking')
   const [tasks, setTasks] = useState(INITIAL_TASKS)
+  const [isKanbanOpen, setIsKanbanOpen] = useState(false)
   const [chatHistory, setChatHistory] = useState({
     sherloc: [],
     watson: [],
@@ -422,6 +444,9 @@ export default function App() {
   // Handle task brief submission
   const handleSendBrief = async (agentId, message) => {
     setIsLoadingBrief(true)
+    if (agentId === 'scout') {
+      handleUpdateAgentStatus('scout', 'working')
+    }
 
     const tempTaskId = `task-${Date.now()}`
     const tempTask = {
@@ -447,7 +472,7 @@ export default function App() {
           ...prev,
           [agentId]: [
             ...(prev[agentId] || []),
-            { user: message, response: data.response, time: 'Baru saja' }
+            { message: message, user: message, response: data.response, time: 'Baru saja', timestamp: 'Baru saja' }
           ]
         }))
 
@@ -471,14 +496,14 @@ export default function App() {
         } else if (agentId === 'velocia') {
           fallbackResponse = `🎯 [Velocia Growth Strategy]\nBrief "${message}" telah dipetakan ke dalam analisis tren permintaan pasar dari log chat Sherloc (permintaan fuel sensor & GPS tracker mini melonjak).`
         } else {
-          fallbackResponse = `📰 [Scout Knowledge & Tutorial Lab]\nSintesis informasi untuk "${message}" berhasil dikompilasi. Draf panduan SOP tutorial penanganan isu berulang siap ditambahkan ke knowledge base Sherloc.`
+          fallbackResponse = `📰 **Scout Engine: Draf Copywriting Strategis**\n\n### 🎯 **Maraknya Aksi Curanmor di Area Parkir Terbuka: Pola Waktu Rawan dan Mengapa Kunci Ganda Saja Tak Lagi Cukup**\n*Gembok fisik dan kunci setang hanya menunda pencuri hitungan detik. Ketika proteksi mekanik gagal, pelacak digital tersembunyi menjadi jaring pengaman terakhir yang logis.*\n\n**1. Hook & Realita Lapangan:**\nLaporan curanmor kembali mendominasi berita radio Suara Surabaya dan Detik News. Pelaku hanya butuh 3—10 detik melumpuhkan kunci kontak motor di area parkir terbuka.\n\n**2. Bedah Modus & Akar Masalah:**\nKunci setang dan gembok fisik dengan mudah dilumpuhkan dengan kunci T baja modifikasi atau cairan kimia perontok. Kelemahan fatalnya: tidak ada peringatan seketika saat pembobolan terjadi.\n\n**3. Pilar Edukasi Preventif:**\nParkir di area terang ber-CCTV, gunakan gembok berbahan boron carbide, dan pasang pelacak digital independen.\n\n**4. Solusi Teknologi Orin:**\nORIN GPS Tracker dilengkapi Live Tracking Google Maps & Remote Engine Cut-Off untuk mematikan mesin dari jauh, serta ORIN Tag² plug-and-play Apple Find My.\n\n**5. Call-to-Action (CTA):**\nKonsultasikan kebutuhan pengamanan armada atau kendaraan Anda di orin.id sekarang juga.`
         }
 
         setChatHistory((prev) => ({
           ...prev,
           [agentId]: [
             ...(prev[agentId] || []),
-            { user: message, response: fallbackResponse, time: 'Baru saja' }
+            { message: message, user: message, response: fallbackResponse, time: 'Baru saja', timestamp: 'Baru saja' }
           ]
         }))
 
@@ -490,6 +515,77 @@ export default function App() {
       }, 900)
     } finally {
       setIsLoadingBrief(false)
+      if (agentId === 'scout') {
+        setTimeout(() => {
+          handleUpdateAgentStatus('scout', 'available')
+        }, 1200)
+      }
+    }
+  }
+
+  // Dedicated Scout Article Generation handler with 3D avatar & Kanban synchronization
+  const handleScoutGenerateArticle = async (topic, customInstructions = '') => {
+    setIsLoadingBrief(true)
+    handleUpdateAgentStatus('scout', 'working')
+
+    const tempTaskId = `task-${Date.now()}`
+    const cleanTopic = topic || 'curanmor'
+    const tempTask = {
+      id: tempTaskId,
+      title: `Riset Berita & Draf Artikel: ${cleanTopic.length > 22 ? cleanTopic.slice(0, 19) + '...' : cleanTopic}`,
+      agent_id: 'scout',
+      agent_name: 'Scout',
+      role_badge: 'CONTENT STRATEGIST',
+      status: 'IN PROGRESS',
+      updated_at: 'Baru saja'
+    }
+    setTasks((prev) => [tempTask, ...prev])
+
+    try {
+      const res = await fetch(`${backendUrl}/api/scout/generate-article`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic: cleanTopic, custom_instructions: customInstructions })
+      })
+
+      if (res.ok) {
+        const article = await res.json()
+        const sources = article.harvested_sources || []
+        const sourcesText = sources.map((s) => `${s.source}`).slice(0, 3).join(', ')
+
+        const formattedResponse = `📰 **Scout Engine: Draf Copywriting Strategis Selesai**\n\n### 🎯 **${article.title}**\n*${article.excerpt}*\n\n**1. Hook & Realita Lapangan:**\n${article.hook}\n\n**2. Bedah Modus & Celah Masalah:**\n${article.problem_analysis}\n\n**3. Pilar Edukasi Preventif Objektif:**\n${article.educational_solution}\n\n**4. Solusi Teknologi & Soft-Selling Orin:**\n${article.soft_selling}\n\n**5. Call-to-Action (CTA):**\n${article.cta}\n\n---\n📊 **Metadata SEO & Distribusi:**\n• **Kategori**: \`${article.category}\` | **Estimasi Baca**: \`${article.read_time}\`\n• **Target Keywords**: \`${(article.keywords || []).slice(0, 4).join(', ')}\`\n• **Rujukan Berita Aktual Terpantau**: ${sourcesText || 'Detik News, Suara Surabaya, Pilar Media'}\n\n*(Draf naskah lengkap telah disinkronkan ke tab Articles Scout dan siap disalin/diterbitkan)*`
+
+        setChatHistory((prev) => ({
+          ...prev,
+          scout: [
+            ...(prev.scout || []),
+            {
+              message: `Riset Berita & Tulis Artikel: ${cleanTopic}`,
+              user: `Riset Berita & Tulis Artikel: ${cleanTopic}`,
+              response: formattedResponse,
+              time: 'Baru saja',
+              timestamp: 'Baru saja',
+              article: article
+            }
+          ]
+        }))
+
+        setTasks((prev) =>
+          prev.map((t) =>
+            t.id === tempTaskId ? { ...t, status: 'DONE', updated_at: 'Selesai' } : t
+          )
+        )
+      } else {
+        throw new Error('Gagal memanggil Scout API')
+      }
+    } catch (err) {
+      console.warn('Scout generate article error, calling brief fallback:', err)
+      await handleSendBrief('scout', `Riset berita dan buat naskah artikel tentang ${cleanTopic}`)
+    } finally {
+      setIsLoadingBrief(false)
+      setTimeout(() => {
+        handleUpdateAgentStatus('scout', 'available')
+      }, 1200)
     }
   }
 
@@ -502,122 +598,135 @@ export default function App() {
     <div className="relative w-screen h-screen overflow-hidden bg-[#eef2f6]">
       {/* --- TOP HEADER OVERLAY (OFFICE VIEW ONLY) --- */}
       {viewMode === 'office' && (
-        <header className="fixed top-0 left-0 right-0 z-30 pointer-events-none p-4 sm:p-6 flex items-start justify-between">
-          {/* Top-Left Stack: AI Agent Card + Vertical Collapsible Kanban Bar (Shared exact width) */}
-          <div className="flex flex-col items-start gap-2.5 w-80 sm:w-[350px] pointer-events-none">
-            {/* Top-Left Panel with Large Close-Up Avatar */}
-            <div className="pointer-events-auto w-full flex items-center gap-3.5 bg-white/95 backdrop-blur-xl p-2.5 pr-4 rounded-2xl shadow-xl border border-slate-200/80 hover:shadow-2xl transition-all">
+        <>
+          <header className="fixed top-3 left-3 right-3 sm:top-4 sm:left-6 sm:right-6 z-30 pointer-events-none flex items-center justify-between gap-3">
+            {/* Left: Brand & Focused Agent Badge */}
+            <div className="pointer-events-auto flex items-center gap-2.5 bg-white/90 backdrop-blur-xl px-3 py-1.5 rounded-2xl shadow-lg border border-slate-200/80 hover:shadow-xl transition-all">
               <AgentCloseUpAvatar
                 agent={displayedAgent}
-                size={52}
+                size={38}
                 showStatus={true}
                 onClick={handleCycleAgent}
               />
-
-              <div className="flex flex-col justify-center min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <h1 className="text-sm font-black text-slate-900 tracking-tight truncate">
-                    VIRTUAL OFFICE AI
-                  </h1>
+              <div className="flex flex-col justify-center min-w-0 pr-1">
+                <div className="flex items-center gap-1.5">
+                  <h1 className="text-xs font-black text-slate-900 tracking-tight">ORIN OFFICE</h1>
                   <span
-                    className="text-[10px] font-extrabold px-1.5 py-0.5 rounded text-white shadow-2xs tracking-wide shrink-0"
+                    className="text-[9px] font-extrabold px-1.5 py-0.2 rounded-full text-white shadow-2xs tracking-wide shrink-0"
                     style={{ backgroundColor: displayedAgent.color }}
                   >
                     {displayedAgent.name}
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-500 font-semibold flex items-center gap-1.5 mt-0.5 truncate">
-                  <span className="truncate">{displayedAgent.role_badge || displayedAgent.role}</span>
-                  <span className="text-slate-300">&bull;</span>
-                  <span className="text-slate-400 font-normal shrink-0">Klik avatar untuk rotasi</span>
+                <p className="text-[10px] text-slate-500 font-medium truncate flex items-center gap-1">
+                  <span>{displayedAgent.role_badge || displayedAgent.role}</span>
+                  <span className="text-slate-300 hidden sm:inline">&bull;</span>
+                  <span className="text-slate-400 font-normal hidden sm:inline">Klik untuk rotasi</span>
                 </p>
               </div>
             </div>
 
-            {/* Vertical Collapsible Kanban Bar directly underneath */}
-            <KanbanBar
-              tasks={tasks}
-              onSelectAgentById={handleSelectAgentById}
-            />
-          </div>
-
-          {/* Quick Agent Jump & Status */}
-          <div className="pointer-events-auto flex items-center gap-2">
-            {/* Quick Agent Jump Buttons */}
-            <div className="hidden md:flex items-center gap-1.5 bg-white/90 backdrop-blur-xl p-1.5 rounded-2xl shadow-lg border border-slate-200/80">
+            {/* Center: Quick Agent Switcher (Desktop/Tablet) */}
+            <div className="pointer-events-auto hidden md:flex items-center gap-1 bg-white/90 backdrop-blur-xl p-1 rounded-2xl shadow-lg border border-slate-200/80">
               {agents.map((agent) => {
-                const isCurrent = selectedAgent?.id === agent.id
+                const isCurrent = (selectedAgent?.id || displayedAgent?.id) === agent.id
                 return (
                   <button
                     key={agent.id}
                     onClick={() => handleSelectAgent(agent)}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       isCurrent
-                        ? 'bg-slate-900 text-white shadow-sm'
-                        : 'text-slate-600 hover:bg-slate-100'
+                        ? 'bg-slate-900 text-white shadow-xs'
+                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                     }`}
                   >
                     <span
-                      className="w-2.5 h-2.5 rounded-full"
+                      className="w-2 h-2 rounded-full shrink-0"
                       style={{ backgroundColor: agent.color }}
                     />
-                    {agent.name}
+                    <span>{agent.name}</span>
                   </button>
                 )
               })}
             </div>
 
-            {/* Settings Page Button (Gear icon) */}
-            <button
-              onClick={() => setViewMode('settings')}
-              className="p-2.5 bg-white/90 backdrop-blur-xl hover:bg-white text-slate-600 hover:text-slate-900 rounded-2xl shadow-lg border border-slate-200/80 transition-all active:scale-95 cursor-pointer"
-              title="Buka Pengaturan Sistem & Workspace"
-            >
-              <Settings className="w-4 h-4" />
-            </button>
+            {/* Right: Actions (Kanban, Local LLM Status, Settings, Reset Camera) */}
+            <div className="pointer-events-auto flex items-center gap-2">
+              {/* Kanban Toggle Button */}
+              <button
+                onClick={() => setIsKanbanOpen(!isKanbanOpen)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-2xl text-xs font-bold transition-all shadow-lg border cursor-pointer active:scale-95 ${
+                  isKanbanOpen
+                    ? 'bg-slate-900 text-white border-slate-900 ring-2 ring-slate-900/20'
+                    : 'bg-white/90 backdrop-blur-xl text-slate-700 hover:bg-white border-slate-200/80'
+                }`}
+                title="Buka / Tutup Workflow Kanban Board"
+              >
+                <Layers className="w-4 h-4 text-indigo-500" />
+                <span className="hidden sm:inline font-extrabold">Kanban</span>
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono font-bold ${
+                  isKanbanOpen ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-800'
+                }`}>
+                  {tasks.length}
+                </span>
+                {tasks.filter((t) => (t.status || '') === 'IN PROGRESS').length > 0 && (
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                  </span>
+                )}
+              </button>
 
-            {/* Reset Camera View Button */}
-            <button
-              onClick={() => {
-                handleSelectAgent(null)
-                setCameraResetCounter((c) => c + 1)
-              }}
-              className="p-2.5 bg-white/90 backdrop-blur-xl hover:bg-white text-slate-600 hover:text-slate-900 rounded-2xl shadow-lg border border-slate-200/80 transition-all active:scale-95 cursor-pointer"
-              title="Reset Posisi Kamera ke Default"
-            >
-              <RotateCcw className="w-4 h-4" />
-            </button>
+              {/* Local LLM / Ollama Status Badge */}
+              <div
+                onClick={() => setViewMode('settings')}
+                className="hidden sm:flex items-center gap-2 px-3 py-2 bg-white/90 backdrop-blur-xl rounded-2xl shadow-lg border border-slate-200/80 cursor-pointer hover:bg-white transition-all group"
+                title="Local AI Engine: Gemma 3 (12B) Online via Ollama. Klik untuk membuka pengaturan."
+              >
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                </span>
+                <span className="text-xs font-bold text-slate-800 group-hover:text-emerald-700 transition-colors">
+                  Ollama (12B)
+                </span>
+              </div>
 
-            {/* Backend Connection Status Badge */}
-            <div className="flex items-center gap-2 px-3.5 py-2.5 bg-white/90 backdrop-blur-xl rounded-2xl shadow-lg border border-slate-200/80">
-              {backendStatus === 'crewai_live' ? (
-                <>
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                  </span>
-                  <span className="text-xs font-bold text-slate-800">
-                    CrewAI Live
-                  </span>
-                </>
-              ) : backendStatus === 'connected' ? (
-                <>
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                  <span className="text-xs font-bold text-slate-800">
-                    Backend Connected
-                  </span>
-                </>
-              ) : (
-                <>
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
-                  <span className="text-xs font-bold text-slate-700">
-                    Simulation Mode
-                  </span>
-                </>
-              )}
+              {/* Settings Page Button (Gear icon) */}
+              <button
+                onClick={() => setViewMode('settings')}
+                className="p-2.5 bg-white/90 backdrop-blur-xl hover:bg-white text-slate-600 hover:text-slate-900 rounded-2xl shadow-lg border border-slate-200/80 transition-all active:scale-95 cursor-pointer"
+                title="Buka Pengaturan Sistem & Workspace"
+              >
+                <Settings className="w-4 h-4" />
+              </button>
+
+              {/* Reset Camera View Button */}
+              <button
+                onClick={() => {
+                  handleSelectAgent(null)
+                  setCameraResetCounter((c) => c + 1)
+                }}
+                className="p-2.5 bg-white/90 backdrop-blur-xl hover:bg-white text-slate-600 hover:text-slate-900 rounded-2xl shadow-lg border border-slate-200/80 transition-all active:scale-95 cursor-pointer"
+                title="Reset Posisi Kamera ke Default"
+              >
+                <RotateCcw className="w-4 h-4" />
+              </button>
             </div>
-          </div>
-        </header>
+          </header>
+
+          {/* Floating Kanban Bar (Smooth animated dropdown beneath top-left / navbar) */}
+          {isKanbanOpen && (
+            <div className="fixed top-18 left-3 sm:left-6 z-30 w-80 sm:w-[360px] animate-in fade-in slide-in-from-top-3 duration-200">
+              <KanbanBar
+                tasks={tasks}
+                onSelectAgentById={handleSelectAgentById}
+                isExpanded={true}
+                onClose={() => setIsKanbanOpen(false)}
+              />
+            </div>
+          )}
+        </>
       )}
 
       {/* If in Settings Page Mode, render the dedicated SettingsPageView */}
@@ -638,6 +747,7 @@ export default function App() {
           onBackToOffice={() => setViewMode('office')}
           onOpenCall={handleOpenCall}
           onSendBrief={handleSendBrief}
+          onScoutGenerateArticle={handleScoutGenerateArticle}
           onSelectAvatarType={handleSelectAvatarType}
           onUpdateAgentModel={handleUpdateAgentModel}
           onUpdateAgentColor={handleUpdateAgentColor}
@@ -659,18 +769,20 @@ export default function App() {
             />
 
             {/* --- GOOGLE MAPS FLOATING CONTROLS (RIGHT SIDE) --- */}
-            <GoogleMapsFloatingWidget
-              cameraViewMode={cameraViewMode}
-              onToggleViewMode={() =>
-                setCameraViewMode((prev) => (prev === 'isometric' ? 'top_down' : 'isometric'))
-              }
-              onResetCamera={() => {
-                handleSelectAgent(null)
-                setCameraResetCounter((c) => c + 1)
-              }}
-              onZoomIn={() => setZoomTrigger({ action: 'in', id: Date.now() })}
-              onZoomOut={() => setZoomTrigger({ action: 'out', id: Date.now() })}
-            />
+            {!isSidebarOpen && (
+              <GoogleMapsFloatingWidget
+                cameraViewMode={cameraViewMode}
+                onToggleViewMode={() =>
+                  setCameraViewMode((prev) => (prev === 'isometric' ? 'top_down' : 'isometric'))
+                }
+                onResetCamera={() => {
+                  handleSelectAgent(null)
+                  setCameraResetCounter((c) => c + 1)
+                }}
+                onZoomIn={() => setZoomTrigger({ action: 'in', id: Date.now() })}
+                onZoomOut={() => setZoomTrigger({ action: 'out', id: Date.now() })}
+              />
+            )}
           </main>
 
           {/* --- SIDEBAR AGENT PROFILE & BRIEF --- */}
@@ -687,6 +799,7 @@ export default function App() {
                 setIsSidebarOpen(false)
               }}
               onSendBrief={handleSendBrief}
+              onScoutGenerateArticle={handleScoutGenerateArticle}
               chatHistory={chatHistory[selectedAgent.id] || []}
               isLoading={isLoadingBrief}
               onSelectAvatarType={handleSelectAvatarType}

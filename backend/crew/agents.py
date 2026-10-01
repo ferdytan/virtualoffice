@@ -100,23 +100,49 @@ AGENTS_METADATA = {
     "scout": {
         "id": "scout",
         "name": "Scout",
-        "role": "News Researcher & Writer",
-        "role_badge": "RESEARCHER",
+        "role": "Content Creator Manager & Strategic Copywriter",
+        "role_badge": "CONTENT STRATEGIST",
         "color": "#22c55e",
         "color_name": "Solid Green",
         "position": [3.35, 0, -3.69],
         "rotation": [0, 0, 0],
         "model": os.getenv("OPENAI_MODEL_NAME", "gpt-4o-mini"),
-        "description": "Bertanggung jawab meriset tren industri, menyusun draf SOP panduan mandiri customer, dan menulis artikel.",
-        "goal": "Meneliti tren industri terdepan, memverifikasi wawasan teknologi & pasar terkini, serta menghasilkan draf panduan SOP mandiri untuk mengurangi beban CS.",
+        "description": "Content Creator Manager & Strategic Copywriter di ekosistem Orin. Meriset berita kriminalitas & logistik, menyusun strategi tema, dan menulis artikel berdaya konversi tinggi dengan soft-selling Orin yang elegan.",
+        "goal": "Meriset fenomena aktual industri kendaraan/logistik dan mengubahnya menjadi artikel edukatif bernilai tinggi dengan soft-selling Orin yang elegan.",
         "backstory": (
-            "Scout adalah agen riset analitis yang gemar menjelajah informasi global, "
-            "menyaring sinyal pasar penting, dan merumuskan SOP pemecahan masalah berulang dari log komplain customer."
+            "Anda adalah Scout, otak kreatif dan kurator konten di Orin. Anda memiliki radar tajam "
+            "terhadap tren berita pencurian, isu BBM armada, dan dinamika logistik. Anda tidak pernah "
+            "sekadar merangkum berita, melainkan membongkar pola masalah dan menghadirkan solusi teknologi "
+            "pelacakan Orin sebagai jawaban logis bagi pembaca."
         ),
         "quick_prompts": [
-            "Identifikasi 3 keluhan pelanggan berulang dan buatkan SOP mandiri",
-            "Riset 3 tren AI Agent terbaru minggu ini",
-            "Tulis draf artikel blog: Masa Depan Virtual Office 3D"
+            "Riset berita curanmor terkini & buat artikel: Mengapa Kunci Ganda Tak Lagi Cukup",
+            "Buat artikel soft-selling: Kebocoran BBM armada logistik & solusi Fuel Sensor Orin",
+            "Susun strategi artikel: Preventive maintenance vs risiko downtime armada truk"
+        ]
+    },
+    "coo": {
+        "id": "coo",
+        "name": "COO",
+        "role": "Chief Operating Officer & Executive Orchestrator",
+        "role_badge": "EXECUTIVE COO",
+        "color": "#334155",
+        "color_name": "Executive Charcoal",
+        "position": [-1.8, 0, 0.8],
+        "rotation": [0, 3.14159265, 0],
+        "model": os.getenv("OPENAI_MODEL_NAME", "gpt-4o-mini"),
+        "description": "Pimpinan operasional & master delegator Virtual Office Orin. Menerima instruksi Direktur via Telegram Bot pribadi, memecah tugas, mendelegasikannya ke spesialis (Nara, Scout, Watson, Sherloc, Velocia), memantau latar belakang, dan melapor kembali secara proaktif.",
+        "goal": "Menerjemahkan instruksi Direktur, mendelegasikan tugas ke spesialis (Nara, Scout, Watson, Sherloc, Velocia), memantau penyelesaian tugas di background, dan menyusun laporan ringkas berkualitas tinggi.",
+        "backstory": (
+            "Anda adalah COO dari Virtual Office Orin. Anda bertanggung jawab penuh atas kelancaran "
+            "seluruh unit kerja. Anda tidak mengerjakan riset atau penulisan teknis secara langsung, "
+            "melainkan mengarahkan Nara untuk telemetri unit, Scout untuk konten, Watson untuk eskalasi tim, "
+            "dan Velocia untuk strategi pasar. Anda selalu melapor secara lugas, berbasis data, dan terstruktur."
+        ),
+        "quick_prompts": [
+            "Cek status Nara dan suruh Scout cari bahan artikel curanmor",
+            "Instruksikan audit telemetri unit offline & evaluasi aturan CAM",
+            "Minta Velocia kaji tren pasar dan Scout siapkan draf promosi BBM"
         ]
     }
 }
@@ -127,6 +153,44 @@ try:
     CREWAI_AVAILABLE = True
 except ImportError:
     logger.warning("CrewAI is not installed or unavailable. Using fallback smart responses.")
+
+# Import Scout specialized tools
+from .tools import harvest_news_topics_tool, fetch_orin_style_guide_tool
+
+# Global agent instances (initialized if credentials/runtime permit)
+scout = None
+coo_agent = None
+
+if CREWAI_AVAILABLE:
+    try:
+        _api_key = os.getenv("OPENAI_API_KEY")
+        if _api_key and not _api_key.startswith("your_openai"):
+            scout = Agent(
+                role="Content Creator Manager & Strategic Copywriter",
+                goal="Meriset fenomena aktual industri kendaraan/logistik dan mengubahnya menjadi artikel edukatif bernilai tinggi dengan soft-selling Orin yang elegan.",
+                backstory=(
+                    "Anda adalah Scout, otak kreatif dan kurator konten di Orin. Anda memiliki radar tajam "
+                    "terhadap tren berita pencurian, isu BBM armada, dan dinamika logistik. Anda tidak pernah "
+                    "sekadar merangkum berita, melainkan membongkar pola masalah dan menghadirkan solusi teknologi "
+                    "pelacakan Orin sebagai jawaban logis bagi pembaca."
+                ),
+                tools=[harvest_news_topics_tool, fetch_orin_style_guide_tool],
+                verbose=True
+            )
+            coo_agent = Agent(
+                role="Chief Operating Officer & Executive Orchestrator",
+                goal="Menerjemahkan instruksi Direktur, mendelegasikan tugas ke spesialis (Nara, Scout, Watson, Sherloc, Velocia), memantau penyelesaian tugas di background, dan menyusun laporan ringkas berkualitas tinggi.",
+                backstory=(
+                    "Anda adalah COO dari Virtual Office Orin. Anda bertanggung jawab penuh atas kelancaran "
+                    "seluruh unit kerja. Anda tidak mengerjakan riset atau penulisan teknis secara langsung, "
+                    "melainkan mengarahkan Nara untuk telemetri unit, Scout untuk konten, Watson untuk eskalasi tim, "
+                    "dan Velocia untuk strategi pasar. Anda selalu melapor secara lugas, berbasis data, dan terstruktur."
+                ),
+                allow_delegation=True,
+                verbose=True
+            )
+    except Exception as _e:
+        logger.debug(f"Global agent pre-init notice: {_e}")
 
 
 def create_crewai_agent(agent_id: str) -> Optional[Any]:
@@ -142,12 +206,17 @@ def create_crewai_agent(agent_id: str) -> Optional[Any]:
         return None
 
     try:
-        # Sherloc and Velocia are team coordinators who can delegate
-        can_delegate = agent_id.lower() in ("sherloc", "velocia")
+        # COO, Sherloc and Velocia are team coordinators who can delegate
+        can_delegate = agent_id.lower() in ("coo", "sherloc", "velocia")
+        tools = []
+        if agent_id.lower() == "scout":
+            tools = [harvest_news_topics_tool, fetch_orin_style_guide_tool]
+
         agent = Agent(
             role=meta["role"],
             goal=meta["goal"],
             backstory=meta["backstory"],
+            tools=tools,
             verbose=True,
             memory=True,
             allow_delegation=can_delegate

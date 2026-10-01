@@ -239,9 +239,9 @@ export default function CallModal({
             <button
               type="submit"
               disabled={isLoading || !inputSpeech.trim()}
-              className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
+              className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shrink-0 whitespace-nowrap cursor-pointer"
             >
-              <Send className="w-3.5 h-3.5" /> Kirim
+              <Send className="w-3.5 h-3.5 shrink-0" /> <span className="whitespace-nowrap">Kirim</span>
             </button>
           </form>
 
@@ -249,22 +249,22 @@ export default function CallModal({
             {/* Mute Button */}
             <button
               onClick={() => setIsMuted(!isMuted)}
-              className={`p-3.5 rounded-full transition-all ${
+              className={`p-3.5 rounded-full transition-all cursor-pointer shrink-0 ${
                 isMuted
                   ? 'bg-amber-100 text-amber-600 hover:bg-amber-200'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
               title={isMuted ? 'Unmute' : 'Mute'}
             >
-              {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+              {isMuted ? <MicOff className="w-5 h-5 shrink-0" /> : <Mic className="w-5 h-5 shrink-0" />}
             </button>
 
             {/* End Call Button */}
             <button
               onClick={onClose}
-              className="flex items-center gap-2 px-6 py-3.5 bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold text-xs uppercase tracking-wider rounded-full shadow-lg shadow-red-500/25 transition-all"
+              className="flex items-center gap-2 px-6 py-3.5 bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold text-xs uppercase tracking-wider rounded-full shadow-lg shadow-red-500/25 transition-all shrink-0 whitespace-nowrap cursor-pointer"
             >
-              <PhoneOff className="w-4 h-4" /> Akhiri Panggilan
+              <PhoneOff className="w-4 h-4 shrink-0" /> <span className="whitespace-nowrap">Akhiri Panggilan</span>
             </button>
           </div>
         </div>

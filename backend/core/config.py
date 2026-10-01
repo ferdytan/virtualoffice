@@ -42,6 +42,11 @@ OPENAI_MODEL_NAME = get_env_cleaned("OPENAI_MODEL_NAME", "gpt-4o-mini")
 ANTHROPIC_API_KEY = get_env_cleaned("ANTHROPIC_API_KEY", "")
 GROQ_API_KEY = get_env_cleaned("GROQ_API_KEY", "")
 
+# Ollama Local LLM Server Configuration
+OLLAMA_BASE_URL = get_env_cleaned("OLLAMA_BASE_URL", "http://172.17.0.1:11434")
+OLLAMA_MODEL = get_env_cleaned("OLLAMA_MODEL", "gemma3:12b")
+LLM_PROVIDER = get_env_cleaned("LLM_PROVIDER", "ollama")  # "ollama" | "openai" | "fallback"
+
 # Nara / Orin Telemetry configuration
 # Supports NARA_API_KEY, ORIN_API_TOKEN, and ORIN_API_KEY aliases
 DEFAULT_ORIN_API_URL = "https://admin-api.orin.id/api/devices/offline"

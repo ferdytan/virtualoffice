@@ -54,10 +54,86 @@ import {
   Plus,
   ArrowUpDown,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
+  Newspaper,
+  BookOpen,
+  Eye,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react'
 import AgentCloseUpAvatar from './AgentCloseUpAvatar'
 import AgentAvatarSettingsView from './AgentAvatarSettingsView'
+
+// --- SCOUT STRATEGIC COPYWRITING & HARVESTER MASTER DATA ---
+const DEFAULT_SCOUT_ARTICLES = [
+  {
+    id: 'art-01-curanmor',
+    title: 'Maraknya Aksi Curanmor di Area Parkir Terbuka: Pola Waktu Rawan dan Mengapa Kunci Ganda Saja Tak Lagi Cukup',
+    slug: 'maraknya-aksi-curanmor-area-parkir-terbuka-kunci-ganda',
+    category: 'Keamanan Kendaraan',
+    read_time: '5 menit baca',
+    seo_score: '96/100',
+    meta_description: 'Pelajari pola waktu rawan aksi curanmor di area terbuka dan mengapa proteksi ganda fisik perlu didukung teknologi GPS remote cut-off.',
+    excerpt: 'Kunci stang dan gembok fisik hanya menunda waktu eksekusi pelaku dalam hitungan detik. Mengapa teknologi pelacak aktif menjadi benteng pertahanan terakhir?',
+    hook: 'Bagi kebanyakan pemilik sepeda motor di perkotaan, rasa aman sering kali disandarkan pada gembok cakram ekstra atau kunci setang ke kanan di area parkir minimarket atau deretan ruko. Namun data laporan kriminalitas jalanan membuktikan realitas yang kontras.',
+    problem_analysis: 'Studi kasus rekaman CCTV menunjukkan komplotan curanmor berpengalaman hanya memerlukan 3 hingga 10 detik untuk melumpuhkan kunci kontak menggunakan leter T berujung baja keras. Gembok fisik hanya menunda waktu eksekusi, bukan mencegah hilangnya aset saat Anda lengah di dalam gedung.',
+    educational_solution: 'Sebagai langkah preventif komprehensif:\n1. Pilih titik parkir dalam radius sorot CCTV aktif dan memiliki penerangan terang benderang.\n2. Kombinasikan gembok fisik dengan sistem alarm pergerakan.\n3. Jangan tinggalkan STNK atau dokumen identitas di dalam bagasi motor.',
+    soft_selling: 'Di sinilah teknologi pelacak cerdas seperti ORIN GPS Tracker dan ORIN Tag² berperan sebagai benteng pertahanan utama. Bahkan jika proteksi mekanis ditembus, sensor getaran ORIN seketika membunyikan peringatan ke smartphone Anda. Melalui aplikasi ORIN, pemilik dapat melacak koordinat presisi via Google Maps secara real-time dan mengaktifkan fitur Remote Engine Cut-Off untuk mematikan mesin dari jarak jauh, melumpuhkan pelarian pelaku sebelum motor dibawa ke luar kota.',
+    cta: 'Jangan tunggu hingga kendaraan Anda menjadi statistik curanmor berikutnya. Lindungi aset berharga keluarga Anda dengan teknologi pelacakan cerdas ORIN sekarang. Kunjungi orin.id untuk konsultasi solusi proteksi motor dan mobil Anda.',
+    keywords: ['curanmor surabaya', 'gps tracker motor', 'orin tag', 'kunci ganda bobol', 'remote engine cutoff', 'keamanan motor parkir'],
+    harvested_sources: [
+      { source: 'Detik News', title: 'Jatanras Polda Jatim Bekuk 4 Curanmor Beraksi Hingga 11 TKP', url: 'https://www.detik.com/jatim/hukum-dan-kriminal/d-8685075/jatanras-polda-jatim-bekuk-4-curanmor-beraksi-hingga-11-tkp' },
+      { source: 'Suara Surabaya', title: 'Curanmor di Wonokromo Terekam CCTV, Dua Pelaku Ditangkap', url: 'https://www.suarasurabaya.net/kelanakota/2026/curanmor-di-wonokromo-surabaya-terekam-cctv-dua-terduga-pelaku-ditangkap-jatanras/' },
+      { source: 'ORIN Artikel', title: 'Solusi GPS Tracking Terbaik dari ORIN', url: 'https://orin.id/artikel' }
+    ],
+    content_markdown: `# Maraknya Aksi Curanmor di Area Parkir Terbuka: Pola Waktu Rawan dan Mengapa Kunci Ganda Saja Tak Lagi Cukup\n\n*Oleh: Scout — Content Creator Manager & Strategic Copywriter, ORIN*\n\n---\n\n### 1. Hook & Realita Lapangan: Ilusi Keamanan Kunci Ganda\nBagi sebagian besar pemilik sepeda motor di perkotaan, mengunci setang ke arah kanan dan memasang gembok tambahan pada piringan cakram sering kali dianggap sudah memberikan proteksi maksimal saat motor diparkir di pelataran minimarket, deretan ruko, atau tepi jalan umum.\n\nNamun rekaman CCTV dan data kepolisian mengungkap fakta yang mencengangkan: sindikat curanmor profesional hanya membutuhkan waktu antara 3 hingga 10 detik untuk mematahkan silinder kunci kontak menggunakan kunci leter T baja keras. Bahkan gembok fisik kerap kali dilumpuhkan dalam hitungan detik menggunakan cairan kimia perontok logam atau pemotong hidrolik portabel.\n\n### 2. Bedah Masalah: Mengapa Pengamanan Pasif Selalu Bobol?\nKelemahan paling mendasar dari metode pengamanan konvensional adalah sifatnya yang sepenuhnya **pasif**:\n* **Tidak Ada Peringatan Dini**: Gembok fisik tidak mampu memberitahu pemilik ketika kendaraan mulai disentuh, digeser, atau diangkat ke atas bak pikap.\n* **Kehilangan Kendali Total Begitu Mesin Hidup**: Saat pelaku berhasil menyalakan mesin dan melaju, pemilik yang berada di dalam ruangan baru menyadari kehilangan motor 15 hingga 30 menit kemudian—waktu yang lebih dari cukup bagi pelaku untuk menyeberang ke perbatasan kota.\n* **Peredaran Cepat & Kanibalisasi Sparepart**: Kendaraan curian umumnya langsung diganti pelat nomornya atau langsung dibongkar di gudang penadah dalam tempo kurang dari 6 jam.\n\n### 3. Pilar Edukasi: Langkah Preventif Berlapis di Area Publik\nUntuk memperkecil risiko kehilangan kendaraan, pemilik perlu menerapkan perlindungan berlapis (*defense-in-depth*):\n1. **Prioritaskan Parkir Berpenjaga Resmi**: Hindari memarkir kendaraan di sudut mati yang tidak terjangkau penerangan jalan atau kamera pengawas.\n2. **Ubah Kebiasaan Parkir Rutin**: Jika memarkir di stasiun atau halte busway setiap hari, ubah titik parkir secara berkala agar pola kendaraan tidak dipelajari oleh pengintai sindikat.\n3. **Pemberian Tanda Identifikasi Rahasia**: Pasang stiker mikro atau tanda khusus pada rangka dalam untuk mempermudah identifikasi kepolisian saat razia penadah.\n\n### 4. Natural Opportunity: Benteng Pertahanan Cerdas ORIN\nProteksi mekanis berguna untuk memperlambat pelaku, namun **teknologi pelacakan aktif adalah jaring pengaman terakhir yang mengembalikan kendali ke tangan Anda**.\n\nMelalui ekosistem proteksi kendaraan **ORIN**:\n* **ORIN GPS Tracker**: Dilengkapi modul GSM/GPS sensitivitas tinggi dengan peta Google Maps real-time. Jika motor Anda dipaksa bergerak, sensor getar seketika mengirimkan notifikasi instan ke aplikasi smartphone Anda. Yang paling krusial, Anda dapat mengaktifkan fitur **Remote Engine Cut-Off** untuk mematikan kelistrikan mesin seketika dari jarak jauh, membuat pelaku terjebak di tengah jalan.\n* **ORIN Tag²**: Bagi pemilik motor baru yang khawatir memotong kabel kelistrikan aki, ORIN Tag² bekerja melalui jaringan global Apple Find My tanpa potong kabel sama sekali (100% mempertahankan garansi pabrik) dengan daya tahan baterai hingga 1 tahun.\n\n### 5. Call-to-Action (CTA)\nKunci ganda fisik menunda pencurian, namun pelacak cerdas menyelamatkan aset berharga Anda dari kehilangan permanen.\n\nLindungi kendaraan harian Anda dan armada bisnis sebelum terlambat. Pelajari lebih lanjut spesifikasi ORIN GPS Tracker dan konsultasikan tipe pelacak paling cocok untuk motor Anda di [orin.id](https://orin.id).\n`,
+    created_at: 'Baru saja'
+  },
+  {
+    id: 'art-02-fuel-theft',
+    title: 'Menguak Kebocoran BBM Armada: Pola "Kencing Solar" dan Mengapa Audit Nota Manual Selalu Gagal',
+    slug: 'menguak-kebocoran-bbm-armada-pola-kencing-solar-audit-nota-manual',
+    category: 'Manajemen Bahan Bakar & Armada',
+    read_time: '6 menit baca',
+    seo_score: '94/100',
+    meta_description: 'Audit nota BBM manual rentan dimanipulasi. Temukan pola kebocoran kencing solar armada truk dan solusi sensor bahan bakar kapasitif Orin.',
+    excerpt: 'BBM menyumbang 35-45% dari biaya operasional logistik. Mengapa audit nota manual selalu kecolongan aksi kencing solar di jalan, dan bagaimana sensor presisi menutup celah tersebut?',
+    hook: 'Di industri logistik dan transportasi darat, bahan bakar minyak (BBM) adalah komponen biaya operasional terbesar, mencapai 35% hingga 45% dari total pengeluaran per perjalanan. Sedikit saja celah kebocoran terjadi di rute antarkota, margin laba bersih perusahaan seketika tergerus tanpa disadari oleh manajemen.',
+    problem_analysis: 'Audit manual berbasis struk SPBU dan odometer analog memiliki kelemahan fatal: nota gampang dimanipulasi atau dibeli dari oknum, dan jarak tempuh tidak merefleksikan kondisi macet atau muatan. Praktik "kencing solar" di rest area liar atau tempat istirahat gelap terjadi dalam hitungan menit tanpa meninggalkan jejak kertas.',
+    educational_solution: 'Terapkan 3 prinsip akuntabilitas armada:\n1. Hitung konsumsi per rute spesifik (baseline trip), bukan rata-rata bulanan global.\n2. Sinkronkan pembakaran BBM dengan odometer GPS riil.\n3. Tetapkan batas toleransi idling mesin maksimal 10 menit saat bongkar muat.',
+    soft_selling: 'ORIN Fleet Pro menghadirkan modul Capacitive Fuel Sensor berstandar industri dengan akurasi tinggi (toleransi error <5%). Apabila volume solar berkurang drastis di luar geofence SPBU resmi, sistem seketika memicu Fuel Theft Alert ke smartphone manajer operasional dan mengunci data per liter secara real-time.',
+    cta: 'Hentikan kebocoran ratusan juta rupiah per tahun dari armada truk Anda. Jadwalkan demonstrasi sensor BBM ORIN Fleet Pro di orin.id sekarang.',
+    keywords: ['fuel management armada', 'kencing solar truk', 'sensor bbm logistik', 'orin fleet pro', 'capacitive fuel sensor', 'audit bbm rute'],
+    harvested_sources: [
+      { source: 'Pilar Media FMS', title: 'Fuel Management Armada Logistik', url: 'https://www.pilarmedia.com/fuel-management-armada/' },
+      { source: 'ORIN Artikel', title: 'Mengatasi Blind Spot Rantai Pasok', url: 'https://orin.id/artikel/mengatasi-blind-spot-rantai-pasok-mengapa-visibility-real-time-menjadi-kunci-efisiensi-operasional-fleets-aset' }
+    ],
+    content_markdown: `# Menguak Kebocoran BBM Armada: Pola "Kencing Solar" dan Mengapa Audit Nota Manual Selalu Gagal\n\n*Oleh: Scout — Content Creator Manager & Strategic Copywriter, ORIN*\n\n---\n\n### 1. Hook & Realita Lapangan: Kebocoran Senyap di Tangki Truk\nBagi para pemilik usaha logistik, ekspedisi kargo, maupun kontraktor alat berat, pengeluaran Bahan Bakar Minyak (BBM) adalah pos biaya operasional paling masif—kerap kali memakan porsi 35% hingga 50% dari total *cost of goods sold* per rute.\n\nNamun ironisnya, di sektor inilah kebocoran kas perusahaan paling sering terjadi secara senyap. Modus operandi yang dikenal luas sebagai "kencing solar"—di mana oknum awak armada menyedot 20 hingga 50 liter solar dari tangki ke jeriken saat berhenti di pangkalan gelap sepanjang jalur Pantura atau lintas Sumatera—masih menjadi momok yang sulit diberantas.\n\n### 2. Bedah Masalah: Titik Lemah Audit Nota SPBU Konvensional\nBanyak manajer armada mengira bahwa mewajibkan sopir menyerahkan struk resmi SPBU dan mencocokkannya dengan odometer di akhir bulan sudah cukup untuk memastikan kejujuran operasional. Pada kenyataannya, audit manual ini memiliki 3 celah fatal:\n* **Sindikat Struk Manipulatif**: Oknum sopir dengan mudah membeli struk cetak SPBU kosong atau meminta petugas SPBU nakal mencetak nominal yang lebih besar dari liter riil yang diisikan ke dalam tangki.\n* **Distorsi Kilometer per Liter (Km/L)**: Menghitung efisiensi BBM hanya dari selisih odometer mengabaikan faktor kemacetan parah, antrean bongkar muat di pelabuhan dengan mesin menyala (*idling* berjam-jam), dan beban tonase muatan.\n* **Ketiadaan Bukti Waktu Nyata**: Tanpa log penurunan volume digital, manajemen tidak memiliki bukti konkret untuk menegur oknum pengemudi tanpa menimbulkan ketegangan hubungan kerja.\n\n### 3. Pilar Edukasi: Standardisasi Transparansi Bahan Bakar\nUntuk menghentikan fenomena kencing solar, perusahaan perlu mereformasi tata kelola armada dengan 3 langkah objektif:\n1. **Tentukan Baseline Konsumsi per Koridor Rute**: Jangan memukul rata konsumsi BBM. Koridor rute berbukit (misal: Semarang–Solo via Bawen) harus memiliki standar liter berbeda dibanding rute datar jalur tol.\n2. **Kendalikan Durasi Mesin Menyala Tanpa Bergerak (*Excessive Idling*)**: Tetapkan batas maksimal toleransi mesin menyala saat parkir bongkar muat (misal: maksimal 10 menit).\n3. **Pencocokan Otomatis Transaksi SPBU dengan Posisi GPS**: Verifikasi apakah pengisian BBM benar-benar dilakukan di lokasi koordinat SPBU yang terdaftar.\n\n### 4. Natural Opportunity: Presisi Sensor BBM Kapasitif ORIN\nLangkah paling efektif untuk menutup celah kebocoran BBM secara permanen adalah menghilangkan tebak-tebakan manusiawi dengan sensor digital terkalibrasi.\n\n**ORIN Fleet Pro** menghadirkan modul **Capacitive Fuel Sensor** berstandar industri dengan keunggulan:\n* **Tingkat Akurasi Tinggi**: Toleransi fluktuasi kurang dari 5%, dilengkapi algoritma *smoothing* yang kebal terhadap guncangan jalan berlubang.\n* **Deteksi Real-Time Drop BBM**: Apabila volume solar berkurang signifikan dalam tempo cepat saat kendaraan berhenti di luar geofence SPBU terdaftar, sistem ORIN seketika mengirimkan sinyal bahaya (Theft Alert) ke dashboard manajemen dan notifikasi WhatsApp manajer armada.\n* **Analisis Konsumsi Riil per Kilometer (Km/L)**: Menghubungkan data pergerakan GPS, kecepatan, dan konsumsi bahan bakar secara otomatis, mempermudah identifikasi sopir yang hemat versus yang boros.\n\n### 5. Call-to-Action (CTA)\nEfisiensi armada dimulai dari transparansi data. Setiap tetes solar yang diselamatkan langsung menjadi margin profit bersih bagi bisnis logistik Anda.\n\nPelajari bagaimana **ORIN Fleet Pro** membantu ratusan perusahaan logistik di seluruh Indonesia menghemat hingga 20% biaya bahan bakar bulanan. Jadwalkan sesi demo sistem dan konsultasi teknis gratis di [orin.id](https://orin.id).\n`,
+    created_at: 'Baru saja'
+  },
+  {
+    id: 'art-03-maintenance',
+    title: 'Downtime Tak Terencana Menghabiskan Margin: Mengubah Pola Servis Armada Berbasis Engine Hours Real-Time',
+    slug: 'downtime-tak-terencana-mengubah-pola-servis-berbasis-engine-hours',
+    category: 'Tips Perawatan Armada',
+    read_time: '4 menit baca',
+    seo_score: '91/100',
+    meta_description: 'Biaya mogok di jalan jauh lebih mahal dibanding servis terencana. Simak bagaimana telemetri engine hours Orin mencegah kerusakan kritis armada.',
+    excerpt: 'Menunggu jadwal servis bulanan sering kali terlambat saat mesin bekerja ekstrem. Pelajari transisi dari perawatan manual ke pemantauan jam kerja mesin presisi.',
+    hook: 'Bagi pengusaha armada, tidak ada yang lebih menakutkan daripada panggilan telepon di tengah malam yang mengabarkan truk tronton mogok di tengah jalan tol lintas Jawa. Di saat muatan harus tiba sebelum subuh, biaya derek darurat dan denda keterlambatan kontrak seketika menghapus margin keuntungan perjalanan tersebut.',
+    problem_analysis: 'Penyebab utama downtime tak terencana adalah ketergantungan pada jadwal servis kalender berkala (misal: "ganti oli tiap tanggal 1"). Padahal, dua truk yang sama bisa memiliki beban kerja mesin yang sangat berbeda karena kemacetan, jalur pegunungan, dan durasi mesin menyala saat bongkar muat.',
+    educational_solution: 'Terapkan pemantauan berbasis Jam Kerja Mesin (Engine Hours / Hour Meter) dan Jarak Tempuh Odometer Aktual. Catat riwayat kesehatan komponen kritis seperti filter solar, kampas rem, dan alternator sebelum mencapai batas keausan maksimum.',
+    soft_selling: 'Sistem ORIN Fleet Telemetry secara otomatis mencatat detak jam kerja mesin (Engine Hours) secara akurat dari modul kelistrikan kendaraan. Manajer armada dapat mengatur notifikasi pengingat servis otomatis di dashboard ORIN ketika kendaraan mendekati ambang batas jam kerja mesin, mencegah mogok mendadak di jalan.',
+    cta: 'Tingkatkan utilisasi armada dan hindari biaya perbaikan darurat yang membengkak. Konsultasikan integrasi telemetri perawatan armada Anda di orin.id sekarang.',
+    keywords: ['preventive maintenance armada', 'engine hours gps', 'perawatan truk', 'orin fleet telemetri', 'mengurangi downtime'],
+    harvested_sources: [
+      { source: 'Pilar Media FMS', title: 'Preventive Maintenance vs Predictive Maintenance Armada', url: 'https://www.pilarmedia.com/preventive-maintenance-vs-predictive-maintenance-armada/' },
+      { source: 'ORIN Insights', title: 'Mengatasi Blind Spot Rantai Pasok', url: 'https://orin.id/artikel/mengatasi-blind-spot-rantai-pasok-mengapa-visibility-real-time-menjadi-kunci-efisiensi-operasional-fleets-aset' }
+    ],
+    content_markdown: `# Downtime Tak Terencana Menghabiskan Margin: Mengubah Pola Servis Armada Berbasis Engine Hours Real-Time\n\n*Oleh: Scout — Content Creator Manager & Strategic Copywriter, ORIN*\n\n---\n\n### 1. Hook & Realita Lapangan: Jebakan 'Mogok di Tengah Jalan'\nBagi pemilik bisnis transportasi dan logistik, momen paling merugikan adalah saat menerima telepon darurat dari pengemudi di tengah malam: truk mogok di bahu jalan tol lintas provinsi karena mesin mendadak *overheat* atau transmisi jebol.\n\nPada detik itu juga, argo kerugian mulai berputar cepat: biaya derek darurat jutaan rupiah, resiko kerusakan muatan berpendingin, denda keterlambatan penyerahan barang (*SLA penalty*), hingga ancaman kehilangan kontrak jangka panjang dari klien manufaktur.\n\n### 2. Bedah Masalah: Mengapa Jadwal Servis Kalender Selalu Meleset?\nSebagian besar manajer armada masih menjadwalkan servis rutin berdasarkan kalender statis—misalnya setiap 30 hari sekali atau mengandalkan laporan manual ingatan pengemudi saat ban sudah gundul atau tarikan mesin berat.\n\nPendekatan ini memiliki cacat mendasar:\n* **Mesin Bekerja Meski Roda Diam**: Truk yang terjebak kemacetan 4 jam di pelabuhan atau mengoperasikan AC saat bongkar muat terus mengalami degradasi oli dan gesekan mesin, meskipun odometernya hampir tidak bertambah.\n* **Beban Muatan & Kontur Jalan yang Berbeda**: Jalur pegunungan dengan muatan penuh menguras usia pakai kampas rem dan transmisi 3x lebih cepat dibanding jalur datar.\n\n### 3. Pilar Edukasi: Transisi Menuju Preventive Maintenance Terukur\nUntuk memangkas biaya perbaikan darurat hingga 40%, perusahaan perlu menerapkan standardisasi berbasis data:\n1. **Gunakan Engine Hours (Jam Kerja Mesin) Sebagai Acuan Utama**: Interval penggantian oli mesin dan filter jauh lebih akurat jika dihitung berdasarkan jam mesin hidup daripada hitungan kalender.\n2. **Kategorisasi Tingkat Kritis Komponen**: Bedakan suku cadang yang jika gagal langsung menyebabkan mogok total (*high-impact*) dengan komponen minor.\n3. **Pencatatan Riwayat Servis Digital Terpusat**: Hindari buku servis sobek di dalam laci dasbor; gunakan log pemeliharaan digital yang dapat diaudit manajemen.\n\n### 4. Natural Opportunity: Otomasi Telemetri Perawatan ORIN\nMelalui modul **ORIN Fleet Telemetry**, manajemen armada tidak perlu lagi menebak kondisi kesehatan kendaraan.\n\nSistem ORIN secara otomatis memantau:\n* **Engine Hour Accumulator**: Menghitung jam operasional mesin secara waktu nyata dengan akurasi detik.\n* **Automated Service Alert**: Memberikan notifikasi otomatis ke dashboard dan WhatsApp kepala bengkel ketika kendaraan mendekati batas 200 jam kerja atau 5.000 km, sehingga jadwal masuk bengkel dapat direncanakan tanpa mengganggu jadwal pengiriman utama.\n* **Analisis Gaya Berkendara (Driver Behavior)**: Mendeteksi pengereman mendadak (*harsh braking*), akselerasi kasar, dan kecepatan berlebih yang mempercepat keausan komponen ban dan suspensi.\n\n### 5. Call-to-Action (CTA)\nArmada yang sehat adalah fondasi pengiriman tepat waktu dan kepuasan pelanggan bisnis Anda. Beralihlah dari pemadam kebakaran darurat menuju manajemen armada yang prediktif dan tenang.\n\nHubungi konsultan IoT **ORIN** di [orin.id](https://orin.id) untuk mempelajari bagaimana telemetri cerdas kami menjaga ratusan armada truk tetap beroperasi prima di jalan raya.\n`,
+    created_at: 'Baru saja'
+  }
+]
 
 export default function AgentWorkspaceView({
   agent,
@@ -66,6 +142,7 @@ export default function AgentWorkspaceView({
   onBackToOffice,
   onOpenCall,
   onSendBrief,
+  onScoutGenerateArticle,
   onSelectAvatarType,
   onUpdateAgentModel,
   onUpdateAgentColor,
@@ -160,6 +237,20 @@ export default function AgentWorkspaceView({
   const [mgmtReplySending, setMgmtReplySending] = useState(false)
   const [mgmtActionFeedback, setMgmtActionFeedback] = useState(null)
   const [ragSearchQuery, setRagSearchQuery] = useState('')
+
+  // Scout Strategic Copywriting & News Harvester State
+  const [scoutArticles, setScoutArticles] = useState(DEFAULT_SCOUT_ARTICLES)
+  const [scoutArticlesLoading, setScoutArticlesLoading] = useState(false)
+  const [scoutHarvestQuery, setScoutHarvestQuery] = useState('curanmor')
+  const [scoutHarvestData, setScoutHarvestData] = useState(null)
+  const [scoutHarvestLoading, setScoutHarvestLoading] = useState(false)
+  const [scoutGenerating, setScoutGenerating] = useState(false)
+  const [showScoutGenerator, setShowScoutGenerator] = useState(false)
+  const [scoutCustomTopic, setScoutCustomTopic] = useState('')
+  const [scoutCustomAngle, setScoutCustomAngle] = useState('')
+  const [scoutTargetProduct, setScoutTargetProduct] = useState('orin_gps_tracker')
+  const [scoutSelectedArticleModal, setScoutSelectedArticleModal] = useState(null)
+  const [scoutExpandedArticleId, setScoutExpandedArticleId] = useState(null)
 
   if (!agent) return null
 
@@ -671,49 +762,8 @@ export default function AgentWorkspaceView({
     return list
   }, [naraLiveReport, naraTableFilter, unitSearch, unitSortField, unitSortDirection])
 
-  // --- SCOUT RESEARCH & ARTICLE LAB DATA ---
-  const SCOUT_ARTICLES = [
-    {
-      id: 'article-1',
-      title: 'Masa Depan Virtual Office 3D: Kolaborasi Multi-Agent Tanpa Batas di 2026',
-      category: 'TREN TEKNOLOGI',
-      readTime: '6 menit baca',
-      seoScore: '94/100',
-      status: 'Siap Publikasi',
-      summary: 'Analisis komprehensif mengenai bagaimana ruang kerja 3D spasial menggantikan platform meeting 2D statis dan meningkatkan engagement tim hingga 35%.',
-      content: `Dunia kerja hybrid telah mencapai titik balik krusial di tahun 2026. Selama bertahun-tahun, platform video conference dua dimensi telah menjadi standar, namun fenomena "Zoom fatigue" dan hilangnya rasa kebersamaan fisik menjadi tantangan besar bagi produktivitas tim jarak jauh.
-
-Virtual Office 3D hadir bukan sekadar sebagai visualisasi grafis, melainkan arsitektur ruang kerja kolaboratif yang menggabungkan spatial computing dengan agen kecerdasan buatan otonom. Dengan representasi spasial 3D, interaksi antar anggota tim terasa natural—seperti menengok ke meja rekan kerja, mengadakan diskusi spontan di lounge, hingga mendelegasikan tugas ke AI Agent yang duduk tepat di seberang meja Anda.
-
-Hasil uji coba industri menunjukkan bahwa ruang kerja spasial 3D mampu mempersingkat waktu koordinasi tim hingga 40% dan mengembalikan budaya kantor yang dinamis tanpa mengorbankan fleksibilitas kerja jarak jauh.`
-    },
-    {
-      id: 'article-2',
-      title: 'Studi Kasus: Bagaimana AI Agent Otonom Menghemat 40 Jam Kerja Tim Setiap Minggu',
-      category: 'STUDI KASUS ENTERPRISE',
-      readTime: '8 menit baca',
-      seoScore: '91/100',
-      status: 'Siap Publikasi',
-      summary: 'Kajian nyata implementasi tim multi-agent (CS Reminder, Strategist, dan Researcher) pada perusahaan logistik berskala nasional.',
-      content: `Mengelola operasional ribuan unit regional dan ratusan tiket eskalasi setiap hari biasanya membutuhkan tim koordinator beranggotakan puluhan staf. Namun, keterlambatan informasi dan human error seringkali membuat unit offline tidak tertangani selama berjam-jam.
-
-Dengan menempatkan agen otonom khusus—seperti Nara yang bertugas mengaudit detak telemetri dan langsung mengontak teknisi lapangan via WhatsApp otomatis—rata-rata waktu respon terhadap unit bermasalah terpangkas dari 90 menit menjadi hanya 4.2 menit.
-
-Sementara itu, agen riset dan strategi marketing seperti Scout dan Velocia mengotomatisasi penyusunan draf proposal, riset kompetitor mingguan, dan kalender promosi secara instan tanpa perlu menunggu rapat koordinasi berjam-jam.`
-    },
-    {
-      id: 'article-3',
-      title: 'WebGL & React Three Fiber di Lingkungan Korporat: Standar Baru Web App Modern',
-      category: 'ENGINEERING & UI/UX',
-      readTime: '5 menit baca',
-      seoScore: '88/100',
-      status: 'Draf Peninjauan',
-      summary: 'Panduan teknis bagi tim pengembang web dalam mengimplementasikan 3D web canvas berperforma tinggi dengan Three.js tanpa membebani memori browser pengguna.',
-      content: `Dahulu grafis 3D interaktif pada web dianggap berat dan hanya cocok untuk website pameran portofolio khusus. Namun dengan evolusi WebGL2, kompresi mesh Draco, serta ekosistem React Three Fiber yang matang, antarmuka 3D kini menjadi standar antarmuka bisnis modern.
-
-Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terkompresi, contact shadows yang efisien, dan rendering terarah hanya saat viewport aktif. Hal ini memungkinkan dashboard 3D berjalan mulus pada 60 FPS bahkan di laptop kantoran standar.`
-    }
-  ]
+  // --- SCOUT RESEARCH & ARTICLE LAB DATA ALIAS ---
+  const SCOUT_ARTICLES = scoutArticles
 
   const handlePingUnit = (unitId) => {
     setPingedUnits((prev) => ({ ...prev, [unitId]: 'Ping OK (38ms)' }))
@@ -1206,6 +1256,83 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
     return list
   }, [naraLiveReport, customerGroupMappingsList])
 
+  // --- SCOUT STRATEGIC COPYWRITING & HARVESTER HANDLERS ---
+  const fetchScoutArticles = async () => {
+    try {
+      setScoutArticlesLoading(true)
+      const res = await fetch('/api/scout/articles')
+      if (res.ok) {
+        const data = await res.json()
+        const list = Array.isArray(data) ? data : (data.articles || [])
+        if (list.length > 0) {
+          setScoutArticles(list)
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to fetch Scout articles:', err)
+    } finally {
+      setScoutArticlesLoading(false)
+    }
+  }
+
+  const fetchScoutHarvested = async (query = scoutHarvestQuery) => {
+    try {
+      setScoutHarvestLoading(true)
+      const res = await fetch(`/api/scout/harvested-topics?query=${encodeURIComponent(query)}`)
+      if (res.ok) {
+        const data = await res.json()
+        setScoutHarvestData(data)
+      }
+    } catch (err) {
+      console.warn('Failed to fetch Scout harvested topics:', err)
+    } finally {
+      setScoutHarvestLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (agentId === 'scout') {
+      fetchScoutArticles()
+      fetchScoutHarvested(scoutHarvestQuery)
+    }
+  }, [agentId])
+
+  const handleSelectHarvestQuery = (q) => {
+    setScoutHarvestQuery(q)
+    fetchScoutHarvested(q)
+  }
+
+  const handleTriggerScoutGenerate = async (topic, instructions = '', targetProduct = 'orin_gps_tracker') => {
+    const cleanTopic = (topic || scoutCustomTopic || 'curanmor').trim()
+    if (!cleanTopic) return
+    setScoutGenerating(true)
+    try {
+      if (onScoutGenerateArticle) {
+        await onScoutGenerateArticle(cleanTopic, instructions || scoutCustomAngle)
+      } else {
+        const res = await fetch('/api/scout/generate-article', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            topic: cleanTopic,
+            custom_instructions: instructions || scoutCustomAngle,
+            target_product: targetProduct || scoutTargetProduct
+          })
+        })
+        if (!res.ok) throw new Error('Generation failed')
+      }
+      await fetchScoutArticles()
+      setShowScoutGenerator(false)
+      setScoutCustomTopic('')
+      setScoutCustomAngle('')
+      setScoutTab('articles')
+    } catch (err) {
+      console.error('Error generating scout article:', err)
+    } finally {
+      setScoutGenerating(false)
+    }
+  }
+
   return (
     <div className="h-screen w-full flex flex-col bg-slate-100 overflow-hidden select-none animate-in fade-in duration-150">
       {/* --- TOP WORKSPACE NAVIGATION BAR --- */}
@@ -1214,44 +1341,44 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
           {/* Back to 3D Office Button */}
           <button
             onClick={onBackToOffice}
-            className="flex items-center gap-1.5 py-1.5 px-3 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-800 font-bold text-xs rounded-xl transition-all cursor-pointer shadow-xs"
+            className="flex items-center gap-1.5 py-1.5 px-3 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-800 font-bold text-xs rounded-xl transition-all cursor-pointer shadow-xs shrink-0 whitespace-nowrap"
             title="Kembali ke Ruang Kantor 3D"
           >
-            <ArrowLeft className="w-3.5 h-3.5 text-slate-600" />
-            <span>Kembali ke 3D Office</span>
+            <ArrowLeft className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+            <span className="whitespace-nowrap">Kembali ke 3D Office</span>
           </button>
 
-          <div className="h-4 w-px bg-slate-200 hidden sm:block" />
+          <div className="h-4 w-px bg-slate-200 hidden sm:block shrink-0" />
 
           {/* Breadcrumb Title */}
-          <div className="hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-500">
+          <div className="hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-500 shrink-0">
             <span>Workspace</span>
             <span>/</span>
             <span className="text-slate-900 font-extrabold flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: agentColor }} />
+              <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: agentColor }} />
               Dashboard {agent.name}
             </span>
           </div>
         </div>
 
         {/* Center / Right Controls: Agent Switcher + Action Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           {/* Quick Agent Switcher Pills */}
-          <div className="hidden md:flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200/80">
+          <div className="hidden md:flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200/80 shrink-0">
             {agents.map((ag) => {
               const isCurrent = ag.id === agent.id
               return (
                 <button
                   key={ag.id}
                   onClick={() => onSelectAgent(ag)}
-                  className={`flex items-center gap-1.5 py-1 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  className={`flex items-center gap-1.5 py-1 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 whitespace-nowrap ${
                     isCurrent
                       ? 'bg-white shadow-xs text-slate-900'
                       : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
-                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: ag.color }} />
-                  {ag.name}
+                  <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: ag.color }} />
+                  <span className="whitespace-nowrap">{ag.name}</span>
                 </button>
               )
             })}
@@ -1260,23 +1387,23 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
           {/* Gear icon for avatar */}
           <button
             onClick={() => setLeftPanelView((prev) => (prev === 'avatar_settings' ? 'menu' : 'avatar_settings'))}
-            className={`p-2 rounded-xl active:scale-95 transition-all cursor-pointer border ${
+            className={`p-2 rounded-xl active:scale-95 transition-all cursor-pointer border shrink-0 ${
               leftPanelView === 'avatar_settings'
                 ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
                 : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100 border-slate-200/60'
             }`}
             title="Pengaturan Avatar & Warna 3D"
           >
-            <Settings className="w-4 h-4" />
+            <Settings className="w-4 h-4 shrink-0" />
           </button>
 
           {/* Call Agent Button */}
           <button
             onClick={() => onOpenCall(agent)}
-            className="flex items-center gap-1.5 py-1.5 px-3 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer"
+            className="flex items-center gap-1.5 py-1.5 px-3 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer shrink-0 whitespace-nowrap"
           >
-            <Phone className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="hidden sm:inline">Panggil (Call)</span>
+            <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <span className="hidden sm:inline whitespace-nowrap">Panggil (Call)</span>
           </button>
         </div>
       </header>
@@ -1604,6 +1731,44 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
             {agentId === 'scout' && (
               <div className="space-y-1.5">
                 <button
+                  onClick={() => setScoutTab('articles')}
+                  className={`w-full p-2.5 rounded-xl text-left transition-all cursor-pointer flex items-center justify-between ${
+                    scoutTab === 'articles'
+                      ? 'bg-slate-900 text-white shadow-xs font-bold text-xs'
+                      : 'bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-700 font-medium text-xs'
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <FileText className={`w-3.5 h-3.5 ${scoutTab === 'articles' ? 'text-emerald-400' : 'text-slate-600'}`} />
+                    Draf Naskah Artikel
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${scoutTab === 'articles' ? 'bg-emerald-500 text-slate-900 font-bold' : 'bg-slate-100 text-slate-600'}`}>
+                      {scoutArticles.length}
+                    </span>
+                    {scoutTab === 'articles' && <ChevronRight className="w-3.5 h-3.5 text-white shrink-0" />}
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => setScoutTab('trends')}
+                  className={`w-full p-2.5 rounded-xl text-left transition-all cursor-pointer flex items-center justify-between ${
+                    scoutTab === 'trends'
+                      ? 'bg-slate-900 text-white shadow-xs font-bold text-xs'
+                      : 'bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-700 font-medium text-xs'
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <Newspaper className={`w-3.5 h-3.5 ${scoutTab === 'trends' ? 'text-emerald-400' : 'text-slate-600'}`} />
+                    Radar Berita & Harvester
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    {scoutTab === 'trends' && <ChevronRight className="w-3.5 h-3.5 text-white shrink-0" />}
+                  </div>
+                </button>
+
+                <button
                   onClick={() => setScoutTab('recurring_issues')}
                   className={`w-full p-2.5 rounded-xl text-left transition-all cursor-pointer flex items-center justify-between ${
                     scoutTab === 'recurring_issues'
@@ -1616,36 +1781,6 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                     Isu Berulang & SOP Writer
                   </span>
                   {scoutTab === 'recurring_issues' && <ChevronRight className="w-3.5 h-3.5 text-white shrink-0" />}
-                </button>
-
-                <button
-                  onClick={() => setScoutTab('articles')}
-                  className={`w-full p-2.5 rounded-xl text-left transition-all cursor-pointer flex items-center justify-between ${
-                    scoutTab === 'articles'
-                      ? 'bg-slate-900 text-white shadow-xs font-bold text-xs'
-                      : 'bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-700 font-medium text-xs'
-                  }`}
-                >
-                  <span className="flex items-center gap-2">
-                    <FileText className={`w-3.5 h-3.5 ${scoutTab === 'articles' ? 'text-emerald-400' : 'text-slate-600'}`} />
-                    Draf Naskah Artikel (3)
-                  </span>
-                  {scoutTab === 'articles' && <ChevronRight className="w-3.5 h-3.5 text-white shrink-0" />}
-                </button>
-
-                <button
-                  onClick={() => setScoutTab('trends')}
-                  className={`w-full p-2.5 rounded-xl text-left transition-all cursor-pointer flex items-center justify-between ${
-                    scoutTab === 'trends'
-                      ? 'bg-slate-900 text-white shadow-xs font-bold text-xs'
-                      : 'bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-700 font-medium text-xs'
-                  }`}
-                >
-                  <span className="flex items-center gap-2">
-                    <TrendingUp className={`w-3.5 h-3.5 ${scoutTab === 'trends' ? 'text-emerald-400' : 'text-slate-600'}`} />
-                    Radar Tren AI 2026
-                  </span>
-                  {scoutTab === 'trends' && <ChevronRight className="w-3.5 h-3.5 text-white shrink-0" />}
                 </button>
               </div>
             )}
@@ -1815,22 +1950,22 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                             </div>
 
                             {/* Quick Delegation Badges */}
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 shrink-0">
                               <button
                                 onClick={() => handleSherlocDelegateToNara(activeChat)}
-                                className="py-1.5 px-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-[11px] border border-blue-200 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                                className="py-1.5 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-[11px] border border-blue-200 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0 whitespace-nowrap"
                                 title="Minta Nara cek telemetri & kirim ping unit"
                               >
-                                <Radio className="w-3 h-3 text-blue-600" />
-                                <span>Delegasi ke Nara</span>
+                                <Radio className="w-3 h-3 text-blue-600 shrink-0" />
+                                <span className="whitespace-nowrap">Delegasi ke Nara</span>
                               </button>
                               <button
                                 onClick={() => handleSherlocEscalateToWatson(activeChat)}
-                                className="py-1.5 px-2.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-[11px] border border-purple-200 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                                className="py-1.5 px-3 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-[11px] border border-purple-200 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0 whitespace-nowrap"
                                 title="Eskalasikan isu teknis ECU ke Watson"
                               >
-                                <AlertTriangle className="w-3 h-3 text-purple-600" />
-                                <span>Eskalasi ke Watson</span>
+                                <AlertTriangle className="w-3 h-3 text-purple-600 shrink-0" />
+                                <span className="whitespace-nowrap">Eskalasi ke Watson</span>
                               </button>
                             </div>
                           </div>
@@ -1899,10 +2034,10 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                             />
                             <button
                               onClick={() => handleSherlocSendReply(activeChat.id)}
-                              className="py-2 px-4 bg-amber-500 hover:bg-amber-600 active:scale-95 text-slate-900 font-black text-xs rounded-xl shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
+                              className="py-2 px-4 bg-amber-500 hover:bg-amber-600 active:scale-95 text-slate-900 font-black text-xs rounded-xl shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
                             >
-                              <Send className="w-3.5 h-3.5" />
-                              <span>Kirim</span>
+                              <Send className="w-3.5 h-3.5 shrink-0" />
+                              <span className="whitespace-nowrap">Kirim</span>
                             </button>
                           </div>
                         </div>
@@ -2045,14 +2180,14 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                         />
                       </div>
 
-                      <div className="flex items-center justify-between pt-1">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
                         <button
                           type="submit"
                           disabled={simWebhookSending}
-                          className="py-2.5 px-5 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-black text-xs rounded-xl shadow-2xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                          className="py-2.5 px-5 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-black text-xs rounded-xl shadow-2xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 shrink-0 whitespace-nowrap"
                         >
-                          <Play className="w-3.5 h-3.5 text-amber-400" />
-                          <span>{simWebhookSending ? 'Memproses Webhook...' : 'Kirim Simulasi Webhook Inbound'}</span>
+                          <Play className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                          <span className="whitespace-nowrap">{simWebhookSending ? 'Memproses Webhook...' : 'Kirim Simulasi Webhook Inbound'}</span>
                         </button>
                         <span className="text-[11px] text-slate-400">Sherloc akan memproses dan membalas otomatis</span>
                       </div>
@@ -2267,10 +2402,10 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                         <button
                           onClick={() => handleWatsonSendManagementReply(selectedTicketId)}
                           disabled={mgmtReplySending}
-                          className="py-2 px-4 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                          className="py-2 px-4 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shrink-0 whitespace-nowrap"
                         >
-                          <Send className="w-3.5 h-3.5" />
-                          <span>{mgmtReplySending ? 'Mengirim...' : 'Kirim Balasan WA'}</span>
+                          <Send className="w-3.5 h-3.5 shrink-0" />
+                          <span className="whitespace-nowrap">{mgmtReplySending ? 'Mengirim...' : 'Kirim Balasan WA'}</span>
                         </button>
                       </div>
                       <p className="text-[10px] text-slate-400">
@@ -2355,91 +2490,104 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
           {/* ======================================================== */}
           {agentId === 'nara' && naraTab === 'offline_units' && (
             <div className="max-w-6xl mx-auto space-y-5 animate-in fade-in duration-200">
-              {/* Telemetry Header Bar */}
-              <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                  <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full border ${
-                      naraLiveReport?.from_cache
-                        ? 'bg-amber-50 text-amber-700 border-amber-200'
-                        : 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                    }`}>
-                      {naraLiveReport?.from_cache
-                        ? `DATABASE CACHE (${naraLiveReport.cached_at || 'Tersimpan'})`
-                        : 'ORIN API LIVE TELEMETRY'}
-                    </span>
-                    <span className="text-[10px] font-bold text-slate-400">
-                      https://admin-api.orin.id/api/devices/offline
-                    </span>
+              {/* Telemetry Header Bar & Control Toolbar */}
+              <div className="p-5 bg-white rounded-2xl border border-slate-200 shadow-2xs space-y-4">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full border ${
+                        naraLiveReport?.from_cache
+                          ? 'bg-amber-50 text-amber-700 border-amber-200'
+                          : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      }`}>
+                        {naraLiveReport?.from_cache
+                          ? `DATABASE CACHE (${naraLiveReport.cached_at || 'Tersimpan'})`
+                          : 'ORIN API LIVE TELEMETRY'}
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-400">
+                        https://admin-api.orin.id/api/devices/offline
+                      </span>
+                    </div>
+                    <h2 className="text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
+                      <Radio className="w-5 h-5 text-sky-500 animate-pulse shrink-0" />
+                      <span>Nara Telemetry Engine &amp; Aturan CAM</span>
+                    </h2>
+                    <p className="text-xs text-slate-500 leading-relaxed max-w-2xl">
+                      Evaluasi otomatis durasi unit offline, filter khusus kamera (&gt; 72 jam), dan pemetaan ke akun pelanggan.
+                    </p>
                   </div>
-                  <h2 className="text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
-                    <Radio className="w-5 h-5 text-sky-500 animate-pulse" />
-                    Nara Telemetry Engine & Aturan CAM
-                  </h2>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Evaluasi otomatis durasi unit offline, filter khusus kamera (&gt; 72 jam), dan pemetaan ke akun pelanggan.
-                  </p>
+
+                  <div className="flex items-center gap-2.5 shrink-0 self-start md:self-center">
+                    {/* Button to Open Customer WA Group Mapping Modal */}
+                    <button
+                      type="button"
+                      onClick={() => handleOpenGroupModal()}
+                      className="py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
+                      title="Atur / Petakan Nama WhatsApp Group per Akun Pelanggan (1 Akun = 1 Grup)"
+                    >
+                      <Settings className="w-3.5 h-3.5 shrink-0" />
+                      <span className="whitespace-nowrap">Atur Grup WA Akun</span>
+                    </button>
+
+                    {/* Request API Orin Button */}
+                    <button
+                      type="button"
+                      onClick={() => fetchNaraEngineData(naraAuditMode, naraDayOverride, true)}
+                      disabled={naraLoading}
+                      className="py-2.5 px-4 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 shrink-0 whitespace-nowrap"
+                      title="Tarik telemetri terkini langsung dari API Orin dan simpan ke database"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 shrink-0 ${naraLoading ? 'animate-spin text-white' : 'text-blue-100'}`} />
+                      <span className="whitespace-nowrap">{naraLoading ? 'Mengambil API...' : 'Request API Orin'}</span>
+                    </button>
+                  </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
-                  {/* Calendar Mode Switcher */}
-                  <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setNaraAuditMode(false)
-                        fetchNaraEngineData(false, null, false)
-                      }}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                        !naraAuditMode
-                          ? 'bg-white text-slate-900 shadow-2xs'
-                          : 'text-slate-500 hover:text-slate-800'
-                      }`}
-                      title="Hanya laporkan unit yang baru mati sejak pengecekan terakhir"
-                    >
-                      <Zap className="w-3.5 h-3.5 text-amber-500" />
-                      <span>Mode Delta (Hari {naraLiveReport?.calendar_day || new Date().getDate()})</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setNaraAuditMode(true)
-                        fetchNaraEngineData(true, 1, false)
-                      }}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                        naraAuditMode
-                          ? 'bg-white text-slate-900 shadow-2xs'
-                          : 'text-slate-500 hover:text-slate-800'
-                      }`}
-                      title="Audit bulanan seluruh unit offline (Tanggal 1)"
-                    >
-                      <Calendar className="w-3.5 h-3.5 text-sky-500" />
-                      <span>Mode Tanggal 1 (Full Audit)</span>
-                    </button>
+                {/* Calendar Mode Switcher Bar */}
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-700 shrink-0">Mode Pelaporan:</span>
+                    <div className="flex items-center bg-white p-1 rounded-xl border border-slate-200 shadow-2xs">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNaraAuditMode(false)
+                          fetchNaraEngineData(false, null, false)
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
+                          !naraAuditMode
+                            ? 'bg-slate-900 text-white shadow-2xs'
+                            : 'text-slate-500 hover:text-slate-800'
+                        }`}
+                        title="Hanya laporkan unit yang baru mati sejak pengecekan terakhir"
+                      >
+                        <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                        <span className="whitespace-nowrap">Mode Delta (Hari {naraLiveReport?.calendar_day || new Date().getDate()})</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNaraAuditMode(true)
+                          fetchNaraEngineData(true, 1, false)
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
+                          naraAuditMode
+                            ? 'bg-slate-900 text-white shadow-2xs'
+                            : 'text-slate-500 hover:text-slate-800'
+                        }`}
+                        title="Audit bulanan seluruh unit offline (Tanggal 1)"
+                      >
+                        <Calendar className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                        <span className="whitespace-nowrap">Mode Tanggal 1 (Full Audit)</span>
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Button to Open Customer WA Group Mapping Modal */}
-                  <button
-                    type="button"
-                    onClick={() => handleOpenGroupModal()}
-                    className="py-1.5 px-3 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
-                    title="Atur / Petakan Nama WhatsApp Group per Akun Pelanggan (1 Akun = 1 Grup)"
-                  >
-                    <Settings className="w-3.5 h-3.5" />
-                    <span>Atur Grup WA Akun</span>
-                  </button>
-
-                  {/* Request API Orin Button (Menggantikan button refresh) */}
-                  <button
-                    type="button"
-                    onClick={() => fetchNaraEngineData(naraAuditMode, naraDayOverride, true)}
-                    disabled={naraLoading}
-                    className="py-1.5 px-3.5 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-2xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
-                    title="Tarik telemetri terkini langsung dari API Orin dan simpan ke database"
-                  >
-                    <RefreshCw className={`w-3.5 h-3.5 ${naraLoading ? 'animate-spin text-white' : 'text-blue-100'}`} />
-                    <span>{naraLoading ? 'Mengambil API...' : 'Request API Orin'}</span>
-                  </button>
+                  <span className="text-[11px] text-slate-500">
+                    {naraAuditMode
+                      ? '⚡ Mode Tanggal 1: Seluruh unit offline dilaporkan untuk audit bulanan menyeluruh.'
+                      : '⚡ Mode Delta: Hanya unit yang baru offline sejak pemeriksaan terakhir yang dilaporkan.'}
+                  </span>
                 </div>
               </div>
 
@@ -2508,76 +2656,78 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
 
               {/* OFFLINE UNITS ENTERPRISE DATA TABLE */}
               <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
-                {/* Table Header Controls: Search + CAM Filter Tabs */}
-                <div className="p-4 border-b border-slate-100 flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-slate-50/50">
-                  <div className="flex items-center gap-2">
-                    <div className="p-1.5 bg-rose-50 text-rose-600 rounded-lg">
-                      <AlertTriangle className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
-                        <span>Matriks Unit Offline &amp; Evaluasi Aturan Bisnis</span>
-                        <span className="text-[10px] font-extrabold px-2 py-0.2 rounded-full bg-slate-200 text-slate-700">
-                          {naraAuditMode ? 'MODE FULL AUDIT' : 'MODE DELTA'}
-                        </span>
-                      </h3>
-                      <p className="text-[11px] text-slate-500">
-                        Menampilkan {filteredUnits.length} unit ({naraTableFilter === 'ALL_QUALIFIED' ? 'Terkualifikasi' : naraTableFilter === 'CAM_GRACE' ? 'Toleransi CAM' : 'Semua Unit'})
-                      </p>
+                {/* Table Header Controls: Two-Tier Layout (Title Top, Filters Bottom) */}
+                <div className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50 space-y-3.5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="p-2 bg-rose-50 text-rose-600 rounded-xl shrink-0 border border-rose-200/60">
+                        <AlertTriangle className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-black text-slate-900 flex items-center gap-2 flex-wrap">
+                          <span>Matriks Unit Offline &amp; Evaluasi Aturan Bisnis</span>
+                          <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">
+                            {naraAuditMode ? 'MODE FULL AUDIT' : 'MODE DELTA'}
+                          </span>
+                        </h3>
+                        <p className="text-[11px] text-slate-500 mt-0.5">
+                          Menampilkan {filteredUnits.length} unit ({naraTableFilter === 'ALL_QUALIFIED' ? 'Terkualifikasi' : naraTableFilter === 'CAM_GRACE' ? 'Toleransi CAM' : 'Semua Unit'})
+                        </p>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Filter & Search Bar */}
-                  <div className="flex flex-wrap items-center gap-2">
+                  {/* Filter & Search Bar Row */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
                     {/* Category Filter Pills */}
-                    <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200 text-[11px]">
+                    <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200 text-[11px] shrink-0">
                       <button
                         type="button"
                         onClick={() => setNaraTableFilter('ALL_QUALIFIED')}
-                        className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
+                        className={`px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer shrink-0 whitespace-nowrap ${
                           naraTableFilter === 'ALL_QUALIFIED'
                             ? 'bg-white text-slate-900 shadow-2xs'
                             : 'text-slate-500 hover:text-slate-800'
                         }`}
                       >
-                        Terkualifikasi ({naraLoading && !naraLiveReport ? '...' : (naraLiveReport?.valid_devices?.length ?? 0)})
+                        <span className="whitespace-nowrap">Terkualifikasi ({naraLoading && !naraLiveReport ? '...' : (naraLiveReport?.valid_devices?.length ?? 0)})</span>
                       </button>
 
                       <button
                         type="button"
                         onClick={() => setNaraTableFilter('CAM_GRACE')}
-                        className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                        className={`px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
                           naraTableFilter === 'CAM_GRACE'
                             ? 'bg-white text-amber-700 shadow-2xs'
                             : 'text-slate-500 hover:text-slate-800'
                         }`}
                       >
-                        <Video className="w-3 h-3 text-amber-500" />
-                        Toleransi CAM ({naraLoading && !naraLiveReport ? '...' : (naraLiveReport?.suppressed_cam_devices?.length ?? 0)})
+                        <Video className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                        <span className="whitespace-nowrap">Toleransi CAM ({naraLoading && !naraLiveReport ? '...' : (naraLiveReport?.suppressed_cam_devices?.length ?? 0)})</span>
                       </button>
 
                       <button
                         type="button"
                         onClick={() => setNaraTableFilter('ALL_ORIN')}
-                        className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
+                        className={`px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer shrink-0 whitespace-nowrap ${
                           naraTableFilter === 'ALL_ORIN'
                             ? 'bg-white text-slate-900 shadow-2xs'
                             : 'text-slate-500 hover:text-slate-800'
                         }`}
                       >
-                        Semua ({naraLoading && !naraLiveReport ? '...' : (naraLiveReport ? (naraLiveReport.valid_devices?.length || 0) + (naraLiveReport.suppressed_cam_devices?.length || 0) : 0)})
+                        <span className="whitespace-nowrap">Semua ({naraLoading && !naraLiveReport ? '...' : (naraLiveReport ? (naraLiveReport.valid_devices?.length || 0) + (naraLiveReport.suppressed_cam_devices?.length || 0) : 0)})</span>
                       </button>
                     </div>
 
                     {/* Search Input */}
-                    <div className="relative">
-                      <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                    <div className="relative w-full sm:w-64">
+                      <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                       <input
                         type="text"
                         value={unitSearch}
                         onChange={(e) => setUnitSearch(e.target.value)}
                         placeholder="Cari Plat, SN, Pelanggan, Tipe..."
-                        className="pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900 w-44 sm:w-56"
+                        className="w-full pl-8.5 pr-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900"
                       />
                     </div>
                   </div>
@@ -2736,19 +2886,30 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                                 </div>
                               </td>
 
-                              {/* 3. Akun Pelanggan + Quick Pencil Edit WhatsApp Group */}
+                              {/* 3. Akun Pelanggan + WhatsApp Group Badge + Pencil Edit */}
                               <td className="py-3 px-4 whitespace-nowrap">
                                 <div className="flex items-center justify-between gap-3">
                                   <div>
                                     <div className="font-bold text-slate-900 text-xs">{cust}</div>
-                                    <div className="text-[10px] text-slate-400 font-mono">ID: {dev.customer_id || 'PRO'}</div>
+                                    <div className="flex items-center gap-1.5 mt-0.5">
+                                      {waGroup ? (
+                                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 font-mono">
+                                          <span>💬 {waGroup}</span>
+                                        </span>
+                                      ) : (
+                                        <span className="inline-flex items-center text-[10px] font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                                          Belum Ada Grup
+                                        </span>
+                                      )}
+                                      <span className="text-[10px] text-slate-400 font-mono">ID: {dev.customer_id || 'PRO'}</span>
+                                    </div>
                                   </div>
 
                                   {/* Icon pencil jika sudah ada WA Group, icon + jika belum ada */}
                                   <button
                                     type="button"
                                     onClick={() => handleOpenGroupModal(dev.customer_id, cust, waGroup, dev.wa_group_id)}
-                                    className={`p-1.5 rounded-lg border transition-all cursor-pointer active:scale-90 ${
+                                    className={`p-1.5 rounded-lg border transition-all cursor-pointer active:scale-90 shrink-0 ${
                                       waGroup
                                         ? 'text-emerald-600 hover:text-emerald-700 bg-emerald-50/70 hover:bg-emerald-100 border-emerald-200/80 shadow-2xs'
                                         : 'text-sky-600 hover:text-sky-700 bg-sky-50/70 hover:bg-sky-100 border-sky-200 shadow-2xs'
@@ -2802,31 +2963,28 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
           {agentId === 'nara' && naraTab === 'customer_dispatch' && (
             <div className="max-w-6xl mx-auto space-y-5 animate-in fade-in duration-200">
               {/* Header Banner */}
-              <div className="p-6 bg-white rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                  <div>
+              <div className="p-6 bg-white rounded-2xl border border-slate-200 shadow-2xs space-y-4">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-slate-100">
+                  <div className="space-y-1">
                     <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full border bg-sky-50 text-sky-700 border-sky-200">
                       DRAFT CHAT &bull; SMART GROUP DISPATCHER &bull; WATSON ANTI-BAN ACTIVE
                     </span>
                     <h2 className="text-xl font-black text-slate-900 tracking-tight mt-1 flex items-center gap-2">
                       <MessageSquare className="w-5 h-5 text-sky-600" />
-                      Draft Chat WhatsApp Pelanggan &amp; Dispatch Grup
+                      <span>Draft Chat WhatsApp Pelanggan &amp; Dispatch Grup</span>
                     </h2>
-                    <p className="text-xs text-slate-500 font-medium">
-                      Nara menyusun draf pesan WhatsApp natural bervariasi per akun pelanggan (1 Akun = 1 Grup WA). Human agent dapat langsung <strong>menyalin draf (Copy)</strong> untuk dikirim manual, atau memerintahkan <strong>Watson untuk mendistribusikan secara otomatis</strong> dengan jitter anti-ban 15–45 detik.
-                    </p>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2 self-start lg:self-auto">
+                  <div className="flex items-center gap-2.5 shrink-0 self-start md:self-center">
                     {/* Button Atur Grup WA Akun */}
                     <button
                       type="button"
                       onClick={() => handleOpenGroupModal()}
-                      className="py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
+                      className="py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
                       title="Atur WhatsApp Group per Akun Pelanggan (1 Akun = 1 Grup)"
                     >
-                      <Settings className="w-3.5 h-3.5" />
-                      <span>Atur Grup WA Akun</span>
+                      <Settings className="w-3.5 h-3.5 shrink-0" />
+                      <span className="whitespace-nowrap">Atur Grup WA Akun</span>
                     </button>
 
                     {/* Batch Dispatch Watson */}
@@ -2834,14 +2992,18 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                       type="button"
                       onClick={handleTriggerNaraDispatch}
                       disabled={naraDispatching}
-                      className="py-2.5 px-4 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-black text-xs rounded-xl shadow-2xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                      className="py-2.5 px-4 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-black text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 shrink-0 whitespace-nowrap"
                       title="Kirim pesan ke seluruh grup customer PRO via Watson Gateway"
                     >
-                      <Play className={`w-3.5 h-3.5 ${naraDispatching ? 'animate-spin' : 'text-emerald-400'}`} />
-                      <span>{naraDispatching ? 'Mendispatch ke Grup...' : 'Batch Kirim Semua Grup'}</span>
+                      <Play className={`w-3.5 h-3.5 shrink-0 ${naraDispatching ? 'animate-spin' : 'text-emerald-400'}`} />
+                      <span className="whitespace-nowrap">{naraDispatching ? 'Mendispatch ke Grup...' : 'Batch Kirim Semua Grup'}</span>
                     </button>
                   </div>
                 </div>
+
+                <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                  Nara menyusun draf pesan WhatsApp natural bervariasi per akun pelanggan (1 Akun = 1 Grup WA). Human agent dapat langsung <strong>menyalin draf (Copy)</strong> untuk dikirim manual, atau memerintahkan <strong>Watson untuk mendistribusikan secara otomatis</strong> dengan jitter anti-ban 15–45 detik.
+                </p>
 
                 {/* Notifications & Toast Feedback */}
                 {draftChatCopyFeedback && (
@@ -2983,35 +3145,35 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                           <button
                             type="button"
                             onClick={() => setDispatchGroupFilter('ALL')}
-                            className={`flex-1 py-1 rounded-lg transition-all cursor-pointer text-center ${
+                            className={`flex-1 py-1 rounded-lg transition-all cursor-pointer text-center shrink-0 whitespace-nowrap ${
                               dispatchGroupFilter === 'ALL'
                                 ? 'bg-white text-slate-900 shadow-2xs'
                                 : 'text-slate-500 hover:text-slate-800'
                             }`}
                           >
-                            Semua ({allCustomerReports.length})
+                            <span className="whitespace-nowrap">Semua ({allCustomerReports.length})</span>
                           </button>
                           <button
                             type="button"
                             onClick={() => setDispatchGroupFilter('MAPPED')}
-                            className={`flex-1 py-1 rounded-lg transition-all cursor-pointer text-center ${
+                            className={`flex-1 py-1 rounded-lg transition-all cursor-pointer text-center shrink-0 whitespace-nowrap ${
                               dispatchGroupFilter === 'MAPPED'
                                 ? 'bg-white text-emerald-700 shadow-2xs'
                                 : 'text-slate-500 hover:text-slate-800'
                             }`}
                           >
-                            Ada Grup ({mappedCount})
+                            <span className="whitespace-nowrap">Ada Grup ({mappedCount})</span>
                           </button>
                           <button
                             type="button"
                             onClick={() => setDispatchGroupFilter('UNMAPPED')}
-                            className={`flex-1 py-1 rounded-lg transition-all cursor-pointer text-center ${
+                            className={`flex-1 py-1 rounded-lg transition-all cursor-pointer text-center shrink-0 whitespace-nowrap ${
                               dispatchGroupFilter === 'UNMAPPED'
                                 ? 'bg-white text-amber-700 shadow-2xs'
                                 : 'text-slate-500 hover:text-slate-800'
                             }`}
                           >
-                            Belum ({unmappedCount})
+                            <span className="whitespace-nowrap">Belum ({unmappedCount})</span>
                           </button>
                         </div>
                       </div>
@@ -3130,23 +3292,23 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                               </div>
                             </div>
 
-                            <div className="flex items-center gap-2 self-start sm:self-auto">
-                              <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-emerald-800 text-emerald-100 border border-emerald-600">
+                            <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+                              <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-emerald-800 text-emerald-100 border border-emerald-600 shrink-0 whitespace-nowrap">
                                 {currentReport.report_mode === 'FULL_AUDIT' ? 'Mode Tanggal 1 (Audit Lengkap)' : 'Mode Delta'}
                               </span>
                               <button
                                 type="button"
                                 onClick={() => handleOpenGroupModal(currentReport.customer_id, currentReport.customer_name, currentReport.wa_group_name, currentReport.wa_group_id)}
-                                className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white text-emerald-900 hover:bg-emerald-50 transition-colors cursor-pointer shadow-2xs"
+                                className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white text-emerald-900 hover:bg-emerald-50 transition-colors cursor-pointer shadow-2xs shrink-0 whitespace-nowrap"
                               >
-                                {currentHasGroup ? 'Ubah Grup WA' : '+ Tambah Grup WA'}
+                                <span className="whitespace-nowrap">{currentHasGroup ? 'Ubah Grup WA' : '+ Tambah Grup WA'}</span>
                               </button>
                             </div>
                           </div>
 
                           {/* Chat Canvas Preview */}
                           <div className="p-5 bg-slate-100/90 flex-1 space-y-4">
-                            <div className="bg-white p-4.5 rounded-2xl rounded-tl-xs shadow-xs border border-slate-200/90 space-y-3">
+                            <div className="bg-white p-5 rounded-2xl rounded-tl-xs shadow-xs border border-slate-200/90 space-y-3.5">
                               <div className="flex items-center justify-between border-b border-slate-100 pb-2 text-[10px] text-slate-400">
                                 <span className="font-bold text-emerald-600 flex items-center gap-1.5">
                                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -3165,7 +3327,7 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                                       setCustomDraftTexts((prev) => ({ ...prev, [currentReport.customer_id]: val }))
                                     }}
                                     rows={14}
-                                    className="w-full p-3 bg-emerald-50/20 border-2 border-emerald-400 rounded-xl text-xs font-mono text-slate-800 leading-relaxed focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-inner"
+                                    className="w-full p-3.5 bg-emerald-50/20 border-2 border-emerald-400 rounded-xl text-xs font-mono text-slate-800 leading-relaxed focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-inner"
                                     placeholder="Edit pesan draf WhatsApp..."
                                   />
                                   <div className="text-[11px] text-slate-500 flex items-center justify-between">
@@ -3177,7 +3339,6 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                                           setCustomDraftTexts((prev) => {
                                             const next = { ...prev }
                                             delete next[currentReport.customer_id]
-                                            return next
                                           })
                                         }}
                                         className="text-rose-600 hover:underline text-[10px] font-bold cursor-pointer"
@@ -3195,32 +3356,32 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                             </div>
 
                             {/* --- DRAFT CHAT MAIN ACTION BUTTONS --- */}
-                            <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div className="p-4 sm:p-5 bg-white rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3">
                               <div className="flex flex-wrap items-center gap-2">
                                 {/* 1. BUTTON FOR HUMAN AGENT: COPY DRAFT TO CLIPBOARD */}
                                 <button
                                   type="button"
                                   onClick={() => handleCopyDraftChat(effectiveMessageText, currentReport.wa_group_name || currentReport.customer_name)}
-                                  className="py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer"
+                                  className="py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer shrink-0 whitespace-nowrap"
                                   title="Salin draft pesan ke clipboard untuk dipaste ke WhatsApp Web / Desktop"
                                 >
-                                  <Copy className="w-4 h-4" />
-                                  <span>Copy Draft Pesan</span>
+                                  <Copy className="w-4 h-4 shrink-0" />
+                                  <span className="whitespace-nowrap">Copy Draft Pesan</span>
                                 </button>
 
                                 {/* 2. TOGGLE EDIT DRAFT */}
                                 <button
                                   type="button"
                                   onClick={() => setIsEditingDraft(!isEditingDraft)}
-                                  className={`py-2.5 px-3.5 rounded-xl font-bold text-xs transition-all cursor-pointer border flex items-center gap-1.5 ${
+                                  className={`py-2.5 px-3.5 rounded-xl font-bold text-xs transition-all cursor-pointer border flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
                                     isEditingDraft
                                       ? 'bg-amber-100 text-amber-900 border-amber-300'
                                       : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
                                   }`}
                                   title="Edit teks pesan secara manual sebelum dikirim atau disalin"
                                 >
-                                  <Edit className="w-3.5 h-3.5 text-slate-600" />
-                                  <span>{isEditingDraft ? 'Selesai Edit' : 'Edit Draf'}</span>
+                                  <Edit className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+                                  <span className="whitespace-nowrap">{isEditingDraft ? 'Selesai Edit' : 'Edit Draf'}</span>
                                 </button>
                               </div>
 
@@ -3229,11 +3390,11 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                                 type="button"
                                 onClick={() => handleDispatchSingleCustomer(currentReport.customer_id, currentReport.wa_group_name || currentReport.customer_name)}
                                 disabled={singleCustomerDispatching}
-                                className="py-2.5 px-5 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-black text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                                className="py-2.5 px-5 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-black text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 shrink-0 whitespace-nowrap"
                                 title="Kirim pesan ini langsung ke grup WhatsApp customer melalui bot Watson"
                               >
-                                <Send className={`w-3.5 h-3.5 ${singleCustomerDispatching ? 'animate-spin' : 'text-emerald-400'}`} />
-                                <span>{singleCustomerDispatching ? 'Watson Mengirim...' : 'Kirim via Watson ke Group WA'}</span>
+                                <Send className={`w-3.5 h-3.5 shrink-0 ${singleCustomerDispatching ? 'animate-spin' : 'text-emerald-400'}`} />
+                                <span className="whitespace-nowrap">{singleCustomerDispatching ? 'Watson Mengirim...' : 'Kirim via Watson ke Group WA'}</span>
                               </button>
                             </div>
                           </div>
@@ -3255,7 +3416,7 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                       {currentReport && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {/* Unit Offline Breakdown for this Customer */}
-                          <div className="p-4.5 bg-white rounded-2xl border border-slate-200 shadow-2xs space-y-3">
+                          <div className="p-5 bg-white rounded-2xl border border-slate-200 shadow-2xs space-y-3.5">
                             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                               <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                                 <Radio className="w-3.5 h-3.5 text-rose-500" />
@@ -3286,7 +3447,7 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                           </div>
 
                           {/* Watson Safety Protocol Card */}
-                          <div className="p-4.5 bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl shadow-2xs space-y-3">
+                          <div className="p-5 bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl shadow-2xs space-y-3.5">
                             <div className="flex items-center justify-between border-b border-white/10 pb-2">
                               <h4 className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-1.5">
                                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
@@ -3411,10 +3572,10 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                     <button
                       type="submit"
                       disabled={naraFeedbackSending}
-                      className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                      className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shrink-0 whitespace-nowrap"
                     >
-                      <Send className="w-3.5 h-3.5" />
-                      <span>{naraFeedbackSending ? 'Memproses Respon...' : 'Kirim Inbound Reply ke Watson &rarr; Nara'}</span>
+                      <Send className="w-3.5 h-3.5 shrink-0" />
+                      <span className="whitespace-nowrap">{naraFeedbackSending ? 'Memproses Respon...' : 'Kirim Inbound Reply ke Watson → Nara'}</span>
                     </button>
                   </form>
                 </div>
@@ -3493,10 +3654,10 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                   <button
                     onClick={handleTriggerSafeBroadcast}
                     disabled={isBroadcasting}
-                    className="py-2.5 px-5 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-black text-xs rounded-xl shadow-2xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 self-start sm:self-auto"
+                    className="py-2.5 px-5 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-black text-xs rounded-xl shadow-2xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 self-start sm:self-center shrink-0 whitespace-nowrap"
                   >
-                    <Play className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>{isBroadcasting ? 'Memproses Antrean...' : 'Jalankan Safe Broadcast'}</span>
+                    <Play className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span className="whitespace-nowrap">{isBroadcasting ? 'Memproses Antrean...' : 'Jalankan Safe Broadcast'}</span>
                   </button>
                 </div>
 
@@ -3663,16 +3824,16 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                   ))}
                 </div>
 
-                <div className="p-4 bg-slate-900 text-white rounded-xl flex items-center justify-between">
+                <div className="p-4 bg-slate-900 text-white rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="text-xs">
                     <span className="font-bold text-amber-400 block mb-0.5">Rekomendasi Strategis Velocia untuk Q4 2026:</span>
                     <p className="text-slate-300">Luncurkan paket promo "Orin Fleet Sensor Pro" dengan diskon 25% untuk pemesanan armada 5 unit ke atas.</p>
                   </div>
                   <button
                     onClick={() => handleDelegatePlan('Promo Bundling Armada & Fuel Sensor Q4')}
-                    className="py-2 px-3.5 bg-amber-500 hover:bg-amber-600 active:scale-95 text-slate-900 font-black text-xs rounded-xl shadow-2xs transition-all shrink-0 cursor-pointer"
+                    className="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 active:scale-95 text-slate-900 font-black text-xs rounded-xl shadow-2xs transition-all shrink-0 whitespace-nowrap cursor-pointer self-start sm:self-center"
                   >
-                    Bahas di Chat Velocia
+                    <span className="whitespace-nowrap">Bahas di Chat Velocia</span>
                   </button>
                 </div>
               </div>
@@ -3692,14 +3853,14 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                     <button
                       key={p.id}
                       onClick={() => setVelociaTab(p.id)}
-                      className={`py-2 px-3.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+                      className={`py-2 px-3.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 shrink-0 whitespace-nowrap ${
                         isCur
                           ? 'bg-slate-900 text-white shadow-2xs'
                           : 'text-slate-600 hover:bg-slate-100'
                       }`}
                     >
-                      <span>{p.title}</span>
-                      <span className={`text-[9px] font-extrabold px-1.5 py-0.2 rounded ${
+                      <span className="whitespace-nowrap">{p.title}</span>
+                      <span className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded shrink-0 ${
                         isCur ? 'bg-white/20 text-white' : p.badgeColor
                       }`}>
                         {p.badge}
@@ -3711,7 +3872,7 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
 
               {/* Executive Overview Hero Banner */}
               <div className="p-6 bg-white rounded-2xl border border-slate-200 shadow-2xs space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
                     <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full border ${VELOCIA_PLANS[velociaTab].badgeColor}`}>
                       {VELOCIA_PLANS[velociaTab].badge}
@@ -3720,17 +3881,17 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                       {VELOCIA_PLANS[velociaTab].title}
                     </h2>
                     <p className="text-xs text-slate-500 font-medium flex items-center gap-1.5 mt-1">
-                      <Clock className="w-3.5 h-3.5 text-slate-400" />
-                      Periode Pelaksanaan: <strong>{VELOCIA_PLANS[velociaTab].period}</strong>
+                      <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span>Periode Pelaksanaan: <strong>{VELOCIA_PLANS[velociaTab].period}</strong></span>
                     </p>
                   </div>
 
                   <button
                     onClick={() => handleDelegatePlan(VELOCIA_PLANS[velociaTab].title)}
-                    className="py-2 px-4 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-bold text-xs rounded-xl shadow-2xs transition-all flex items-center gap-2 cursor-pointer self-start sm:self-auto"
+                    className="py-2.5 px-4 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-bold text-xs rounded-xl shadow-2xs transition-all flex items-center gap-2 cursor-pointer self-start sm:self-center shrink-0 whitespace-nowrap"
                   >
-                    <Send className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Diskusikan di Chat Velocia</span>
+                    <Send className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span className="whitespace-nowrap">Diskusikan di Chat Velocia</span>
                   </button>
                 </div>
 
@@ -3923,10 +4084,10 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                               onClick={() => {
                                 copyToClipboard(`Panduan Mandiri: ${item.issue}\n1. Buka aplikasi Orin Mobile\n2. Klik menu Profil > Keamanan\n3. Verifikasi nomor WhatsApp\n4. Buat PIN baru 6 digit`, `sop-${idx}`)
                               }}
-                              className="py-1.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all flex items-center gap-1 cursor-pointer"
+                              className="py-1.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all flex items-center gap-1 cursor-pointer shrink-0 whitespace-nowrap"
                             >
-                              {copiedId === `sop-${idx}` ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                              <span>{copiedId === `sop-${idx}` ? 'Tersalin' : 'Salin SOP'}</span>
+                              {copiedId === `sop-${idx}` ? <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" /> : <Copy className="w-3.5 h-3.5 shrink-0" />}
+                              <span className="whitespace-nowrap">{copiedId === `sop-${idx}` ? 'Tersalin' : 'Salin SOP'}</span>
                             </button>
                           </div>
                         </div>
@@ -3936,36 +4097,199 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
                 </div>
               )}
 
-              {/* Tab: TRENDS or ALL */}
+              {/* Tab: TRENDS / NEWS HARVESTER RADAR */}
               {(scoutTab === 'trends' || scoutTab === 'all') && (
-                <div className="p-5 bg-white rounded-2xl border border-slate-200 shadow-2xs">
-                  <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2 mb-3">
-                    <TrendingUp className="w-4 h-4 text-emerald-600" />
-                    Top Radar Tren AI Terpantau Minggu Ini
-                  </span>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80">
-                      <div className="flex items-center justify-between mb-1">
-                        <p className="text-xs font-black text-slate-900">Spatial Multi-Agent</p>
-                        <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">+184% Diskusi</span>
+                <div className="space-y-4">
+                  {/* Harvester Header & Query Switcher */}
+                  <div className="p-6 bg-white rounded-2xl border border-slate-200 shadow-2xs space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full border bg-emerald-50 text-emerald-700 border-emerald-200 flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            LIVE OSINT HARVESTER RADAR
+                          </span>
+                          <span className="text-[11px] text-slate-400 font-medium">
+                            Detik • Suara Surabaya • Pilar Media • Mojok
+                          </span>
+                        </div>
+                        <h2 className="text-xl font-black text-slate-900 tracking-tight mt-1.5 flex items-center gap-2">
+                          <Newspaper className="w-5 h-5 text-emerald-600" />
+                          Radar Berita Lapangan & Analisis Modus Kejahatan
+                        </h2>
+                        <p className="text-xs text-slate-500 font-medium mt-1">
+                          Scout memantau isu aktual kriminalitas dan logistik secara real-time, membedah celah pengamanan konvensional, dan merancang sudut pandang solutif Orin.
+                        </p>
                       </div>
-                      <span className="text-[11px] text-slate-600 leading-relaxed block">Lonjakan adopsi arsitektur 3D ruang kerja di kalangan enterprise CTO & tech founders.</span>
+
+                      <button
+                        onClick={() => fetchScoutHarvested(scoutHarvestQuery)}
+                        disabled={scoutHarvestLoading}
+                        className="self-start sm:self-center py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 shrink-0 whitespace-nowrap"
+                      >
+                        <RefreshCw className={`w-3.5 h-3.5 shrink-0 ${scoutHarvestLoading ? 'animate-spin text-emerald-600' : ''}`} />
+                        <span className="whitespace-nowrap">{scoutHarvestLoading ? 'Memindai Portal...' : 'Tarik Berita Terbaru'}</span>
+                      </button>
                     </div>
 
-                    <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80">
-                      <div className="flex items-center justify-between mb-1">
-                        <p className="text-xs font-black text-slate-900">Voice-to-Action Protocol</p>
-                        <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">+122% Adopsi</span>
+                    {/* Query Domain Filters */}
+                    <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-100">
+                      {[
+                        { id: 'curanmor', label: '🚨 Curanmor & Keamanan Kendaraan', desc: 'Detik & Suara Surabaya' },
+                        { id: 'fuel_theft', label: '⛽ Pencurian BBM Solar Armada', desc: 'Pilar Media & Detik' },
+                        { id: 'maintenance', label: '🚛 Perawatan & Engine Hours Truk', desc: 'Pilar Media & Orin' },
+                        { id: 'logistics_tips', label: '📦 Tips Logistik & Visibility', desc: 'Orin Articles & Mojok' }
+                      ].map((item) => (
+                        <button
+                          key={item.id}
+                          onClick={() => handleSelectHarvestQuery(item.id)}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 whitespace-nowrap ${
+                            scoutHarvestQuery === item.id
+                              ? 'bg-slate-900 text-white shadow-xs'
+                              : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
+                          }`}
+                        >
+                          {item.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Modus Operandi & Editorial Angle Cards */}
+                  {scoutHarvestData && (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      {/* Modus Operandi Patterns */}
+                      <div className="p-5 bg-gradient-to-br from-amber-500/5 via-white to-amber-500/10 rounded-2xl border border-amber-200/80 shadow-2xs space-y-3">
+                        <div className="flex items-center gap-2">
+                          <ShieldAlert className="w-4 h-4 text-amber-600" />
+                          <h3 className="text-xs font-black text-amber-900 uppercase tracking-wider">
+                            Pola & Modus Operandi Terdeteksi di Lapangan
+                          </h3>
+                        </div>
+                        <div className="space-y-2">
+                          {(scoutHarvestData.modus_operandi_patterns || []).map((pattern, idx) => (
+                            <div key={idx} className="flex items-start gap-2.5 p-2.5 bg-white/90 rounded-xl border border-amber-200/60 text-xs text-slate-700">
+                              <span className="w-4 h-4 rounded-full bg-amber-100 text-amber-800 text-[10px] font-black flex items-center justify-center shrink-0 mt-0.5">
+                                {idx + 1}
+                              </span>
+                              <span className="leading-relaxed font-medium">{pattern}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                      <span className="text-[11px] text-slate-600 leading-relaxed block">Pendelegasian tugas lisan real-time langsung ke pipeline task management kanban tim.</span>
+
+                      {/* Scout Editorial Recommendation & Quick Generate */}
+                      <div className="p-5 bg-gradient-to-br from-emerald-500/5 via-white to-emerald-500/10 rounded-2xl border border-emerald-200/80 shadow-2xs flex flex-col justify-between gap-4">
+                        <div className="space-y-2.5">
+                          <div className="flex items-center gap-2">
+                            <Sparkles className="w-4 h-4 text-emerald-600" />
+                            <h3 className="text-xs font-black text-emerald-900 uppercase tracking-wider">
+                              Rekomendasi Sudut Pandang Strategis (Scout POV)
+                            </h3>
+                          </div>
+                          <div>
+                            <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider block">Hook Judul Rekomendasi:</span>
+                            <p className="text-sm font-black text-slate-900 leading-snug mt-0.5">
+                              "{scoutHarvestData.editorial_recommendation?.suggested_hook}"
+                            </p>
+                          </div>
+                          <div>
+                            <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider block">Akar Masalah yang Dibedah:</span>
+                            <p className="text-xs text-slate-600 leading-relaxed mt-0.5">
+                              {scoutHarvestData.editorial_recommendation?.problem_to_deconstruct}
+                            </p>
+                          </div>
+                          <div>
+                            <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider block">Jangkar Produk Orin:</span>
+                            <span className="inline-block mt-0.5 px-2.5 py-0.5 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-lg border border-emerald-200">
+                              {scoutHarvestData.editorial_recommendation?.recommended_product_anchor}
+                            </span>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() => handleTriggerScoutGenerate(scoutHarvestData.editorial_recommendation?.suggested_hook || scoutHarvestQuery)}
+                          disabled={scoutGenerating}
+                          className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs disabled:opacity-50 shrink-0 whitespace-nowrap"
+                        >
+                          {scoutGenerating ? (
+                            <>
+                              <RefreshCw className="w-3.5 h-3.5 animate-spin shrink-0" />
+                              <span className="whitespace-nowrap">Scout Sedang Menulis Draf...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Zap className="w-3.5 h-3.5 fill-current shrink-0" />
+                              <span className="whitespace-nowrap">Tulis Artikel dari POV Ini</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Harvested News Feed List */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
+                        <Newspaper className="w-4 h-4 text-slate-700" />
+                        Laporan Berita Aktual Terpantau ({scoutHarvestData?.articles?.length || 0} Artikel)
+                      </h3>
+                      <span className="text-[11px] text-slate-400 font-medium">Domain: {scoutHarvestData?.topic_domain || 'Keamanan'}</span>
                     </div>
 
-                    <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80">
-                      <div className="flex items-center justify-between mb-1">
-                        <p className="text-xs font-black text-slate-900">Edge IoT Telemetry Sync</p>
-                        <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">+95% Penetrasi</span>
-                      </div>
-                      <span className="text-[11px] text-slate-600 leading-relaxed block">Pengawasan detak unit offline otomatis oleh AI dengan respons penanganan instan.</span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {(scoutHarvestData?.articles || []).map((news, idx) => (
+                        <div key={idx} className="p-4 bg-white rounded-2xl border border-slate-200/90 shadow-2xs space-y-2.5 flex flex-col justify-between">
+                          <div className="space-y-1.5">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className={`text-[10px] font-black px-2 py-0.5 rounded-full border ${
+                                news.source?.includes('Detik')
+                                  ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                  : news.source?.includes('Suara')
+                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                  : news.source?.includes('Pilar')
+                                  ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                  : 'bg-purple-50 text-purple-700 border-purple-200'
+                              }`}>
+                                {news.source}
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-medium">{news.date || 'Aktual'}</span>
+                            </div>
+
+                            <h4 className="text-xs font-black text-slate-900 leading-snug line-clamp-2">
+                              {news.title}
+                            </h4>
+
+                            <p className="text-[11px] text-slate-500 leading-relaxed line-clamp-2">
+                              {news.snippet}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
+                            {news.url && (
+                              <a
+                                href={news.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-[11px] text-slate-500 hover:text-slate-900 font-bold flex items-center gap-1 transition-colors"
+                              >
+                                <span>Buka Sumber</span>
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                            )}
+
+                            <button
+                              onClick={() => handleTriggerScoutGenerate(news.title, `Sudut pandang: Bedah isu riil "${news.title}" dari ${news.source} dengan memberikan tips preventif objektif lalu sisipkan proteksi teknologi ORIN.`)}
+                              disabled={scoutGenerating}
+                              className="py-1.5 px-3 bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-bold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shrink-0 whitespace-nowrap"
+                            >
+                              <Edit3 className="w-3 h-3 text-emerald-400 shrink-0" />
+                              <span className="whitespace-nowrap">Tulis Artikel</span>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -3974,53 +4298,300 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
               {/* Tab: ARTICLES or ALL */}
               {(scoutTab === 'articles' || scoutTab === 'all') && (
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-slate-700" />
-                      Draf Artikel & Blog Siap Rilis (Otomatis dibuat oleh Scout)
-                    </h3>
-                    <span className="text-[11px] text-slate-400 font-medium">3 Draf Terpublikasikan</span>
-                  </div>
-
-                  {SCOUT_ARTICLES.map((art) => (
-                    <div key={art.id} className="p-5 bg-white rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  {/* Studio Header & Trigger Generator */}
+                  <div className="p-6 bg-white rounded-2xl border border-slate-200 shadow-2xs space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div>
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-800 border border-slate-200">
-                            {art.category}
+                          <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full border bg-emerald-50 text-emerald-700 border-emerald-200 flex items-center gap-1.5">
+                            <Sparkles className="w-3 h-3 text-emerald-600" />
+                            ORIN STRATEGIC COPYWRITER STUDIO
                           </span>
                           <span className="text-[11px] text-slate-400 font-medium">
-                            {art.readTime} • SEO Score: <strong className="text-emerald-600">{art.seoScore}</strong>
+                            Struktur Narasi 5-Babak • Anti-Hard Sell
                           </span>
                         </div>
-
-                        <button
-                          onClick={() => copyToClipboard(art.content, art.id)}
-                          className="self-start sm:self-auto py-1.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
-                        >
-                          {copiedId === art.id ? (
-                            <>
-                              <Check className="w-3.5 h-3.5 text-emerald-600" />
-                              Tersalin!
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-3.5 h-3.5" />
-                              Salin Naskah Lengkap
-                            </>
-                          )}
-                        </button>
+                        <h2 className="text-xl font-black text-slate-900 tracking-tight mt-1.5 flex items-center gap-2">
+                          <FileText className="w-5 h-5 text-emerald-600" />
+                          Draf Artikel & Naskah Copywriting Orin
+                        </h2>
+                        <p className="text-xs text-slate-500 font-medium mt-1">
+                          Setiap draf membedah kasus lapangan aktual, memberikan edukasi preventif terukur, menyisipkan solusi teknologi Orin secara elegan, dan menyertakan Call-to-Action bersahabat.
+                        </p>
                       </div>
 
-                      <h4 className="text-base font-black text-slate-900">
-                        {art.title}
-                      </h4>
-
-                      <p className="text-xs text-slate-700 leading-relaxed bg-slate-50/80 p-3.5 rounded-xl border border-slate-100 whitespace-pre-line font-serif">
-                        {art.content}
-                      </p>
+                      <div className="flex items-center gap-2 shrink-0 self-start sm:self-center">
+                        <button
+                          onClick={() => fetchScoutArticles()}
+                          disabled={scoutArticlesLoading}
+                          className="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all cursor-pointer shrink-0"
+                          title="Refresh Draf Artikel"
+                        >
+                          <RefreshCw className={`w-3.5 h-3.5 shrink-0 ${scoutArticlesLoading ? 'animate-spin text-emerald-600' : ''}`} />
+                        </button>
+                        <button
+                          onClick={() => setShowScoutGenerator(!showScoutGenerator)}
+                          className="py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-xs shrink-0 whitespace-nowrap"
+                        >
+                          <Plus className="w-4 h-4 shrink-0" />
+                          <span className="whitespace-nowrap">{showScoutGenerator ? 'Tutup Generator' : 'Tulis Artikel Baru'}</span>
+                        </button>
+                      </div>
                     </div>
-                  ))}
+
+                    {/* Interactive Generator Form (Collapsible) */}
+                    {showScoutGenerator && (
+                      <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200/90 space-y-4 animate-in fade-in duration-150">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                            <Bot className="w-4 h-4 text-emerald-600" />
+                            Parameter Generator Scout Engine
+                          </span>
+                          <span className="text-[11px] text-slate-500">Pilih preset topik atau masukkan brief kustom</span>
+                        </div>
+
+                        {/* Preset Topic Chips */}
+                        <div className="flex flex-wrap gap-2">
+                          {[
+                            { label: '🚨 Curanmor (Kunci Ganda vs GPS)', topic: 'curanmor', instructions: 'Fokus pada pola waktu rawan di parkir terbuka dan mengapa kunci stang saja tidak cukup.', prod: 'orin_gps_tracker' },
+                            { label: '⛽ Audit BBM (Kencing Solar Armada)', topic: 'fuel_theft', instructions: 'Bongkar celah nota manual SPBU dan hadirkan capacitive fuel sensor Orin.', prod: 'orin_fuel_sensor_fleet' },
+                            { label: '🚛 Servis Truk (Engine Hours Telemetri)', topic: 'maintenance', instructions: 'Jelaskan risiko jadwal servis kalender vs jam kerja mesin aktual.', prod: 'orin_fuel_sensor_fleet' },
+                            { label: '📱 Proteksi Motor Baru (Orin Tag²)', topic: 'orin_tag_protection', instructions: 'Tekankan instalasi tanpa potong kabel aki untuk motor baru.', prod: 'orin_tag' }
+                          ].map((preset, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => {
+                                setScoutCustomTopic(preset.topic)
+                                setScoutCustomAngle(preset.instructions)
+                                setScoutTargetProduct(preset.prod)
+                              }}
+                              className="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-lg border border-slate-200 transition-colors cursor-pointer shrink-0 whitespace-nowrap"
+                            >
+                              <span className="whitespace-nowrap">{preset.label}</span>
+                            </button>
+                          ))}
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                              Topik / Isu Target
+                            </label>
+                            <input
+                              type="text"
+                              value={scoutCustomTopic}
+                              onChange={(e) => setScoutCustomTopic(e.target.value)}
+                              placeholder="Contoh: curanmor, fuel_theft, atau pencurian motor matic di minimarket"
+                              className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                              Jangkar Produk Orin yang Ditonjolkan
+                            </label>
+                            <select
+                              value={scoutTargetProduct}
+                              onChange={(e) => setScoutTargetProduct(e.target.value)}
+                              className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 cursor-pointer"
+                            >
+                              <option value="orin_gps_tracker">ORIN GPS Tracker (Motor & Mobil, Remote Engine Cut-Off)</option>
+                              <option value="orin_tag">ORIN Tag² (Apple Find My, Tanpa Potong Kabel)</option>
+                              <option value="orin_fuel_sensor_fleet">ORIN Fleet Pro + Fuel Sensor (Truk & Armada Komersial)</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1">
+                            Instruksi Sudut Pandang / Angle Khusus (Opsional)
+                          </label>
+                          <textarea
+                            rows={2}
+                            value={scoutCustomAngle}
+                            onChange={(e) => setScoutCustomAngle(e.target.value)}
+                            placeholder="Contoh: Awali dengan data statistik kehilangan motor di Jawa Timur, sorot titik lengah parkir tanpa pengawas, lalu kaitkan dengan respon cepat remote cutoff."
+                            className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-end gap-2 pt-2">
+                          <button
+                            type="button"
+                            onClick={() => setShowScoutGenerator(false)}
+                            className="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl border border-slate-200 transition-colors cursor-pointer shrink-0 whitespace-nowrap"
+                          >
+                            <span className="whitespace-nowrap">Batal</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleTriggerScoutGenerate(scoutCustomTopic, scoutCustomAngle, scoutTargetProduct)}
+                            disabled={scoutGenerating || !scoutCustomTopic.trim()}
+                            className="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-black rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-xs disabled:opacity-50 shrink-0 whitespace-nowrap"
+                          >
+                            {scoutGenerating ? (
+                              <>
+                                <RefreshCw className="w-3.5 h-3.5 animate-spin text-emerald-400 shrink-0" />
+                                <span className="whitespace-nowrap">Scout Sedang Meriset & Menulis...</span>
+                              </>
+                            ) : (
+                              <>
+                                <Zap className="w-3.5 h-3.5 text-emerald-400 fill-current shrink-0" />
+                                <span className="whitespace-nowrap">Eksekusi Riset & Tulis Artikel</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Articles List */}
+                  <div className="space-y-4">
+                    {scoutArticles.map((art) => (
+                      <div key={art.id} className="p-6 bg-white rounded-2xl border border-slate-200 shadow-2xs space-y-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-800 border border-slate-200 shrink-0">
+                              {art.category}
+                            </span>
+                            <span className="text-[11px] text-slate-400 font-medium">
+                              {art.read_time || art.readTime || '5 menit baca'} • SEO Score: <strong className="text-emerald-600">{art.seo_score || art.seoScore || '95/100'}</strong>
+                            </span>
+                            <span className="text-[11px] text-slate-400">• {art.created_at || 'Baru saja'}</span>
+                          </div>
+
+                          <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+                            <button
+                              onClick={() => setScoutSelectedArticleModal(art)}
+                              className="py-1.5 px-3 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-slate-700 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0 whitespace-nowrap"
+                            >
+                              <Eye className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                              <span className="whitespace-nowrap">Baca Penuh</span>
+                            </button>
+
+                            <button
+                              onClick={() => copyToClipboard(art.content_markdown || art.content, art.id)}
+                              className="py-1.5 px-3 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0 whitespace-nowrap"
+                            >
+                              {copiedId === art.id ? (
+                                <>
+                                  <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                                  <span className="whitespace-nowrap">Tersalin!</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="w-3.5 h-3.5 shrink-0" />
+                                  <span className="whitespace-nowrap">Salin Naskah</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <h4 className="text-base font-black text-slate-900 leading-snug">
+                            {art.title}
+                          </h4>
+                          {art.excerpt && (
+                            <p className="text-xs text-slate-500 italic mt-1 font-serif">
+                              "{art.excerpt}"
+                            </p>
+                          )}
+                        </div>
+
+                        {/* 5-Babak Narrative Breakdown (Preview) */}
+                        {art.hook ? (
+                          <div className="space-y-2 pt-2 border-t border-slate-100">
+                            <span className="text-[11px] font-black text-slate-900 uppercase tracking-wider block">
+                              Alur Naratif 5-Babak Scout:
+                            </span>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                              {/* 1. Hook */}
+                              <div className="p-3 bg-rose-50/50 rounded-xl border border-rose-200/60 space-y-1">
+                                <span className="text-[10px] font-black text-rose-700 uppercase tracking-wider flex items-center gap-1">
+                                  <span>1. Hook & Realita Lapangan</span>
+                                </span>
+                                <p className="text-[11px] text-slate-700 line-clamp-2 leading-relaxed">
+                                  {art.hook}
+                                </p>
+                              </div>
+
+                              {/* 2. Modus & Masalah */}
+                              <div className="p-3 bg-amber-50/50 rounded-xl border border-amber-200/60 space-y-1">
+                                <span className="text-[10px] font-black text-amber-700 uppercase tracking-wider flex items-center gap-1">
+                                  <span>2. Bedah Modus & Akar Masalah</span>
+                                </span>
+                                <p className="text-[11px] text-slate-700 line-clamp-2 leading-relaxed">
+                                  {art.problem_analysis}
+                                </p>
+                              </div>
+
+                              {/* 3. Edukasi Preventif */}
+                              <div className="p-3 bg-blue-50/50 rounded-xl border border-blue-200/60 space-y-1">
+                                <span className="text-[10px] font-black text-blue-700 uppercase tracking-wider flex items-center gap-1">
+                                  <span>3. Pilar Edukasi Preventif Objektif</span>
+                                </span>
+                                <p className="text-[11px] text-slate-700 line-clamp-2 leading-relaxed">
+                                  {art.educational_solution}
+                                </p>
+                              </div>
+
+                              {/* 4. Soft-Selling Orin */}
+                              <div className="p-3 bg-emerald-50/50 rounded-xl border border-emerald-200/60 space-y-1">
+                                <span className="text-[10px] font-black text-emerald-700 uppercase tracking-wider flex items-center gap-1">
+                                  <span>4. Natural Opportunity & Solusi Orin</span>
+                                </span>
+                                <p className="text-[11px] text-slate-700 line-clamp-2 leading-relaxed">
+                                  {art.soft_selling}
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* 5. CTA Bar */}
+                            <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                              <div className="text-[11px] text-slate-600">
+                                <strong className="text-slate-900 font-bold">5. CTA:</strong> {art.cta}
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-xs text-slate-700 leading-relaxed bg-slate-50/80 p-3.5 rounded-xl border border-slate-100 whitespace-pre-line font-serif">
+                            {art.content}
+                          </p>
+                        )}
+
+                        {/* Harvested Sources & Keywords Footer */}
+                        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 text-[11px]">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className="text-slate-400 font-bold">Rujukan:</span>
+                            {(art.harvested_sources || []).map((src, sIdx) => (
+                              <a
+                                key={sIdx}
+                                href={src.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200 flex items-center gap-1 transition-colors"
+                              >
+                                <span>{src.source}</span>
+                                <ExternalLink className="w-2.5 h-2.5" />
+                              </a>
+                            ))}
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-1">
+                            {(art.keywords || []).slice(0, 4).map((kw, kIdx) => (
+                              <span key={kIdx} className="text-[10px] text-slate-400 font-mono">
+                                #{kw}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -4147,33 +4718,201 @@ Kuncinya terletak pada teknik optimasi aset: penggunaan skeletal animation terko
               </div>
 
               {/* Action Buttons Footer */}
-              <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2.5">
+              <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2.5 shrink-0">
                 <button
                   type="button"
                   onClick={() => setShowGroupModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-200/70 hover:text-slate-800 transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-200/70 hover:text-slate-800 transition-colors cursor-pointer shrink-0 whitespace-nowrap"
                 >
-                  Batal
+                  <span className="whitespace-nowrap">Batal</span>
                 </button>
                 <button
                   type="submit"
                   disabled={savingGroupMapping || !inputGroupName.trim()}
-                  className="px-5 py-2.5 rounded-xl text-xs font-black bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white shadow-xs transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  className="px-5 py-2.5 rounded-xl text-xs font-black bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white shadow-xs transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shrink-0 whitespace-nowrap"
                 >
                   {savingGroupMapping ? (
                     <>
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                      <span>Menyimpan...</span>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin shrink-0" />
+                      <span className="whitespace-nowrap">Menyimpan...</span>
                     </>
                   ) : (
                     <>
-                      <Check className="w-3.5 h-3.5" />
-                      <span>Simpan Grup WA</span>
+                      <Check className="w-3.5 h-3.5 shrink-0" />
+                      <span className="whitespace-nowrap">Simpan Grup WA</span>
                     </>
                   )}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* --- SCOUT STRATEGIC ARTICLE READER MODAL --- */}
+      {scoutSelectedArticleModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] border border-slate-200 shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-150">
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/50">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  {scoutSelectedArticleModal.category}
+                </span>
+                <span className="text-[11px] text-slate-400 font-medium">
+                  {scoutSelectedArticleModal.read_time || scoutSelectedArticleModal.readTime || '5 menit baca'} • SEO Score: <strong className="text-emerald-600">{scoutSelectedArticleModal.seo_score || scoutSelectedArticleModal.seoScore || '96/100'}</strong>
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setScoutSelectedArticleModal(null)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto space-y-5">
+              <div>
+                <h2 className="text-xl font-black text-slate-900 leading-tight">
+                  {scoutSelectedArticleModal.title}
+                </h2>
+                {scoutSelectedArticleModal.excerpt && (
+                  <p className="text-xs text-slate-500 italic mt-1.5 font-serif border-l-2 border-emerald-400 pl-3">
+                    {scoutSelectedArticleModal.excerpt}
+                  </p>
+                )}
+              </div>
+
+              {/* 5-Babak Narrative Breakdown (if available) */}
+              {scoutSelectedArticleModal.hook && (
+                <div className="space-y-3 pt-3 border-t border-slate-100">
+                  <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                    Bedah Struktur Narasi 5-Babak
+                  </span>
+
+                  <div className="space-y-2.5">
+                    <div className="p-3.5 bg-rose-50/60 rounded-xl border border-rose-200/70 space-y-1">
+                      <span className="text-[10px] font-black text-rose-700 uppercase tracking-wider block">
+                        Babak 1: Hook & Realita Lapangan
+                      </span>
+                      <p className="text-xs text-slate-700 leading-relaxed">
+                        {scoutSelectedArticleModal.hook}
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 bg-amber-50/60 rounded-xl border border-amber-200/70 space-y-1">
+                      <span className="text-[10px] font-black text-amber-700 uppercase tracking-wider block">
+                        Babak 2: Bedah Modus & Akar Masalah
+                      </span>
+                      <p className="text-xs text-slate-700 leading-relaxed">
+                        {scoutSelectedArticleModal.problem_analysis}
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 bg-blue-50/60 rounded-xl border border-blue-200/70 space-y-1">
+                      <span className="text-[10px] font-black text-blue-700 uppercase tracking-wider block">
+                        Babak 3: Pilar Edukasi Preventif Objektif
+                      </span>
+                      <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-line">
+                        {scoutSelectedArticleModal.educational_solution}
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 bg-emerald-50/60 rounded-xl border border-emerald-200/70 space-y-1">
+                      <span className="text-[10px] font-black text-emerald-700 uppercase tracking-wider block">
+                        Babak 4: Natural Opportunity & Soft-Selling ORIN
+                      </span>
+                      <p className="text-xs text-slate-700 leading-relaxed">
+                        {scoutSelectedArticleModal.soft_selling}
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 bg-purple-50/60 rounded-xl border border-purple-200/70 space-y-1">
+                      <span className="text-[10px] font-black text-purple-700 uppercase tracking-wider block">
+                        Babak 5: Call-to-Action (CTA)
+                      </span>
+                      <p className="text-xs text-slate-700 leading-relaxed">
+                        {scoutSelectedArticleModal.cta}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Full Markdown Article Content */}
+              <div className="pt-3 border-t border-slate-100 space-y-2">
+                <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5 text-slate-600" />
+                  Naskah Lengkap (Siap Publish)
+                </span>
+                <div className="p-4 bg-slate-50/90 rounded-2xl border border-slate-200 text-xs text-slate-800 leading-relaxed whitespace-pre-line font-serif">
+                  {scoutSelectedArticleModal.content_markdown || scoutSelectedArticleModal.content}
+                </div>
+              </div>
+
+              {/* Sources & Keywords */}
+              <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="text-slate-400 font-bold">Rujukan Berita Aktual:</span>
+                  {(scoutSelectedArticleModal.harvested_sources || []).map((src, idx) => (
+                    <a
+                      key={idx}
+                      href={src.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 flex items-center gap-1 transition-colors"
+                    >
+                      <span>{src.source}: {src.title?.slice(0, 24)}...</span>
+                      <ExternalLink className="w-2.5 h-2.5" />
+                    </a>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-1">
+                  {(scoutSelectedArticleModal.keywords || []).map((kw, idx) => (
+                    <span key={idx} className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-mono">
+                      #{kw}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0">
+              <span className="text-[11px] text-slate-400">
+                Slug: <code className="text-slate-700 font-mono">/{scoutSelectedArticleModal.slug || 'artikel'}</code>
+              </span>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setScoutSelectedArticleModal(null)}
+                  className="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl border border-slate-200 transition-colors cursor-pointer shrink-0 whitespace-nowrap"
+                >
+                  <span className="whitespace-nowrap">Tutup</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(scoutSelectedArticleModal.content_markdown || scoutSelectedArticleModal.content, 'modal-art')}
+                  className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-black rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-xs shrink-0 whitespace-nowrap"
+                >
+                  {copiedId === 'modal-art' ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      <span className="whitespace-nowrap">Naskah Tersalin!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5 shrink-0" />
+                      <span className="whitespace-nowrap">Salin Naskah Lengkap</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

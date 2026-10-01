@@ -8,6 +8,7 @@ import CoffeeCorner from './CoffeeCorner'
 import OfficeNPC from './OfficeNPC'
 import DeskAccessories from './DeskAccessories'
 import OfficePlants from './OfficePlants'
+import ExecutiveWorkstation from './ExecutiveWorkstation'
 
 /**
  * Camera controller that smoothly transitions focus when an agent is selected,
@@ -656,6 +657,17 @@ export default function OfficeScene({
 
           {/* Lush Greenery & Floor / Desktop Plants */}
           <OfficePlants isColorful={isColorful} />
+
+          {/* Executive Workstation & Desk for COO (Chief Operating Officer) */}
+          <ExecutiveWorkstation
+            position={[-1.8, 0, 0.35]}
+            rotation={[0, 0, 0]}
+            isSelected={selectedAgent?.id === 'coo'}
+            onClick={() => {
+              const coo = agents.find((a) => a.id === 'coo')
+              if (coo) onSelectAgent(coo)
+            }}
+          />
 
           {/* Autonomous NPC Cleaning & Coffee Delivery Robot */}
           {scenerySettings?.showNPC && (

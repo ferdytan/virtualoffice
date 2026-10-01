@@ -46,7 +46,10 @@ from routers import (
     nara_router,
     chat_router,
     tasks_router,
-    tools_router
+    tools_router,
+    scout_router,
+    llm_router,
+    coo_router
 )
 
 # Setup logging
@@ -54,9 +57,9 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(na
 logger = logging.getLogger("virtual_office.server")
 
 app = FastAPI(
-    title="Virtual Office AI Backend - Phase 2 Ecosystem",
-    description="Modular FastAPI + CrewAI backend with Sherloc, Watson, Nara, Velocia, and Scout.",
-    version="2.0.0"
+    title="Virtual Office AI Backend - Phase 3 Ecosystem",
+    description="Modular FastAPI + CrewAI backend with COO Orchestrator, Telegram Gateway, Sherloc, Watson, Nara, Velocia, and Scout.",
+    version="3.0.0"
 )
 
 # Mount uploads directory for serving custom GLB models
@@ -77,6 +80,9 @@ app.include_router(nara_router)
 app.include_router(chat_router)
 app.include_router(tasks_router)
 app.include_router(tools_router)
+app.include_router(scout_router)
+app.include_router(llm_router)
+app.include_router(coo_router)
 
 
 @app.get("/")
@@ -104,5 +110,6 @@ def health_check():
 
 if __name__ == "__main__":
     import uvicorn
+    backend_dir = os.path.dirname(os.path.abspath(__file__))
     logger.info(f"Starting Virtual Office AI Backend on http://{HOST}:{PORT}")
-    uvicorn.run("server:app", host=HOST, port=PORT, reload=True)
+    uvicorn.run("server:app", host=HOST, port=PORT, reload=True, reload_dirs=[backend_dir])
