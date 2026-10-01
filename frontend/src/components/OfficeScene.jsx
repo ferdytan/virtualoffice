@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useMemo, Suspense } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { OrbitControls, useGLTF, useTexture, ContactShadows } from '@react-three/drei'
+import { OrbitControls, OrthographicCamera, Environment, useGLTF, useTexture, ContactShadows } from '@react-three/drei'
 import * as THREE from 'three'
 import AgentAvatar from './AgentAvatar'
 import ScreenDisplays from './ScreenDisplays'
@@ -57,7 +57,11 @@ function CameraRig({
     prevZoomTriggerRef.current = zoomTrigger
 
     const isZoomIn = zoomTrigger.action === 'in'
-    if (isTopDown) {
+    if (camera.isOrthographicCamera) {
+      const step = isZoomIn ? 18 : -18
+      camera.zoom = THREE.MathUtils.clamp(camera.zoom + step, 45, 160)
+      camera.updateProjectionMatrix()
+    } else if (isTopDown) {
       const step = isZoomIn ? -2.6 : 2.6
       camera.position.y = THREE.MathUtils.clamp(camera.position.y + step, 4.5, 28)
     } else {
@@ -75,22 +79,11 @@ function CameraRig({
     if (!controlsRef.current) return
 
     if (isTopDown) {
-      // In Top-Down mode (tampak atas): strictly lock overhead, only allowing zoom in/out
-      let targetPos = topDownTarget
-      if (selectedAgent && selectedAgent.position) {
-        targetPos = new THREE.Vector3(selectedAgent.position[0], 0, selectedAgent.position[2])
-      }
-      controlsRef.current.target.lerp(targetPos, 0.08)
-
+      controlsRef.current.target.lerp(topDownTarget, 0.08)
       if (isTransitioningRef.current) {
-        const desiredCamPos = new THREE.Vector3(targetPos.x, 18, targetPos.z - 0.001)
-        camera.position.lerp(desiredCamPos, 0.08)
-      } else {
-        camera.position.x = targetPos.x
-        camera.position.z = targetPos.z - 0.001
+        camera.position.lerp(new THREE.Vector3(0, 20, 0.001), 0.08)
       }
     } else {
-      // In Isometric mode: standard 3D perspective angle
       if (selectedAgent && selectedAgent.position) {
         const targetPos = new THREE.Vector3(
           selectedAgent.position[0],
@@ -98,20 +91,10 @@ function CameraRig({
           selectedAgent.position[2]
         )
         controlsRef.current.target.lerp(targetPos, 0.08)
-
-        // Smoothly glide camera into a high, cozy isometric closeup of the agent's pod
-        const desiredCamPos = new THREE.Vector3(
-          selectedAgent.position[0],
-          7.2,
-          selectedAgent.position[2] + 7.8
-        )
-        camera.position.lerp(desiredCamPos, 0.06)
       } else {
-        controlsRef.current.target.lerp(defaultTarget, 0.05)
-
+        controlsRef.current.target.lerp(defaultTarget, 0.06)
         if (isTransitioningRef.current) {
-          const desiredCamPos = new THREE.Vector3(0, 13.5, 14.5)
-          camera.position.lerp(desiredCamPos, 0.06)
+          camera.position.lerp(new THREE.Vector3(12, 10, 12), 0.08)
         }
       }
     }
@@ -130,8 +113,8 @@ function CameraRig({
       enableRotate={!isTopDown}
       enablePan={false}
       enableZoom={true}
-      maxPolarAngle={isTopDown ? 0.001 : Math.PI / 2.6}
-      minPolarAngle={isTopDown ? 0 : Math.PI / 6}
+      maxPolarAngle={isTopDown ? 0.001 : Math.PI / 2.2}
+      minPolarAngle={isTopDown ? 0 : Math.PI / 4}
       maxAzimuthAngle={isTopDown ? 0 : Infinity}
       minAzimuthAngle={isTopDown ? 0 : -Infinity}
     />
@@ -615,24 +598,29 @@ export default function OfficeScene({
     <div className="w-full h-full relative cursor-grab active:cursor-grabbing">
       <Canvas
         shadows
-        camera={{ position: [0, 13.5, 14.5], fov: 40 }}
         gl={{ antialias: true, alpha: false }}
       >
-        {/* Canvas Background: Clean porcelain studio diorama backdrop */}
-        <color attach="background" args={['#f8fafc']} />
-
-        {/* Ambient & Directional Lighting Setup for Clean Studio Diorama */}
-        <ambientLight color="#ffffff" intensity={Math.PI * 0.9} />
-        <hemisphereLight
-          skyColor="#ffffff"
-          groundColor="#e2e8f0"
-          intensity={0.65}
+        {/* Section 4: Pure Isometric Orthographic Camera */}
+        <OrthographicCamera
+          makeDefault
+          position={[12, 10, 12]}
+          zoom={80}
         />
 
+        {/* Clean Clay Porcelain Backdrop */}
+        <color attach="background" args={['#f8fafc']} />
+
+        {/* Section 1: Setup Cahaya: Environment preset="city" & directionalLight bersudut 45 derajat */}
+        <ambientLight color="#fffbeb" intensity={0.8} />
+
+        <Suspense fallback={null}>
+          <Environment preset="city" />
+        </Suspense>
+
         <directionalLight
-          position={[10, 22, 12]}
+          position={[10, 15, 10]}
           color="#ffffff"
-          intensity={Math.PI * 0.75}
+          intensity={1.2}
           castShadow
           shadow-mapSize-width={2048}
           shadow-mapSize-height={2048}
@@ -647,7 +635,7 @@ export default function OfficeScene({
         />
 
         {/* Soft Accent Fill Light */}
-        <directionalLight position={[-10, 14, -10]} intensity={0.4} color="#bae6fd" />
+        <directionalLight position={[-8, 12, -8]} intensity={0.4} color="#bae6fd" />
 
         <Suspense fallback={null}>
           {isDiorama ? (
@@ -701,13 +689,13 @@ export default function OfficeScene({
           <meshBasicMaterial />
         </mesh>
 
-        {/* Soft Contact Shadow beneath Diorama Platform */}
+        {/* Section 1: ContactShadows under floor diorama and desks */}
         <ContactShadows
-          position={[0, -0.22, 0]}
-          opacity={0.45}
-          scale={28}
-          blur={2.0}
-          far={6}
+          position={[0, 0, 0]}
+          opacity={0.4}
+          scale={20}
+          blur={2.5}
+          far={4}
         />
 
         {/* Dynamic Camera Orbit & Lerping Controls (Supports Isometric & Top-Down / Tampak Atas) */}
