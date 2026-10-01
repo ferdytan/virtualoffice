@@ -22,12 +22,12 @@ const INITIAL_AGENTS = [
     id: 'sherloc',
     name: 'Sherloc',
     role: 'Frontline WhatsApp & Customer Face',
-    role_badge: 'FRONTLINE CS',
+    role_badge: 'FRONTLINE CS (BUNNY)',
     status: 'working',
-    color: '#f59e0b',
-    color_name: 'Amber Gold',
-    position: [-4.135, 0, 4.471], // Front Desk / Receptionist Counter
-    rotation: [0, Math.PI, 0], // Facing South into lobby/office
+    color: '#f43f5e',
+    color_name: 'Coral Rose',
+    position: [-5.3, 0.05, -2.5], // Top-Left Coral Red Hex Pod (Bunny Girl)
+    rotation: [0, Math.PI / 4, 0], // Facing inward into office
     model: 'gpt-4o-mini',
     description: 'Satu-satunya Frontline Voice & Face WhatsApp customer. Memvalidasi nomor telepon/email pengguna (Pelanggan Orin vs Calon), menjawab FAQ dari Knowledge Base, serta mendelegasikan issue GPS ke Nara dan eskalasi teknis ke Watson.',
     quick_prompts: [
@@ -41,12 +41,12 @@ const INITIAL_AGENTS = [
     id: 'watson',
     name: 'Watson',
     role: 'Technical Escalation & Knowledge Loop',
-    role_badge: 'TECH ESCALATION',
+    role_badge: 'TECH ESCALATION (CAT)',
     status: 'available',
-    color: '#6366f1',
-    color_name: 'Deep Indigo',
-    position: [2.85, 0, -1.89], // Workstation 4, side-by-side with Nara
-    rotation: [0, Math.PI, 0], // Facing South (-Z)
+    color: '#0284c7',
+    color_name: 'Cyber Blue',
+    position: [5.3, 0.05, -2.5], // Top-Right Cyan Blue Hex Pod (Cat Boy sipping coffee)
+    rotation: [0, -Math.PI / 4, 0], // Facing inward into office
     model: 'gpt-4o-mini',
     description: 'Jembatan eskalasi teknis ke WhatsApp Group Tim Manajemen & Lead internal. Menerima solusi eskalasi dan secara otomatis memanen pasangan Q&A ke Knowledge Base / RAG.',
     quick_prompts: [
@@ -59,14 +59,14 @@ const INITIAL_AGENTS = [
     id: 'nara',
     name: 'Nara',
     role: 'CS & Offline Unit Reminder',
-    role_badge: 'REMINDER CS',
+    role_badge: 'REMINDER CS (SERVER HUB)',
     status: 'working',
     color: '#38bdf8',
     color_name: 'Sky Blue',
-    position: [1.08, 0, -1.89],
-    rotation: [0, Math.PI, 0], // Facing South (-Z), directly face-to-face with Velocia
+    position: [0.0, 0.05, -1.0], // Front of Central High-Tech Glass Server Room
+    rotation: [0, 0, 0], // Facing forward
     model: 'gpt-4o-mini',
-    description: 'Bertanggung jawab memantau telemetri GPS offline secara real-time dan broadcast pengingat aman anti-banned (jitter random 15-45s & typing status).',
+    description: 'Bertanggung jawab memantau telemetri GPS offline secara real-time dari Server Datacenter dan broadcast pengingat aman anti-banned (jitter random 15-45s & typing status).',
     quick_prompts: [
       'Cek unit offline yang membutuhkan eskalasi',
       'Kirim safe group broadcast dengan anti-banned delay',
@@ -77,14 +77,14 @@ const INITIAL_AGENTS = [
     id: 'velocia',
     name: 'Velocia',
     role: 'Marketing Strategist & Lead',
-    role_badge: 'MARKETING STRATEGIST',
+    role_badge: 'MARKETING (CONFERENCE)',
     status: 'available',
     color: '#ef4444',
     color_name: 'Solid Red',
-    position: [1.58, 0, -3.69],
-    rotation: [0, 0, 0], // Facing North (+Z), directly face-to-face with Nara
+    position: [-2.1, 0.05, 1.4], // Inside the Glass Conference Meeting Room
+    rotation: [0, Math.PI / 4, 0],
     model: 'gpt-4o-mini',
-    description: 'Menelan log chat selesai dari Sherloc, menganalisis tren permintaan pasar (fuel sensor, mini GPS, promo bundling), dan merancang strategi pertumbuhan.',
+    description: 'Menelan log chat selesai dari Sherloc, menganalisis tren permintaan pasar (fuel sensor, mini GPS, promo bundling), dan merancang strategi pertumbuhan di ruang meeting.',
     quick_prompts: [
       'Analisis tren permintaan pasar dari log chat Sherloc',
       'Rancang strategi bundling produk Fuel Sensor & GPS Mini',
@@ -95,14 +95,14 @@ const INITIAL_AGENTS = [
     id: 'scout',
     name: 'Scout',
     role: 'Content Creator Manager & Strategic Copywriter',
-    role_badge: 'CONTENT STRATEGIST',
+    role_badge: 'CONTENT STRATEGIST (FOX)',
     status: 'available',
-    color: '#22c55e',
-    color_name: 'Solid Green',
-    position: [3.35, 0, -3.69],
-    rotation: [0, 0, 0], // Facing North (+Z) alongside Velocia
+    color: '#f59e0b',
+    color_name: 'Golden Amber',
+    position: [5.3, 0.05, 2.1], // Bottom-Right Warm Amber Hex Pod (Fox Girl by Art Easel)
+    rotation: [0, -Math.PI / 3, 0],
     model: 'gpt-4o-mini',
-    description: 'Content Creator Manager & Strategic Copywriter di ekosistem Orin. Meriset berita kriminalitas & logistik, menyusun strategi tema, dan menulis artikel berdaya konversi tinggi dengan soft-selling Orin yang elegan.',
+    description: 'Content Creator Manager & Strategic Copywriter di ekosistem Orin. Meriset berita kriminalitas & logistik, menyusun strategi tema di easel lukisan, dan menulis artikel berdaya konversi tinggi dengan soft-selling Orin yang elegan.',
     quick_prompts: [
       'Riset berita curanmor terkini & buat artikel: Mengapa Kunci Ganda Tak Lagi Cukup',
       'Buat artikel soft-selling: Kebocoran BBM armada logistik & solusi Fuel Sensor Orin',
@@ -113,12 +113,12 @@ const INITIAL_AGENTS = [
     id: 'coo',
     name: 'COO',
     role: 'Chief Operating Officer & Executive Orchestrator',
-    role_badge: 'COO - Executive Orchestrator',
+    role_badge: 'EXECUTIVE COO (BEAR)',
     status: 'working',
-    color: '#334155',
-    color_name: 'Executive Charcoal',
-    position: [-1.8, 0, 0.8],
-    rotation: [0, Math.PI, 0],
+    color: '#a855f7',
+    color_name: 'Royal Violet',
+    position: [-5.3, 0.05, 2.1], // Bottom-Left Royal Purple Hex Pod (Bear Supervisor with glasses)
+    rotation: [0, Math.PI / 3, 0],
     model: 'gpt-4o-mini',
     description: 'Pimpinan operasional & master delegator Virtual Office Orin. Menerima instruksi Direktur via Telegram Bot pribadi, memecah tugas, mendelegasikannya ke spesialis (Nara, Scout, Watson, Sherloc, Velocia), memantau latar belakang, dan melapor kembali secara proaktif.',
     quick_prompts: [

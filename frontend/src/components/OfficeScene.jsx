@@ -10,6 +10,7 @@ import DeskAccessories from './DeskAccessories'
 import OfficePlants from './OfficePlants'
 import ExecutiveWorkstation from './ExecutiveWorkstation'
 import OfficeThematicRooms from './OfficeThematicRooms'
+import DioramaOffice from './DioramaOffice'
 
 /**
  * Camera controller that smoothly transitions focus when an agent is selected,
@@ -26,10 +27,10 @@ function CameraRig({
 }) {
   const controlsRef = useRef()
   const { camera } = useThree()
-  // Default workspace center in the 4-desk pod for Isometric view
-  const defaultTarget = React.useMemo(() => new THREE.Vector3(2.21, 0.6, -2.79), [])
-  // Overhead center for Top-Down (tampak atas) view framing the 10m x 10m office
-  const topDownTarget = React.useMemo(() => new THREE.Vector3(0.5, 0, -0.8), [])
+  // Default workspace center for Isometric view framing the diorama
+  const defaultTarget = React.useMemo(() => new THREE.Vector3(0, 0.4, 0), [])
+  // Overhead center for Top-Down (tampak atas) view framing the diorama
+  const topDownTarget = React.useMemo(() => new THREE.Vector3(0, 0, 0), [])
 
   const isTopDown = cameraViewMode === 'top_down'
   const isTransitioningRef = useRef(false)
@@ -82,11 +83,9 @@ function CameraRig({
       controlsRef.current.target.lerp(targetPos, 0.08)
 
       if (isTransitioningRef.current) {
-        // Smoothly glide camera directly overhead
-        const desiredCamPos = new THREE.Vector3(targetPos.x, 17.5, targetPos.z - 0.001)
+        const desiredCamPos = new THREE.Vector3(targetPos.x, 18, targetPos.z - 0.001)
         camera.position.lerp(desiredCamPos, 0.08)
       } else {
-        // Enforce pure vertical alignment over the target, preserving current user zoom (Y)
         camera.position.x = targetPos.x
         camera.position.z = targetPos.z - 0.001
       }
@@ -104,7 +103,7 @@ function CameraRig({
       }
 
       if (isTransitioningRef.current) {
-        const desiredCamPos = new THREE.Vector3(9, 8.5, 13)
+        const desiredCamPos = new THREE.Vector3(0, 11, 14.5)
         camera.position.lerp(desiredCamPos, 0.06)
       }
     }
@@ -593,7 +592,7 @@ export default function OfficeScene({
   onSelectAgent,
   hideTooltip = false,
   scenerySettings = {
-    theme: 'colorful',
+    theme: 'diorama',
     floorType: 'white',
     showNPC: true,
     showCoffeeCorner: true
@@ -602,87 +601,73 @@ export default function OfficeScene({
   resetKey = 0,
   zoomTrigger = null
 }) {
-  const isColorful = scenerySettings?.theme === 'colorful'
+  const isDiorama = scenerySettings?.theme !== 'classic'
 
   return (
     <div className="w-full h-full relative cursor-grab active:cursor-grabbing">
       <Canvas
         shadows
-        camera={{ position: [9, 8.5, 13], fov: 40 }}
+        camera={{ position: [0, 11, 14.5], fov: 42 }}
         gl={{ antialias: true, alpha: false }}
       >
-        {/* Canvas Background: Warm tint in colorful mode, clean slate in minimalist */}
-        <color attach="background" args={[isColorful ? '#fef9f5' : '#eef2f6']} />
+        {/* Canvas Background: Clean porcelain studio diorama backdrop */}
+        <color attach="background" args={['#f8fafc']} />
 
-        {/* Ambient & Directional Lighting Setup with Cozy Warm Tycoon Palette */}
-        <ambientLight
-          color={isColorful ? '#fffbeb' : '#ffffff'}
-          intensity={Math.PI * (isColorful ? 0.95 : 0.9)}
-        />
+        {/* Ambient & Directional Lighting Setup for Clean Studio Diorama */}
+        <ambientLight color="#ffffff" intensity={Math.PI * 0.9} />
         <hemisphereLight
-          skyColor={isColorful ? '#fffbeb' : '#ffffff'}
-          groundColor={isColorful ? '#fef3c7' : '#cbd5e1'}
+          skyColor="#ffffff"
+          groundColor="#e2e8f0"
           intensity={0.65}
         />
 
         <directionalLight
-          position={[10, 20, 10]}
-          color={isColorful ? '#fef3c7' : '#ffffff'}
-          intensity={Math.PI * 0.7}
+          position={[10, 22, 12]}
+          color="#ffffff"
+          intensity={Math.PI * 0.75}
           castShadow
           shadow-mapSize-width={2048}
           shadow-mapSize-height={2048}
           shadow-camera-near={0.1}
           shadow-camera-far={60}
-          shadow-camera-left={-10}
-          shadow-camera-right={10}
-          shadow-camera-top={10}
-          shadow-camera-bottom={-10}
+          shadow-camera-left={-12}
+          shadow-camera-right={12}
+          shadow-camera-top={12}
+          shadow-camera-bottom={-12}
           shadow-bias={-0.0001}
           shadow-radius={2}
         />
 
-        {/* Subtle Accent Fill Light */}
-        <directionalLight position={[-8, 12, -8]} intensity={0.35} color="#bae6fd" />
+        {/* Soft Accent Fill Light */}
+        <directionalLight position={[-10, 14, -10]} intensity={0.4} color="#bae6fd" />
 
         <Suspense fallback={null}>
-          {/* Authentic Office Environment with dynamic floor & furniture styling */}
-          <DelegationOffice scenerySettings={scenerySettings} />
-
-          {/* 4 Thematic Zones with Modular Pastel Rugs, Low Frosted Partitions & Knowledge Archive */}
-          <OfficeThematicRooms isColorful={isColorful} />
-
-          {/* Decorative Colorful Books, Notebooks, Mugs & Sticky Notes on Desks */}
-          <DeskAccessories isColorful={isColorful} />
-
-          {/* 4 Active Glowing & Colorful Browser Displays mounted on workstation monitors */}
-          <ScreenDisplays agents={agents} onSelectAgent={onSelectAgent} />
-
-          {/* Espresso Coffee Corner & Lounge Bar */}
-          {scenerySettings?.showCoffeeCorner && (
-            <CoffeeCorner isColorful={isColorful} />
+          {isDiorama ? (
+            /* --- CUTE ANIME DIORAMA WORKSPACE (REFERENCE IMAGE) --- */
+            <DioramaOffice />
+          ) : (
+            /* --- CLASSIC OFFICE SCENERY FALLBACK --- */
+            <>
+              <DelegationOffice scenerySettings={scenerySettings} />
+              <OfficeThematicRooms isColorful={true} />
+              <DeskAccessories isColorful={true} />
+              <ScreenDisplays agents={agents} onSelectAgent={onSelectAgent} />
+              {scenerySettings?.showCoffeeCorner && <CoffeeCorner isColorful={true} />}
+              <OfficePlants isColorful={true} />
+              <ExecutiveWorkstation
+                position={[-1.8, 0, 0.35]}
+                rotation={[0, 0, 0]}
+                isSelected={selectedAgent?.id === 'coo'}
+                onClick={() => {
+                  const coo = agents.find((a) => a.id === 'coo')
+                  if (coo) onSelectAgent(coo)
+                }}
+              />
+              {scenerySettings?.showNPC && <OfficeNPC isColorful={true} />}
+            </>
           )}
 
-          {/* Lush Greenery & Floor / Desktop Plants */}
-          <OfficePlants isColorful={isColorful} />
-
-          {/* Executive Workstation & Desk for COO (Chief Operating Officer) */}
-          <ExecutiveWorkstation
-            position={[-1.8, 0, 0.35]}
-            rotation={[0, 0, 0]}
-            isSelected={selectedAgent?.id === 'coo'}
-            onClick={() => {
-              const coo = agents.find((a) => a.id === 'coo')
-              if (coo) onSelectAgent(coo)
-            }}
-          />
-
-          {/* Autonomous NPC Cleaning & Coffee Delivery Robot */}
-          {scenerySettings?.showNPC && (
-            <OfficeNPC isColorful={isColorful} />
-          )}
-
-          {/* 3D Agent Avatars sitting at designated clean workstations */}
+          {/* 3D Kemonomimi Anime Chibi Avatars in their respective pods/rooms */}
           {agents.map((agent) => (
             <AgentAvatar
               key={agent.id}
@@ -691,7 +676,7 @@ export default function OfficeScene({
               onSelect={onSelectAgent}
               position={agent.position || [0, 0, 0]}
               rotation={agent.rotation || [0, 0, 0]}
-              initialAnimation="Sit_Work"
+              initialAnimation="Idle"
               hideTooltip={hideTooltip}
             />
           ))}
@@ -699,7 +684,7 @@ export default function OfficeScene({
 
         {/* Ground click catcher to deselect */}
         <mesh
-          position={[0, -0.05, 0]}
+          position={[0, -0.25, 0]}
           rotation={[-Math.PI / 2, 0, 0]}
           onClick={() => onSelectAgent(null)}
           visible={false}
@@ -708,13 +693,13 @@ export default function OfficeScene({
           <meshBasicMaterial />
         </mesh>
 
-        {/* Soft Contact Shadow */}
+        {/* Soft Contact Shadow beneath Diorama Platform */}
         <ContactShadows
-          position={[0, 0.005, 0]}
-          opacity={0.35}
-          scale={22}
-          blur={1.6}
-          far={5}
+          position={[0, -0.22, 0]}
+          opacity={0.45}
+          scale={28}
+          blur={2.0}
+          far={6}
         />
 
         {/* Dynamic Camera Orbit & Lerping Controls (Supports Isometric & Top-Down / Tampak Atas) */}
