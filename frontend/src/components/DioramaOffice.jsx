@@ -265,7 +265,7 @@ function WorkstationDesk({
   monitorColor = '#38bdf8',
   hasDualMonitors = false,
   isOccupied = false,
-  chairPosition = [0, 0, -0.55],
+  chairPosition = [0, 0, -0.48],
   chairRotation = [0, 0, 0]
 }) {
   return (
@@ -318,12 +318,12 @@ function WorkstationDesk({
         </group>
       )}
 
-      {/* Keyboard & Mousepad */}
-      <mesh position={[0, 0.61, -0.08]} castShadow>
+      {/* Keyboard & Mousepad: placed at Z = -0.18 so seated agent at Z = -0.48 with 0.30 arm reach rests hands directly on keyboard */}
+      <mesh position={[0, 0.61, -0.18]} castShadow>
         <boxGeometry args={[0.32, 0.008, 0.12]} />
         <meshStandardMaterial color="#e2e8f0" metalness={0.3} />
       </mesh>
-      <mesh position={[0.22, 0.608, -0.08]}>
+      <mesh position={[0.22, 0.608, -0.18]}>
         <cylinderGeometry args={[0.025, 0.025, 0.005, 12]} />
         <meshStandardMaterial color="#0284c7" />
       </mesh>
@@ -454,49 +454,49 @@ function AnimatedAquarium({ position = [0, 0, 0] }) {
 function ExecutiveCOORoom() {
   return (
     <group name="coo-executive-room">
-      {/* Room Flooring Carpet */}
+      {/* Room Flooring Carpet (Clean White) */}
       <mesh position={[6.0, 0.005, -4.0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[4.8, 4.8]} />
-        <meshStandardMaterial color="#1e293b" roughness={0.8} />
+        <meshStandardMaterial color="#ffffff" roughness={0.7} />
       </mesh>
 
-      {/* Enclosed Private Room Walls */}
+      {/* Enclosed Private Room Walls (Clean White with Silver/Slate Molding) */}
       {/* Back Wall */}
-      <SolidWall position={[6.0, 0, -6.4]} size={[4.8, 1.3, 0.08]} color="#334155" />
+      <SolidWall position={[6.0, 0, -6.4]} size={[4.8, 1.3, 0.08]} color="#ffffff" />
       {/* Right Exterior Wall */}
-      <SolidWall position={[8.4, 0, -4.0]} size={[0.08, 1.3, 4.8]} color="#334155" />
+      <SolidWall position={[8.4, 0, -4.0]} size={[0.08, 1.3, 4.8]} color="#ffffff" />
       {/* Left Wall dividing from Operations */}
-      <SolidWall position={[3.6, 0, -4.0]} size={[0.08, 1.3, 4.8]} color="#334155" />
+      <SolidWall position={[3.6, 0, -4.0]} size={[0.08, 1.3, 4.8]} color="#ffffff" />
       {/* Front Wall with Doorway Opening */}
-      <SolidWall position={[4.6, 0, -1.6]} size={[2.0, 1.3, 0.08]} color="#334155" />
-      <SolidWall position={[7.6, 0, -1.6]} size={[1.6, 1.3, 0.08]} color="#334155" />
+      <SolidWall position={[4.6, 0, -1.6]} size={[2.0, 1.3, 0.08]} color="#ffffff" />
+      <SolidWall position={[7.6, 0, -1.6]} size={[1.6, 1.3, 0.08]} color="#ffffff" />
 
-      {/* Executive Wooden Desk */}
+      {/* Executive Clean Modern White Director Desk */}
       <group position={[6.0, 0, -4.2]}>
         <mesh position={[0, 0.58, 0]} castShadow receiveShadow>
           <boxGeometry args={[2.0, 0.06, 0.85]} />
-          <meshStandardMaterial color="#1e293b" roughness={0.4} metalness={0.2} />
+          <meshStandardMaterial color="#ffffff" roughness={0.4} metalness={0.05} />
         </mesh>
-        {/* Solid Wood Side Panels */}
+        {/* Side Panels */}
         {[-0.92, 0.92].map((lx, idx) => (
           <mesh key={idx} position={[lx, 0.28, 0]} castShadow receiveShadow>
             <boxGeometry args={[0.08, 0.56, 0.8]} />
-            <meshStandardMaterial color="#0f172a" roughness={0.5} />
+            <meshStandardMaterial color="#e2e8f0" roughness={0.5} />
           </mesh>
         ))}
         {/* Leather Desk Blotter */}
-        <mesh position={[0, 0.615, 0]} castShadow>
+        <mesh position={[0, 0.615, -0.18]} castShadow>
           <boxGeometry args={[0.85, 0.008, 0.45]} />
-          <meshStandardMaterial color="#334155" roughness={0.8} />
+          <meshStandardMaterial color="#cbd5e1" roughness={0.8} />
         </mesh>
 
-        {/* Executive Laptop (Telegram Gateway Feed) */}
-        <group position={[0, 0.62, 0.05]}>
+        {/* Executive Laptop (Telegram Gateway Feed) - Centered under COO's hands */}
+        <group position={[0, 0.62, -0.18]}>
           <mesh position={[0, 0.005, 0]} castShadow>
             <boxGeometry args={[0.3, 0.012, 0.2]} />
             <meshStandardMaterial color="#cbd5e1" metalness={0.8} />
           </mesh>
-          <group position={[0, 0.01, -0.1]} rotation={[-0.3, 0, 0]}>
+          <group position={[0, 0.01, -0.09]} rotation={[-0.3, 0, 0]}>
             <mesh position={[0, 0.1, 0]} castShadow>
               <boxGeometry args={[0.3, 0.2, 0.01]} />
               <meshStandardMaterial color="#0f172a" />
@@ -526,7 +526,7 @@ function ExecutiveCOORoom() {
         </group>
 
         {/* High-Back Executive Leather Chair for COO */}
-        <group position={[0, 0, -0.6]}>
+        <group position={[0, 0, -0.48]}>
           <ErgonomicOfficeChair />
           <mesh position={[0, 0.94, -0.18]} castShadow>
             <boxGeometry args={[0.32, 0.22, 0.06]} />
@@ -564,29 +564,30 @@ function ExecutiveCOORoom() {
 
 /**
  * ROOM 2: DATACENTER & TELEMETRY LAB (Back-Left - Nara's Station)
+ * - Clean white high-tech walls and floors
  * - Server racks against the back wall with blinking status LEDs
  * - Telemetry console desk facing the server rack
- * - Nara seated/standing right here facing North towards the server racks
+ * - Nara seated right here facing North directly towards the server racks
  */
 function DatacenterTelemetryRoom() {
   return (
     <group name="datacenter-telemetry-room">
-      {/* High-Tech Dark Grid Floor */}
+      {/* High-Tech Clean White Grid Floor */}
       <mesh position={[-6.0, 0.005, -4.0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[4.8, 4.8]} />
-        <meshStandardMaterial color="#090d16" roughness={0.7} />
+        <meshStandardMaterial color="#ffffff" roughness={0.7} />
       </mesh>
 
-      {/* Enclosed Server Room Walls */}
+      {/* Enclosed Server Room Walls (Clean White with Silver/Slate Trim) */}
       {/* Back Wall */}
-      <SolidWall position={[-6.0, 0, -6.4]} size={[4.8, 1.3, 0.08]} color="#1e293b" />
+      <SolidWall position={[-6.0, 0, -6.4]} size={[4.8, 1.3, 0.08]} color="#ffffff" />
       {/* Left Exterior Wall */}
-      <SolidWall position={[-8.4, 0, -4.0]} size={[0.08, 1.3, 4.8]} color="#1e293b" />
+      <SolidWall position={[-8.4, 0, -4.0]} size={[0.08, 1.3, 4.8]} color="#ffffff" />
       {/* Right Wall dividing from Operations */}
-      <SolidWall position={[-3.6, 0, -4.0]} size={[0.08, 1.3, 4.8]} color="#1e293b" />
+      <SolidWall position={[-3.6, 0, -4.0]} size={[0.08, 1.3, 4.8]} color="#ffffff" />
       {/* Front Wall with Doorway */}
-      <SolidWall position={[-7.4, 0, -1.6]} size={[2.0, 1.3, 0.08]} color="#1e293b" />
-      <SolidWall position={[-4.4, 0, -1.6]} size={[1.6, 1.3, 0.08]} color="#1e293b" />
+      <SolidWall position={[-7.4, 0, -1.6]} size={[2.0, 1.3, 0.08]} color="#ffffff" />
+      <SolidWall position={[-4.4, 0, -1.6]} size={[1.6, 1.3, 0.08]} color="#ffffff" />
 
       {/* Row of Blinking Server Rack Towers against Back Wall */}
       <BlinkingServerRack position={[-7.0, 0, -5.8]} />
@@ -594,21 +595,21 @@ function DatacenterTelemetryRoom() {
       <BlinkingServerRack position={[-4.2, 0, -5.8]} />
 
       {/* Telemetry Console Desk facing North directly into the Server Racks */}
-      <group position={[-5.8, 0, -4.6]}>
+      <group position={[-5.8, 0, -4.9]}>
         <mesh position={[0, 0.58, 0]} castShadow receiveShadow>
-          <boxGeometry args={[1.8, 0.045, 0.7]} />
-          <meshStandardMaterial color="#0f172a" roughness={0.5} />
+          <boxGeometry args={[1.8, 0.045, 0.72]} />
+          <meshStandardMaterial color="#ffffff" roughness={0.5} />
         </mesh>
         {/* Legs */}
         {[-0.8, 0.8].map((lx, idx) => (
           <mesh key={idx} position={[lx, 0.28, 0]} castShadow>
             <cylinderGeometry args={[0.02, 0.02, 0.56, 8]} />
-            <meshStandardMaterial color="#475569" />
+            <meshStandardMaterial color="#94a3b8" metalness={0.7} />
           </mesh>
         ))}
 
         {/* Dual Telemetry Fleet Monitors (Facing South towards Nara) */}
-        <group position={[-0.25, 0.82, -0.12]}>
+        <group position={[-0.25, 0.82, -0.16]}>
           <mesh castShadow>
             <boxGeometry args={[0.55, 0.32, 0.02]} />
             <meshStandardMaterial color="#0f172a" />
@@ -618,7 +619,7 @@ function DatacenterTelemetryRoom() {
             <meshBasicMaterial color="#38bdf8" />
           </mesh>
         </group>
-        <group position={[0.35, 0.82, -0.1]} rotation={[0, -0.15, 0]}>
+        <group position={[0.35, 0.82, -0.14]} rotation={[0, -0.15, 0]}>
           <mesh castShadow>
             <boxGeometry args={[0.55, 0.32, 0.02]} />
             <meshStandardMaterial color="#0f172a" />
@@ -629,14 +630,14 @@ function DatacenterTelemetryRoom() {
           </mesh>
         </group>
 
-        {/* Keyboard & Diagnostics Terminal */}
-        <mesh position={[0, 0.61, 0.1]} castShadow>
+        {/* Keyboard & Diagnostics Terminal - Directly under Nara's hands */}
+        <mesh position={[0, 0.61, 0.18]} castShadow>
           <boxGeometry args={[0.34, 0.008, 0.12]} />
-          <meshStandardMaterial color="#e2e8f0" />
+          <meshStandardMaterial color="#e2e8f0" metalness={0.3} />
         </mesh>
 
-        {/* Ergonomic Swivel Chair where Nara Sits */}
-        <ErgonomicOfficeChair position={[0, 0, 0.8]} rotation={[0, 0, 0]} />
+        {/* Ergonomic Swivel Chair where Nara Sits facing North into Server Racks */}
+        <ErgonomicOfficeChair position={[0, 0, 0.48]} rotation={[0, Math.PI, 0]} />
       </group>
     </group>
   )
@@ -652,38 +653,40 @@ function TechOperationsBay() {
       {/* 4-Desk Modular Cubicle Pod */}
       {/* Desk 1: Watson's Diagnostic Desk */}
       <WorkstationDesk
-        position={[-1.2, 0, -4.5]}
+        position={[-1.2, 0, -4.2]}
         hasDualMonitors={true}
         monitorColor="#1d4ed8"
-        chairPosition={[0, 0, 0.6]}
+        chairPosition={[0, 0, -0.48]}
         chairRotation={[0, 0, 0]}
       />
 
       {/* Desk 2: Empty Desk for Future Tech Agent */}
       <WorkstationDesk
-        position={[1.2, 0, -4.5]}
+        position={[1.2, 0, -4.2]}
         hasDualMonitors={true}
         monitorColor="#38bdf8"
-        chairPosition={[0, 0, 0.6]}
+        chairPosition={[0, 0, -0.48]}
         chairRotation={[0, 0, 0]}
       />
 
       {/* Desk 3: Empty Desk for Future Agent */}
       <WorkstationDesk
-        position={[-1.2, 0, -2.5]}
+        position={[-1.2, 0, -2.8]}
+        rotation={[0, Math.PI, 0]}
         hasDualMonitors={false}
         monitorColor="#10b981"
-        chairPosition={[0, 0, -0.6]}
-        chairRotation={[0, Math.PI, 0]}
+        chairPosition={[0, 0, -0.48]}
+        chairRotation={[0, 0, 0]}
       />
 
       {/* Desk 4: Empty Desk for Future Agent */}
       <WorkstationDesk
-        position={[1.2, 0, -2.5]}
+        position={[1.2, 0, -2.8]}
+        rotation={[0, Math.PI, 0]}
         hasDualMonitors={false}
         monitorColor="#f59e0b"
-        chairPosition={[0, 0, -0.6]}
-        chairRotation={[0, Math.PI, 0]}
+        chairPosition={[0, 0, -0.48]}
+        chairRotation={[0, 0, 0]}
       />
 
       {/* Cubicle Center Acoustic Divider */}
@@ -714,12 +717,12 @@ function FrontlineCSRoom() {
       <SolidWall position={[-3.2, 0, 4.8]} size={[0.08, 1.3, 3.2]} color="#cbd5e1" />
 
       {/* Desk 1: Sherloc's CS Workstation */}
-      <group position={[-6.0, 0, 4.0]}>
+      <group position={[-6.0, 0, 3.8]}>
         <WorkstationDesk
           position={[0, 0, 0]}
           hasDualMonitors={true}
           monitorColor="#f43f5e"
-          chairPosition={[0, 0, -0.6]}
+          chairPosition={[0, 0, -0.48]}
           chairRotation={[0, 0, 0]}
         />
         {/* Headset Prop on Desk */}
@@ -757,10 +760,10 @@ function FrontlineCSRoom() {
 
       {/* Desk 2: Empty CS Desk ready for Future Agent */}
       <WorkstationDesk
-        position={[-4.0, 0, 4.0]}
+        position={[-4.0, 0, 3.8]}
         hasDualMonitors={false}
         monitorColor="#38bdf8"
-        chairPosition={[0, 0, -0.6]}
+        chairPosition={[0, 0, -0.48]}
         chairRotation={[0, 0, 0]}
       />
 
@@ -833,19 +836,19 @@ function CreativeWorkshopRoom() {
 
       {/* Desk 1: Velocia's Strategy Workstation */}
       <WorkstationDesk
-        position={[4.8, 0, 4.2]}
+        position={[4.8, 0, 4.0]}
         hasDualMonitors={false}
         monitorColor="#ef4444"
-        chairPosition={[0, 0, -0.6]}
+        chairPosition={[0, 0, -0.48]}
         chairRotation={[0, 0, 0]}
       />
 
       {/* Desk 2: Scout's Creative Workstation */}
       <WorkstationDesk
-        position={[6.8, 0, 4.2]}
+        position={[6.8, 0, 4.0]}
         hasDualMonitors={false}
         monitorColor="#f59e0b"
-        chairPosition={[0, 0, -0.6]}
+        chairPosition={[0, 0, -0.48]}
         chairRotation={[0, 0, 0]}
       />
 
@@ -854,7 +857,7 @@ function CreativeWorkshopRoom() {
         position={[5.8, 0, 5.8]}
         hasDualMonitors={true}
         monitorColor="#10b981"
-        chairPosition={[0, 0, -0.6]}
+        chairPosition={[0, 0, -0.48]}
         chairRotation={[0, 0, 0]}
       />
     </group>

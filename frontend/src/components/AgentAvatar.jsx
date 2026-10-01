@@ -234,12 +234,12 @@ function GatherPixelCharacter({ agentId, isHovered, isSelected }) {
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime()
-    // Typing arm bounce on keyboard
+    // Typing arm bounce on keyboard (keyboard surface is at Y=0.61 in world space, agent base Y=0.05)
     if (leftArmRef.current) {
-      leftArmRef.current.position.y = 0.44 + Math.sin(t * 14) * 0.015
+      leftArmRef.current.position.y = 0.56 + Math.sin(t * 14) * 0.01
     }
     if (rightArmRef.current) {
-      rightArmRef.current.position.y = 0.44 + Math.cos(t * 14) * 0.015
+      rightArmRef.current.position.y = 0.56 + Math.cos(t * 14) * 0.01
     }
     // Subtle head focus bobbing
     if (headRef.current) {
@@ -266,29 +266,29 @@ function GatherPixelCharacter({ agentId, isHovered, isSelected }) {
         </mesh>
       </group>
 
-      {/* 3. ARMS RESTING ON DESK TYPING AT KEYBOARD */}
+      {/* 3. ARMS RESTING ON DESK TYPING AT KEYBOARD (Keyboard height is Y=0.55 relative to agent root) */}
       {/* Left Arm */}
-      <group ref={leftArmRef} position={[-0.22, 0.44, 0.16]}>
-        <mesh castShadow rotation={[0.4, 0, 0]}>
-          <boxGeometry args={[0.1, 0.1, 0.32]} />
+      <group ref={leftArmRef} position={[-0.18, 0.55, 0.16]}>
+        <mesh castShadow rotation={[0.15, 0, 0]}>
+          <boxGeometry args={[0.08, 0.08, 0.28]} />
           <meshStandardMaterial color="#334155" roughness={0.6} />
         </mesh>
-        {/* Pixel Hand */}
-        <mesh position={[0, -0.02, 0.16]} castShadow>
-          <boxGeometry args={[0.08, 0.06, 0.08]} />
+        {/* Pixel Hand resting on Keyboard */}
+        <mesh position={[0, -0.01, 0.14]} castShadow>
+          <boxGeometry args={[0.08, 0.04, 0.08]} />
           <meshStandardMaterial color="#fcd34d" roughness={0.6} />
         </mesh>
       </group>
 
       {/* Right Arm */}
-      <group ref={rightArmRef} position={[0.22, 0.44, 0.16]}>
-        <mesh castShadow rotation={[0.4, 0, 0]}>
-          <boxGeometry args={[0.1, 0.1, 0.32]} />
+      <group ref={rightArmRef} position={[0.18, 0.55, 0.16]}>
+        <mesh castShadow rotation={[0.15, 0, 0]}>
+          <boxGeometry args={[0.08, 0.08, 0.28]} />
           <meshStandardMaterial color="#334155" roughness={0.6} />
         </mesh>
-        {/* Pixel Hand */}
-        <mesh position={[0, -0.02, 0.16]} castShadow>
-          <boxGeometry args={[0.08, 0.06, 0.08]} />
+        {/* Pixel Hand resting on Keyboard */}
+        <mesh position={[0, -0.01, 0.14]} castShadow>
+          <boxGeometry args={[0.08, 0.04, 0.08]} />
           <meshStandardMaterial color="#fcd34d" roughness={0.6} />
         </mesh>
       </group>

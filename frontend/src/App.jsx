@@ -26,7 +26,7 @@ const INITIAL_AGENTS = [
     status: 'working',
     color: '#d97706',
     color_name: 'Warm Gold',
-    position: [-6.0, 0.05, 3.4], // Frontline CS Office: Seated at CS desk facing dual monitors
+    position: [-6.0, 0.05, 3.32], // Frontline CS Office: Seated at CS desk facing dual monitors & typing
     rotation: [0, 0, 0],
     model: 'gpt-4o-mini',
     description: 'Satu-satunya Frontline Voice & Face WhatsApp customer. Memvalidasi nomor telepon/email pengguna, menjawab FAQ, serta mendelegasikan issue GPS ke Nara dan eskalasi teknis ke Watson.',
@@ -45,8 +45,8 @@ const INITIAL_AGENTS = [
     status: 'available',
     color: '#1d4ed8',
     color_name: 'Deep Navy',
-    position: [-1.2, 0.05, -3.9], // Tech Cubicle Bay: Seated at diagnostic desk facing monitors
-    rotation: [0, Math.PI, 0],
+    position: [-1.2, 0.05, -4.68], // Tech Cubicle Bay: Seated at diagnostic desk facing monitors & typing
+    rotation: [0, 0, 0],
     model: 'gpt-4o-mini',
     description: 'Jembatan eskalasi teknis ke WhatsApp Group Tim Manajemen & Lead internal. Menerima solusi eskalasi dan secara otomatis memanen pasangan Q&A ke Knowledge Base / RAG.',
     quick_prompts: [
@@ -63,7 +63,7 @@ const INITIAL_AGENTS = [
     status: 'working',
     color: '#38bdf8',
     color_name: 'Sky Blue',
-    position: [-5.8, 0.05, -3.8], // Datacenter Room: Facing North directly towards Server Racks & telemetry console
+    position: [-5.8, 0.05, -4.42], // Datacenter Server Room: Seated facing North towards Server Racks & telemetry console
     rotation: [0, Math.PI, 0],
     model: 'gpt-4o-mini',
     description: 'Bertanggung jawab memantau telemetri GPS offline secara real-time dari Server Datacenter dan broadcast pengingat aman anti-banned (jitter random 15-45s & typing status).',
@@ -81,7 +81,7 @@ const INITIAL_AGENTS = [
     status: 'available',
     color: '#ef4444',
     color_name: 'Solid Red',
-    position: [4.8, 0.05, 3.6], // Creative Workshop: Seated at strategy desk facing laptop
+    position: [4.8, 0.05, 3.52], // Creative Workshop: Seated at strategy desk facing laptop & typing
     rotation: [0, 0, 0],
     model: 'gpt-4o-mini',
     description: 'Menelan log chat selesai dari Sherloc, menganalisis tren permintaan pasar (fuel sensor, mini GPS, promo bundling), dan merancang strategi pertumbuhan di depan papan presentasi.',
@@ -99,7 +99,7 @@ const INITIAL_AGENTS = [
     status: 'available',
     color: '#f59e0b',
     color_name: 'Golden Amber',
-    position: [6.8, 0.05, 3.6], // Creative Workshop: Seated at creative desk with design tablet
+    position: [6.8, 0.05, 3.52], // Creative Workshop: Seated at creative desk with design tablet & typing
     rotation: [0, 0, 0],
     model: 'gpt-4o-mini',
     description: 'Content Creator Manager & Strategic Copywriter di ekosistem Orin. Meriset berita kriminalitas & logistik, menyusun strategi artikel konversi tinggi dengan tablet catatan kerja.',
@@ -117,7 +117,7 @@ const INITIAL_AGENTS = [
     status: 'working',
     color: '#334155',
     color_name: 'Slate Executive',
-    position: [6.0, 0.05, -4.8], // Executive Room: Seated inside private executive office at wooden director desk
+    position: [6.0, 0.05, -4.68], // Executive Room: Seated inside private executive office at director desk & typing
     rotation: [0, 0, 0],
     model: 'gpt-4o-mini',
     description: 'Pimpinan operasional & master delegator Virtual Office Orin. Menerima instruksi Direktur via Telegram Bot pribadi, memecah tugas, mendelegasikannya ke spesialis, dan memantau dari ruang kerja eksekutif pribadinya.',
@@ -264,7 +264,10 @@ export default function App() {
               setAgents((prev) =>
                 prev.map((a) => {
                   const fresh = data.agents.find((fa) => fa.id === a.id)
-                  return fresh ? { ...a, ...fresh } : a
+                  if (!fresh) return a
+                  // Exclude position and rotation from backend merge to keep 3D desk positioning exact
+                  const { position: _pos, rotation: _rot, ...rest } = fresh
+                  return { ...a, ...rest }
                 })
               )
             }
@@ -295,7 +298,10 @@ export default function App() {
               setAgents((prev) =>
                 prev.map((a) => {
                   const fresh = agentsData.agents.find((fa) => fa.id === a.id)
-                  return fresh ? { ...a, ...fresh } : a
+                  if (!fresh) return a
+                  // Exclude position and rotation from backend merge to keep 3D desk positioning exact
+                  const { position: _pos, rotation: _rot, ...rest } = fresh
+                  return { ...a, ...rest }
                 })
               )
             }
