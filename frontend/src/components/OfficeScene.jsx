@@ -94,17 +94,25 @@ function CameraRig({
       if (selectedAgent && selectedAgent.position) {
         const targetPos = new THREE.Vector3(
           selectedAgent.position[0],
-          0.75,
+          0.6,
           selectedAgent.position[2]
         )
-        controlsRef.current.target.lerp(targetPos, 0.06)
+        controlsRef.current.target.lerp(targetPos, 0.08)
+
+        // Smoothly glide camera into a high, cozy isometric closeup of the agent's pod
+        const desiredCamPos = new THREE.Vector3(
+          selectedAgent.position[0],
+          7.2,
+          selectedAgent.position[2] + 7.8
+        )
+        camera.position.lerp(desiredCamPos, 0.06)
       } else {
         controlsRef.current.target.lerp(defaultTarget, 0.05)
-      }
 
-      if (isTransitioningRef.current) {
-        const desiredCamPos = new THREE.Vector3(0, 11, 14.5)
-        camera.position.lerp(desiredCamPos, 0.06)
+        if (isTransitioningRef.current) {
+          const desiredCamPos = new THREE.Vector3(0, 13.5, 14.5)
+          camera.position.lerp(desiredCamPos, 0.06)
+        }
       }
     }
 
@@ -122,7 +130,7 @@ function CameraRig({
       enableRotate={!isTopDown}
       enablePan={false}
       enableZoom={true}
-      maxPolarAngle={isTopDown ? 0.001 : Math.PI / 2.15}
+      maxPolarAngle={isTopDown ? 0.001 : Math.PI / 2.6}
       minPolarAngle={isTopDown ? 0 : Math.PI / 6}
       maxAzimuthAngle={isTopDown ? 0 : Infinity}
       minAzimuthAngle={isTopDown ? 0 : -Infinity}
@@ -607,7 +615,7 @@ export default function OfficeScene({
     <div className="w-full h-full relative cursor-grab active:cursor-grabbing">
       <Canvas
         shadows
-        camera={{ position: [0, 11, 14.5], fov: 42 }}
+        camera={{ position: [0, 13.5, 14.5], fov: 40 }}
         gl={{ antialias: true, alpha: false }}
       >
         {/* Canvas Background: Clean porcelain studio diorama backdrop */}
