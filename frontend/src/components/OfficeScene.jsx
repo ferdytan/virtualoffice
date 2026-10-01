@@ -90,7 +90,7 @@ function CameraRig({
       } else {
         controlsRef.current.target.lerp(defaultTarget, 0.06)
         if (isTransitioningRef.current) {
-          camera.position.lerp(new THREE.Vector3(13.2, 11.0, 13.2), 0.08)
+          camera.position.lerp(new THREE.Vector3(14.0, 12.0, 14.0), 0.08)
         }
       }
     }
@@ -595,7 +595,7 @@ export default function OfficeScene({
       <Canvas
         shadows
         gl={{ antialias: true, alpha: false }}
-        camera={{ position: [13.2, 11.0, 13.2], fov: 36 }}
+        camera={{ position: [14.0, 12.0, 14.0], fov: 38 }}
       >
         {/* Clean Studio Matte Backdrop with Soft Contrast */}
         <color attach="background" args={['#e2e8f0']} />
@@ -682,8 +682,8 @@ export default function OfficeScene({
         {/* Section 1: ContactShadows under floating diorama platform */}
         <ContactShadows
           position={[0, -0.45, 0]}
-          opacity={0.55}
-          scale={22}
+          opacity={0.5}
+          scale={26}
           blur={2.5}
           far={4}
         />

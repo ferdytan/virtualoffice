@@ -26,7 +26,7 @@ const INITIAL_AGENTS = [
     status: 'working',
     color: '#d97706',
     color_name: 'Warm Gold',
-    position: [-4.5, 0.05, 2.65], // Zone 1: Frontline & CS Room
+    position: [-6.0, 0.05, 3.4], // Frontline CS Office: Seated at CS desk facing dual monitors
     rotation: [0, 0, 0],
     model: 'gpt-4o-mini',
     description: 'Satu-satunya Frontline Voice & Face WhatsApp customer. Memvalidasi nomor telepon/email pengguna, menjawab FAQ, serta mendelegasikan issue GPS ke Nara dan eskalasi teknis ke Watson.',
@@ -45,8 +45,8 @@ const INITIAL_AGENTS = [
     status: 'available',
     color: '#1d4ed8',
     color_name: 'Deep Navy',
-    position: [-1.8, 0.05, -3.75], // Zone 2: Core Operations & Diagnostics Lab
-    rotation: [0, 0, 0],
+    position: [-1.2, 0.05, -3.9], // Tech Cubicle Bay: Seated at diagnostic desk facing monitors
+    rotation: [0, Math.PI, 0],
     model: 'gpt-4o-mini',
     description: 'Jembatan eskalasi teknis ke WhatsApp Group Tim Manajemen & Lead internal. Menerima solusi eskalasi dan secara otomatis memanen pasangan Q&A ke Knowledge Base / RAG.',
     quick_prompts: [
@@ -63,8 +63,8 @@ const INITIAL_AGENTS = [
     status: 'working',
     color: '#38bdf8',
     color_name: 'Sky Blue',
-    position: [0.6, 0.05, -3.75], // Zone 2: Core Operations & Telemetry Lab
-    rotation: [0, 0, 0],
+    position: [-5.8, 0.05, -3.8], // Datacenter Room: Facing North directly towards Server Racks & telemetry console
+    rotation: [0, Math.PI, 0],
     model: 'gpt-4o-mini',
     description: 'Bertanggung jawab memantau telemetri GPS offline secara real-time dari Server Datacenter dan broadcast pengingat aman anti-banned (jitter random 15-45s & typing status).',
     quick_prompts: [
@@ -81,7 +81,7 @@ const INITIAL_AGENTS = [
     status: 'available',
     color: '#ef4444',
     color_name: 'Solid Red',
-    position: [5.0, 0.05, 0.65], // Zone 4: Growth & Creative Workshop
+    position: [4.8, 0.05, 3.6], // Creative Workshop: Seated at strategy desk facing laptop
     rotation: [0, 0, 0],
     model: 'gpt-4o-mini',
     description: 'Menelan log chat selesai dari Sherloc, menganalisis tren permintaan pasar (fuel sensor, mini GPS, promo bundling), dan merancang strategi pertumbuhan di depan papan presentasi.',
@@ -99,7 +99,7 @@ const INITIAL_AGENTS = [
     status: 'available',
     color: '#f59e0b',
     color_name: 'Golden Amber',
-    position: [6.2, 0.05, 0.65], // Zone 4: Growth & Creative Workshop
+    position: [6.8, 0.05, 3.6], // Creative Workshop: Seated at creative desk with design tablet
     rotation: [0, 0, 0],
     model: 'gpt-4o-mini',
     description: 'Content Creator Manager & Strategic Copywriter di ekosistem Orin. Meriset berita kriminalitas & logistik, menyusun strategi artikel konversi tinggi dengan tablet catatan kerja.',
@@ -117,10 +117,10 @@ const INITIAL_AGENTS = [
     status: 'working',
     color: '#334155',
     color_name: 'Slate Executive',
-    position: [5.4, 0.05, -3.78], // Zone 3: Executive & Coordination Office
+    position: [6.0, 0.05, -4.8], // Executive Room: Seated inside private executive office at wooden director desk
     rotation: [0, 0, 0],
     model: 'gpt-4o-mini',
-    description: 'Pimpinan operasional & master delegator Virtual Office Orin. Menerima instruksi Direktur via Telegram Bot pribadi, memecah tugas, mendelegasikannya ke spesialis, dan memantau dari ruang kerja eksekutif.',
+    description: 'Pimpinan operasional & master delegator Virtual Office Orin. Menerima instruksi Direktur via Telegram Bot pribadi, memecah tugas, mendelegasikannya ke spesialis, dan memantau dari ruang kerja eksekutif pribadinya.',
     quick_prompts: [
       'Cek status Nara dan suruh Scout cari bahan artikel curanmor',
       'Instruksikan audit telemetri unit offline & evaluasi aturan CAM',

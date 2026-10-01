@@ -11,18 +11,14 @@ export default function RoombaRobot() {
   const robotRef = useRef()
   const ledRef = useRef()
 
-  // Hallway patrol waypoints connecting all office zones
+  // Open hallway patrol waypoints strictly within central thoroughfare
   const WAYPOINTS = [
-    [-4.2, 0.06, 0.8],   // Frontline hallway
-    [-0.5, 0.06, 0.8],   // Central crossroads
-    [-0.5, 0.06, -2.5],  // Operations corridor
-    [-5.2, 0.06, -2.5],  // Pantry & Aquarium corner
-    [-5.2, 0.06, 0.8],   // Pantry turn
-    [-0.5, 0.06, 0.8],   // Back to crossroads
-    [-0.5, 0.06, 2.8],   // Lounge corridor
-    [3.8, 0.06, 2.8],    // Social lounge walkway
-    [3.8, 0.06, 0.8],    // Workshop / Executive corridor
-    [0.5, 0.06, 0.8]     // Returning to crossroads
+    [-2.6, 0.06, 0.2],   // Frontline hallway junction
+    [0.0, 0.06, 0.2],    // Central crossroad
+    [2.6, 0.06, 0.2],    // Executive/Workshop junction
+    [2.6, 0.06, -0.6],   // Corridor turn
+    [0.0, 0.06, -0.6],   // Central thoroughfare
+    [-2.6, 0.06, -0.6]   // Datacenter corridor turn
   ]
 
   const currentWpIndex = useRef(0)
