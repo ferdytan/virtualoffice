@@ -9,6 +9,7 @@ import OfficeNPC from './OfficeNPC'
 import DeskAccessories from './DeskAccessories'
 import OfficePlants from './OfficePlants'
 import ExecutiveWorkstation from './ExecutiveWorkstation'
+import OfficeThematicRooms from './OfficeThematicRooms'
 
 /**
  * Camera controller that smoothly transitions focus when an agent is selected,
@@ -611,19 +612,23 @@ export default function OfficeScene({
         gl={{ antialias: true, alpha: false }}
       >
         {/* Canvas Background: Warm tint in colorful mode, clean slate in minimalist */}
-        <color attach="background" args={[isColorful ? '#f1f5f9' : '#eef2f6']} />
+        <color attach="background" args={[isColorful ? '#fef9f5' : '#eef2f6']} />
 
-        {/* Ambient & Directional Lighting Setup */}
-        <ambientLight intensity={Math.PI * (isColorful ? 0.95 : 0.9)} />
+        {/* Ambient & Directional Lighting Setup with Cozy Warm Tycoon Palette */}
+        <ambientLight
+          color={isColorful ? '#fffbeb' : '#ffffff'}
+          intensity={Math.PI * (isColorful ? 0.95 : 0.9)}
+        />
         <hemisphereLight
-          skyColor="#ffffff"
-          groundColor={isColorful ? '#e2e8f0' : '#cbd5e1'}
-          intensity={0.55}
+          skyColor={isColorful ? '#fffbeb' : '#ffffff'}
+          groundColor={isColorful ? '#fef3c7' : '#cbd5e1'}
+          intensity={0.65}
         />
 
         <directionalLight
           position={[10, 20, 10]}
-          intensity={Math.PI * 0.65}
+          color={isColorful ? '#fef3c7' : '#ffffff'}
+          intensity={Math.PI * 0.7}
           castShadow
           shadow-mapSize-width={2048}
           shadow-mapSize-height={2048}
@@ -643,6 +648,9 @@ export default function OfficeScene({
         <Suspense fallback={null}>
           {/* Authentic Office Environment with dynamic floor & furniture styling */}
           <DelegationOffice scenerySettings={scenerySettings} />
+
+          {/* 4 Thematic Zones with Modular Pastel Rugs, Low Frosted Partitions & Knowledge Archive */}
+          <OfficeThematicRooms isColorful={isColorful} />
 
           {/* Decorative Colorful Books, Notebooks, Mugs & Sticky Notes on Desks */}
           <DeskAccessories isColorful={isColorful} />
