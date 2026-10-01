@@ -786,8 +786,8 @@ export default function AgentAvatar({
   const [isApproved, setIsApproved] = useState(false)
   const preset = CHARACTER_PRESETS[agent.id] || CHARACTER_PRESETS.sherloc
 
-  // Watson is the hero active agent with pending task (like Miro in reference image), or when selected/hovered
-  const showActionCard = isSelected || hovered || agent.id === 'watson'
+  // Expanded Floating Action Card ONLY appears when agent is selected or hovered
+  const showActionCard = isSelected || hovered
 
   const handleApprove = () => {
     setIsApproved(true)
@@ -805,15 +805,15 @@ export default function AgentAvatar({
           ======================================================== */}
       {!hideTooltip && (
         <Html
-          position={[0, 1.48, 0]}
+          position={[0, 1.45, 0]}
           center
-          distanceFactor={10}
+          distanceFactor={11}
           zIndexRange={[1, 20]}
           style={{ pointerEvents: 'none' }}
         >
           {showActionCard ? (
-            /* --- EXPANDED FLOATING ACTION CARD (REFERENCE UI HERO) --- */
-            <div className="bg-white text-slate-900 border-2 border-slate-900 rounded-2xl shadow-2xl p-4 min-w-[270px] max-w-[310px] select-none text-left relative animate-in fade-in zoom-in-95 duration-200 pointer-events-auto">
+            /* --- EXPANDED FLOATING ACTION CARD (HERO UI CARD) --- */
+            <div className="bg-white text-slate-900 border-2 border-slate-900 rounded-2xl shadow-2xl p-3.5 min-w-[250px] max-w-[280px] select-none text-left relative animate-in fade-in zoom-in-95 duration-200 pointer-events-auto">
               {/* Header: [NEEDS YOU] • Agent Name     9m 58s Left */}
               <div className="flex items-center justify-between gap-2 w-full mb-2">
                 <div className="flex items-center gap-1.5">
@@ -831,18 +831,18 @@ export default function AgentAvatar({
               </div>
 
               {/* Body: Task summary */}
-              <p className="text-[11px] leading-relaxed text-slate-600 font-medium mb-3 line-clamp-3">
+              <p className="text-[11px] leading-relaxed text-slate-600 font-medium mb-3 line-clamp-2">
                 {preset.sampleTask}
               </p>
 
               {/* Footer: Action Buttons */}
-              <div className="flex items-center justify-end gap-2 pt-1 border-t border-slate-100">
+              <div className="flex items-center justify-end gap-2 pt-1.5 border-t border-slate-100">
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
                     onSelect(agent)
                   }}
-                  className="px-3 py-1 rounded-full text-[11px] font-bold text-slate-700 hover:text-slate-900 border border-slate-300 hover:border-slate-400 hover:bg-slate-50 transition-all cursor-pointer"
+                  className="px-2.5 py-1 rounded-full text-[10px] font-bold text-slate-700 hover:text-slate-900 border border-slate-300 hover:border-slate-400 hover:bg-slate-50 transition-all cursor-pointer"
                 >
                   Review first
                 </button>
@@ -851,7 +851,7 @@ export default function AgentAvatar({
                     e.stopPropagation()
                     handleApprove()
                   }}
-                  className={`px-3.5 py-1 rounded-full text-[11px] font-bold text-white transition-all shadow-sm cursor-pointer ${
+                  className={`px-3 py-1 rounded-full text-[10px] font-bold text-white transition-all shadow-sm cursor-pointer ${
                     isApproved
                       ? 'bg-emerald-600 hover:bg-emerald-700'
                       : 'bg-blue-600 hover:bg-blue-700 active:scale-95'
@@ -862,8 +862,8 @@ export default function AgentAvatar({
               </div>
 
               {/* Speech Bubble Downward Notch Pointer */}
-              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-slate-900" />
-              <div className="absolute -bottom-[6px] left-1/2 -translate-x-1/2 w-0 h-0 border-x-7 border-x-transparent border-t-7 border-t-white" />
+              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-x-6 border-x-transparent border-t-8 border-t-slate-900" />
+              <div className="absolute -bottom-[6px] left-1/2 -translate-x-1/2 w-0 h-0 border-x-5 border-x-transparent border-t-7 border-t-white" />
             </div>
           ) : (
             /* --- SLEEK COMPACT NAME PILL (Strictly Name & Mascot) --- */
@@ -872,17 +872,14 @@ export default function AgentAvatar({
                 e.stopPropagation()
                 onSelect(agent)
               }}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/95 hover:bg-slate-900 text-white shadow-xl border border-white/30 backdrop-blur-sm select-none transition-transform duration-200 hover:scale-105 relative cursor-pointer whitespace-nowrap pointer-events-auto"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 hover:bg-slate-950 text-white shadow-xl border border-white/20 backdrop-blur-sm select-none transition-transform duration-200 hover:scale-105 relative cursor-pointer whitespace-nowrap pointer-events-auto"
             >
               <span className="text-xs leading-none">{preset.emoji}</span>
               <span className="text-[11px] font-black text-white tracking-tight leading-none">
                 {agent.name}
               </span>
-              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider ml-0.5">
-                {preset.agentNum}
-              </span>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0 ml-0.5" />
-              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-0 border-x-3 border-x-transparent border-t-4 border-t-slate-900/95" />
+              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-0 border-x-3 border-x-transparent border-t-4 border-t-slate-900/90" />
             </div>
           )}
         </Html>

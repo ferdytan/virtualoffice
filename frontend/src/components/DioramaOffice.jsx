@@ -152,15 +152,20 @@ function FloatingPlatform() {
       {/* Matte Porcelain Clay Base */}
       <mesh geometry={platformGeometry} receiveShadow castShadow>
         <meshStandardMaterial
-          color="#f8fafc"
+          color="#ffffff"
           roughness={0.65}
-          metalness={0.04}
+          metalness={0.02}
         />
       </mesh>
-      {/* Subtle Chamfer Trim */}
-      <mesh position={[0, -0.38, 0]} receiveShadow>
-        <cylinderGeometry args={[7.4, 7.4, 0.04, 32]} />
-        <meshStandardMaterial color="#cbd5e1" roughness={0.6} />
+      {/* Architectural Inset Pedestal Base */}
+      <mesh position={[0, -0.26, 0]} receiveShadow>
+        <boxGeometry args={[14.4, 0.22, 10.4]} />
+        <meshStandardMaterial color="#94a3b8" roughness={0.65} metalness={0.06} />
+      </mesh>
+      {/* Recessed Dark Shadow Base Rim */}
+      <mesh position={[0, -0.4, 0]} receiveShadow>
+        <boxGeometry args={[13.8, 0.08, 9.8]} />
+        <meshStandardMaterial color="#64748b" roughness={0.8} />
       </mesh>
     </group>
   )

@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useMemo, Suspense } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { OrbitControls, OrthographicCamera, Environment, useGLTF, useTexture, ContactShadows } from '@react-three/drei'
+import { OrbitControls, Environment, useGLTF, useTexture, ContactShadows } from '@react-three/drei'
 import * as THREE from 'three'
 import AgentAvatar from './AgentAvatar'
 import ScreenDisplays from './ScreenDisplays'
@@ -57,18 +57,14 @@ function CameraRig({
     prevZoomTriggerRef.current = zoomTrigger
 
     const isZoomIn = zoomTrigger.action === 'in'
-    if (camera.isOrthographicCamera) {
-      const step = isZoomIn ? 18 : -18
-      camera.zoom = THREE.MathUtils.clamp(camera.zoom + step, 45, 160)
-      camera.updateProjectionMatrix()
-    } else if (isTopDown) {
+    if (isTopDown) {
       const step = isZoomIn ? -2.6 : 2.6
       camera.position.y = THREE.MathUtils.clamp(camera.position.y + step, 4.5, 28)
     } else {
       const dir = new THREE.Vector3().subVectors(controlsRef.current.target, camera.position).normalize()
       const step = isZoomIn ? 2.5 : -2.5
       const currentDist = camera.position.distanceTo(controlsRef.current.target)
-      if ((isZoomIn && currentDist > 4.5) || (!isZoomIn && currentDist < 30)) {
+      if ((isZoomIn && currentDist > 5) || (!isZoomIn && currentDist < 30)) {
         camera.position.addScaledVector(dir, step)
       }
     }
@@ -94,7 +90,7 @@ function CameraRig({
       } else {
         controlsRef.current.target.lerp(defaultTarget, 0.06)
         if (isTransitioningRef.current) {
-          camera.position.lerp(new THREE.Vector3(12, 10, 12), 0.08)
+          camera.position.lerp(new THREE.Vector3(11.5, 9.5, 11.5), 0.08)
         }
       }
     }
@@ -108,8 +104,8 @@ function CameraRig({
       makeDefault
       enableDamping
       dampingFactor={0.06}
-      minDistance={3.5}
-      maxDistance={32}
+      minDistance={5}
+      maxDistance={30}
       enableRotate={!isTopDown}
       enablePan={false}
       enableZoom={true}
@@ -599,16 +595,10 @@ export default function OfficeScene({
       <Canvas
         shadows
         gl={{ antialias: true, alpha: false }}
+        camera={{ position: [11.5, 9.5, 11.5], fov: 34 }}
       >
-        {/* Section 4: Pure Isometric Orthographic Camera */}
-        <OrthographicCamera
-          makeDefault
-          position={[12, 10, 12]}
-          zoom={80}
-        />
-
-        {/* Clean Clay Porcelain Backdrop */}
-        <color attach="background" args={['#f8fafc']} />
+        {/* Clean Studio Matte Backdrop with Soft Contrast */}
+        <color attach="background" args={['#e2e8f0']} />
 
         {/* Section 1: Setup Cahaya: Environment preset="city" & directionalLight bersudut 45 derajat */}
         <ambientLight color="#fffbeb" intensity={0.8} />
@@ -689,11 +679,11 @@ export default function OfficeScene({
           <meshBasicMaterial />
         </mesh>
 
-        {/* Section 1: ContactShadows under floor diorama and desks */}
+        {/* Section 1: ContactShadows under floating diorama platform */}
         <ContactShadows
-          position={[0, 0, 0]}
-          opacity={0.4}
-          scale={20}
+          position={[0, -0.45, 0]}
+          opacity={0.55}
+          scale={22}
           blur={2.5}
           far={4}
         />
