@@ -283,8 +283,8 @@ function WorkstationDesk({
         </mesh>
       ))}
 
-      {/* Primary Computer Monitor */}
-      <group position={[hasDualMonitors ? -0.22 : 0, 0.82, 0.16]}>
+      {/* Primary Computer Monitor (Faces South towards seated agent) */}
+      <group position={[hasDualMonitors ? -0.22 : 0, 0.82, 0.16]} rotation={[0, Math.PI, 0]}>
         <mesh castShadow>
           <boxGeometry args={[0.5, 0.3, 0.02]} />
           <meshStandardMaterial color="#0f172a" />
@@ -300,9 +300,9 @@ function WorkstationDesk({
         </mesh>
       </group>
 
-      {/* Optional Dual Monitor */}
+      {/* Optional Dual Monitor (Ergonomically angled towards seated agent) */}
       {hasDualMonitors && (
-        <group position={[0.3, 0.82, 0.14]} rotation={[0, -0.2, 0]}>
+        <group position={[0.26, 0.82, 0.16]} rotation={[0, Math.PI + 0.25, 0]}>
           <mesh castShadow>
             <boxGeometry args={[0.48, 0.3, 0.02]} />
             <meshStandardMaterial color="#0f172a" />
@@ -490,18 +490,22 @@ function ExecutiveCOORoom() {
           <meshStandardMaterial color="#cbd5e1" roughness={0.8} />
         </mesh>
 
-        {/* Executive Laptop (Telegram Gateway Feed) - Centered under COO's hands */}
+        {/* Executive Laptop (Telegram Gateway Feed) - Centered under COO's hands, screen facing COO */}
         <group position={[0, 0.62, -0.18]}>
           <mesh position={[0, 0.005, 0]} castShadow>
             <boxGeometry args={[0.3, 0.012, 0.2]} />
             <meshStandardMaterial color="#cbd5e1" metalness={0.8} />
           </mesh>
-          <group position={[0, 0.01, -0.09]} rotation={[-0.3, 0, 0]}>
+          <mesh position={[0, 0.012, 0]}>
+            <boxGeometry args={[0.26, 0.002, 0.14]} />
+            <meshStandardMaterial color="#1e293b" roughness={0.4} />
+          </mesh>
+          <group position={[0, 0.01, 0.09]} rotation={[0.25, 0, 0]}>
             <mesh position={[0, 0.1, 0]} castShadow>
               <boxGeometry args={[0.3, 0.2, 0.01]} />
               <meshStandardMaterial color="#0f172a" />
             </mesh>
-            <mesh position={[0, 0.1, 0.006]}>
+            <mesh position={[0, 0.1, -0.006]} rotation={[0, Math.PI, 0]}>
               <planeGeometry args={[0.28, 0.18]} />
               <meshBasicMaterial color="#9333ea" />
             </mesh>
