@@ -22,11 +22,11 @@ const INITIAL_AGENTS = [
     id: 'sherloc',
     name: 'Sherloc',
     role: 'Frontline WhatsApp & Customer Face',
-    role_badge: 'FRONTLINE CS (BUNNY)',
+    role_badge: 'FRONTLINE CS (BUNNY BOY)',
     status: 'working',
     color: '#f43f5e',
     color_name: 'Coral Rose',
-    position: [-5.3, 0.05, -2.5], // Top-Left Coral Red Hex Pod (Bunny Girl)
+    position: [-5.3, 0.05, -2.5], // Top-Left Coral Red Hex Pod (Bunny Boy)
     rotation: [0, Math.PI / 4, 0], // Facing inward into office
     model: 'gpt-4o-mini',
     description: 'Satu-satunya Frontline Voice & Face WhatsApp customer. Memvalidasi nomor telepon/email pengguna (Pelanggan Orin vs Calon), menjawab FAQ dari Knowledge Base, serta mendelegasikan issue GPS ke Nara dan eskalasi teknis ke Watson.',
@@ -113,11 +113,11 @@ const INITIAL_AGENTS = [
     id: 'coo',
     name: 'COO',
     role: 'Chief Operating Officer & Executive Orchestrator',
-    role_badge: 'EXECUTIVE COO (BEAR)',
+    role_badge: 'EXECUTIVE COO (BEAR MALE)',
     status: 'working',
     color: '#a855f7',
     color_name: 'Royal Violet',
-    position: [-5.3, 0.05, 2.1], // Bottom-Left Royal Purple Hex Pod (Bear Supervisor with glasses)
+    position: [-5.3, 0.05, 2.1], // Bottom-Left Royal Purple Hex Pod (Bear Male Supervisor with glasses)
     rotation: [0, Math.PI / 3, 0],
     model: 'gpt-4o-mini',
     description: 'Pimpinan operasional & master delegator Virtual Office Orin. Menerima instruksi Direktur via Telegram Bot pribadi, memecah tugas, mendelegasikannya ke spesialis (Nara, Scout, Watson, Sherloc, Velocia), memantau latar belakang, dan melapor kembali secara proaktif.',
