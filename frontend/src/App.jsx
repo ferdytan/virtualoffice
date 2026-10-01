@@ -22,11 +22,11 @@ const INITIAL_AGENTS = [
     id: 'sherloc',
     name: 'Sherloc',
     role: 'Frontline WhatsApp & Customer Face',
-    role_badge: 'FRONTLINE CS (BUNNY BOY)',
+    role_badge: 'FRONTLINE CS (SHERLOC)',
     status: 'working',
-    color: '#f43f5e',
-    color_name: 'Coral Rose',
-    position: [-2.5, 0.05, 1.45], // Left Meeting Area: Sitting at round table facing board
+    color: '#d97706',
+    color_name: 'Warm Gold',
+    position: [-4.5, 0.05, 2.65], // Zone 1: Frontline & CS Room
     rotation: [0, 0, 0],
     model: 'gpt-4o-mini',
     description: 'Satu-satunya Frontline Voice & Face WhatsApp customer. Memvalidasi nomor telepon/email pengguna, menjawab FAQ, serta mendelegasikan issue GPS ke Nara dan eskalasi teknis ke Watson.',
@@ -41,12 +41,12 @@ const INITIAL_AGENTS = [
     id: 'watson',
     name: 'Watson',
     role: 'Technical Escalation & Knowledge Loop',
-    role_badge: 'TECH ESCALATION (CAT BOY)',
+    role_badge: 'TECH ANALYST (WATSON)',
     status: 'available',
-    color: '#0284c7',
-    color_name: 'Cyber Blue',
-    position: [0.75, 0.05, 0.45], // Center Workstation: Sitting at ergonomic desk typing
-    rotation: [0, Math.PI, 0], // Facing North towards desk & monitor
+    color: '#1d4ed8',
+    color_name: 'Deep Navy',
+    position: [-1.8, 0.05, -3.75], // Zone 2: Core Operations & Diagnostics Lab
+    rotation: [0, 0, 0],
     model: 'gpt-4o-mini',
     description: 'Jembatan eskalasi teknis ke WhatsApp Group Tim Manajemen & Lead internal. Menerima solusi eskalasi dan secara otomatis memanen pasangan Q&A ke Knowledge Base / RAG.',
     quick_prompts: [
@@ -59,12 +59,12 @@ const INITIAL_AGENTS = [
     id: 'nara',
     name: 'Nara',
     role: 'CS & Offline Unit Reminder',
-    role_badge: 'REMINDER CS (SERVER HUB)',
+    role_badge: 'TELEMETRY CS (NARA)',
     status: 'working',
     color: '#38bdf8',
     color_name: 'Sky Blue',
-    position: [0.75, 0.05, -1.25], // Center Workstation: Sitting opposite Watson typing
-    rotation: [0, 0, 0], // Facing South towards desk
+    position: [0.6, 0.05, -3.75], // Zone 2: Core Operations & Telemetry Lab
+    rotation: [0, 0, 0],
     model: 'gpt-4o-mini',
     description: 'Bertanggung jawab memantau telemetri GPS offline secara real-time dari Server Datacenter dan broadcast pengingat aman anti-banned (jitter random 15-45s & typing status).',
     quick_prompts: [
@@ -77,12 +77,12 @@ const INITIAL_AGENTS = [
     id: 'velocia',
     name: 'Velocia',
     role: 'Marketing Strategist & Lead',
-    role_badge: 'MARKETING (CONFERENCE)',
+    role_badge: 'STRATEGY LEAD (VELOCIA)',
     status: 'available',
     color: '#ef4444',
     color_name: 'Solid Red',
-    position: [-3.4, 0.05, -0.65], // Left Meeting Area: Standing pointing at presentation whiteboard
-    rotation: [0, Math.PI / 3.5, 0],
+    position: [5.0, 0.05, 0.65], // Zone 4: Growth & Creative Workshop
+    rotation: [0, 0, 0],
     model: 'gpt-4o-mini',
     description: 'Menelan log chat selesai dari Sherloc, menganalisis tren permintaan pasar (fuel sensor, mini GPS, promo bundling), dan merancang strategi pertumbuhan di depan papan presentasi.',
     quick_prompts: [
@@ -95,12 +95,12 @@ const INITIAL_AGENTS = [
     id: 'scout',
     name: 'Scout',
     role: 'Content Creator Manager & Strategic Copywriter',
-    role_badge: 'CONTENT STRATEGIST (FOX)',
+    role_badge: 'CONTENT CREATOR (SCOUT)',
     status: 'available',
     color: '#f59e0b',
     color_name: 'Golden Amber',
-    position: [2.7, 0.05, 2.15], // Foreground Lounge: Sitting on sofa with creative notes tablet
-    rotation: [0, -Math.PI / 3, 0],
+    position: [6.2, 0.05, 0.65], // Zone 4: Growth & Creative Workshop
+    rotation: [0, 0, 0],
     model: 'gpt-4o-mini',
     description: 'Content Creator Manager & Strategic Copywriter di ekosistem Orin. Meriset berita kriminalitas & logistik, menyusun strategi artikel konversi tinggi dengan tablet catatan kerja.',
     quick_prompts: [
@@ -113,14 +113,14 @@ const INITIAL_AGENTS = [
     id: 'coo',
     name: 'COO',
     role: 'Chief Operating Officer & Executive Orchestrator',
-    role_badge: 'EXECUTIVE COO (BEAR MALE)',
+    role_badge: 'EXECUTIVE LEAD (COO)',
     status: 'working',
-    color: '#a855f7',
-    color_name: 'Royal Violet',
-    position: [1.3, 0.05, 2.35], // Foreground Lounge: Sitting comfortably on executive sofa
-    rotation: [0, -Math.PI / 4, 0],
+    color: '#334155',
+    color_name: 'Slate Executive',
+    position: [5.4, 0.05, -3.78], // Zone 3: Executive & Coordination Office
+    rotation: [0, 0, 0],
     model: 'gpt-4o-mini',
-    description: 'Pimpinan operasional & master delegator Virtual Office Orin. Menerima instruksi Direktur via Telegram Bot pribadi, memecah tugas, mendelegasikannya ke spesialis, dan memantau dari lounge eksekutif.',
+    description: 'Pimpinan operasional & master delegator Virtual Office Orin. Menerima instruksi Direktur via Telegram Bot pribadi, memecah tugas, mendelegasikannya ke spesialis, dan memantau dari ruang kerja eksekutif.',
     quick_prompts: [
       'Cek status Nara dan suruh Scout cari bahan artikel curanmor',
       'Instruksikan audit telemetri unit offline & evaluasi aturan CAM',
@@ -715,9 +715,9 @@ export default function App() {
             </div>
           </header>
 
-          {/* Floating Kanban Bar (Smooth animated dropdown beneath top-left / navbar) */}
+          {/* Floating Kanban Bar (Smooth animated dropdown beneath top-right Kanban menu button) */}
           {isKanbanOpen && (
-            <div className="fixed top-18 left-3 sm:left-6 z-30 w-80 sm:w-[360px] animate-in fade-in slide-in-from-top-3 duration-200">
+            <div className="fixed top-16 sm:top-18 right-3 sm:right-6 z-30 w-80 sm:w-[380px] animate-in fade-in slide-in-from-top-3 duration-200">
               <KanbanBar
                 tasks={tasks}
                 onSelectAgentById={handleSelectAgentById}

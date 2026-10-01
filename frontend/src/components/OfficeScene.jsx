@@ -90,7 +90,7 @@ function CameraRig({
       } else {
         controlsRef.current.target.lerp(defaultTarget, 0.06)
         if (isTransitioningRef.current) {
-          camera.position.lerp(new THREE.Vector3(11.5, 9.5, 11.5), 0.08)
+          camera.position.lerp(new THREE.Vector3(13.2, 11.0, 13.2), 0.08)
         }
       }
     }
@@ -595,7 +595,7 @@ export default function OfficeScene({
       <Canvas
         shadows
         gl={{ antialias: true, alpha: false }}
-        camera={{ position: [11.5, 9.5, 11.5], fov: 34 }}
+        camera={{ position: [13.2, 11.0, 13.2], fov: 36 }}
       >
         {/* Clean Studio Matte Backdrop with Soft Contrast */}
         <color attach="background" args={['#e2e8f0']} />

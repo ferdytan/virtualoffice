@@ -4,89 +4,93 @@ import { Html } from '@react-three/drei'
 import * as THREE from 'three'
 
 /**
- * Character Presets matching the Clay 3D Toy / Chibi aesthetic from the reference image:
+ * Character Presets matching the Clay 3D Toy / Chibi aesthetic from Gather 2.0:
  *
  * MALE CHARACTERS (Gender: Pria):
- * - Sherloc (🐰): Bunny Boy. Stylish caramel clay hair, tall bunny ears, coral hoodie, dark trousers, white sneakers. Sitting in meeting chair.
- * - Watson (🐱): Cat Boy. Wavy spiky deep navy/blue clay hair (like Miro in reference image), black cat ears, cat tail, cozy white hoodie, dark jeans. Sitting at workstation typing.
- * - COO (🐻): Bear Male Supervisor. Layered mocha clay hair, round bear ears, gold wire-frame glasses, royal purple sweater, charcoal trousers. Sitting relaxed on lounge sofa with executive tablet.
+ * - COO (🐻): Executive Lead. Neat short dark hair, sharp gold glasses, charcoal/slate blazer (#334155), charcoal trousers.
+ * - Sherloc (🐰): Frontline CS. Casual swept brown hair, CS headset hanging around neck/ears, warm amber/gold jacket (#d97706).
+ * - Watson (🐱): Tech Analyst. Neat deep navy/black hair, rolled-up sleeve indigo shirt (#1d4ed8), analyst glasses.
+ * - Scout (🦊): Content Creator. Creative top-knot, reading glasses, warm mustard sweater (#f59e0b), design tablet.
  *
  * FEMALE CHARACTERS (Gender: Wanita):
- * - Nara (📡): Cyber Specialist. Sky-blue bob clay hair, radar antenna ears with pulsing beacon, tech jacket. Sitting at workstation typing.
- * - Scout (🦊): Creative Fox. Golden-amber clay hair with high top-knot bun (like Ara in reference image!), fluffy fox ears, big bushy fox tail, mustard knit sweater. Sitting on lounge sofa with notes tablet.
- * - Velocia (📈): Strategy Lead. Flowing crimson clay hair past shoulders (like the presenter in reference image!), coral ears, crimson blazer. Standing at whiteboard pointing at growth curve.
+ * - Nara (📡): CS & Telemetry. Sky-blue pastel (#38bdf8), neat bob cut, radar ear beacon, friendly & meticulous.
+ * - Velocia (📈): Strategy Lead. Energetic coral/red (#ef4444), stylish long wavy hair, elegant blazer.
  */
 const CHARACTER_PRESETS = {
   sherloc: {
     emoji: '🐰',
-    animal: 'Bunny Boy',
+    animal: 'Frontline CS',
     gender: 'male',
     agentNum: 'AGENT 1',
     skinColor: '#ffd7ba',
-    hairColor: '#854d0e',
+    hairColor: '#78350f',
     hairStyle: 'boy_swept',
     earType: 'bunny',
-    eyeColor: '#f43f5e',
-    outfitColor: '#f43f5e', // coral rose hoodie
+    eyeColor: '#d97706',
+    outfitColor: '#d97706', // warm amber/gold jacket
     secondaryColor: '#ffffff',
-    bottomColor: '#334155', // dark charcoal trousers
-    prop: null,
+    bottomColor: '#334155',
+    prop: 'headset',
+    hasGlasses: false,
     hasTail: false,
-    defaultPose: 'sitting_meeting',
+    defaultPose: 'sitting_typing',
     sampleTask: 'WhatsApp Inbound: Validasi nomor telepon pelanggan baru #CUST-9821 siap didelegasikan.'
   },
   watson: {
     emoji: '🐱',
-    animal: 'Cat Boy',
+    animal: 'Tech Analyst',
     gender: 'male',
     agentNum: 'AGENT 2',
     skinColor: '#ffd7ba',
-    hairColor: '#1d4ed8', // rich navy/blue sculpted clay hair (like Miro)
+    hairColor: '#0f172a',
     hairStyle: 'spiky_clay',
     earType: 'cat',
-    eyeColor: '#0284c7',
-    outfitColor: '#f8fafc', // cozy off-white hoodie
-    secondaryColor: '#0284c7',
-    bottomColor: '#1e293b', // dark denim jeans
-    prop: 'typing',
+    eyeColor: '#1d4ed8',
+    outfitColor: '#1d4ed8', // deep navy / indigo shirt
+    secondaryColor: '#ffffff',
+    bottomColor: '#1e293b',
+    prop: 'glasses',
+    hasGlasses: true,
     hasTail: 'cat',
     defaultPose: 'sitting_typing',
     sampleTask: 'September channel plan is drafted. The launch copy needs your approval before it goes live.'
   },
   nara: {
     emoji: '📡',
-    animal: 'Radar Specialist',
+    animal: 'Telemetry CS',
     gender: 'female',
     agentNum: 'AGENT 3',
     skinColor: '#ffd7ba',
-    hairColor: '#0284c7', // vibrant cyan/sky blue
+    hairColor: '#0284c7',
     hairStyle: 'bob_cut',
     earType: 'radar',
     eyeColor: '#38bdf8',
-    outfitColor: '#38bdf8', // tech blue jacket
+    outfitColor: '#38bdf8', // sky blue pastel jacket
     secondaryColor: '#ffffff',
     bottomColor: '#0f172a',
-    prop: 'typing',
+    prop: null,
+    hasGlasses: false,
     hasTail: false,
     defaultPose: 'sitting_typing',
     sampleTask: 'Telemetri Armada: 48 unit GPS offline terdeteksi. Broadcast pengingat anti-banned dijadwalkan.'
   },
   scout: {
     emoji: '🦊',
-    animal: 'Fox Creator',
-    gender: 'female',
+    animal: 'Content Creator',
+    gender: 'male',
     agentNum: 'AGENT 4',
     skinColor: '#ffd7ba',
-    hairColor: '#d97706', // golden amber / honey
-    hairStyle: 'top_bun', // high top-knot bun like Ara in reference image
+    hairColor: '#b45309',
+    hairStyle: 'top_bun',
     earType: 'fox',
     eyeColor: '#f59e0b',
-    outfitColor: '#f59e0b', // warm mustard/amber knit sweater
+    outfitColor: '#f59e0b', // warm mustard/amber sweater
     secondaryColor: '#ffffff',
-    bottomColor: '#ffffff',
+    bottomColor: '#1e293b',
     prop: 'tablet',
+    hasGlasses: true,
     hasTail: 'fox',
-    defaultPose: 'sitting_lounge',
+    defaultPose: 'sitting_typing',
     sampleTask: 'Draf Artikel: Mengapa Kunci Ganda Tak Cukup & Solusi Sensor Orin siap untuk review publikasi.'
   },
   velocia: {
@@ -95,40 +99,42 @@ const CHARACTER_PRESETS = {
     gender: 'female',
     agentNum: 'AGENT 5',
     skinColor: '#ffd7ba',
-    hairColor: '#dc2626', // rich flowing crimson/coral hair
+    hairColor: '#dc2626',
     hairStyle: 'long_wavy',
     earType: 'fox_red',
     eyeColor: '#ef4444',
-    outfitColor: '#ef4444', // stylish crimson blazer
+    outfitColor: '#ef4444', // coral / red blazer
     secondaryColor: '#ffffff',
     bottomColor: '#ffffff',
     prop: null,
+    hasGlasses: false,
     hasTail: false,
-    defaultPose: 'standing_pointing',
+    defaultPose: 'sitting_typing',
     sampleTask: 'Strategi OKR: Analisis tren permintaan pasar Fuel Sensor naik +142.8% siap dipresentasikan.'
   },
   coo: {
     emoji: '🐻',
-    animal: 'Bear Supervisor',
+    animal: 'Executive Lead',
     gender: 'male',
     agentNum: 'LEAD',
     skinColor: '#ffd7ba',
-    hairColor: '#451a03', // dark mocha brown clay hair
+    hairColor: '#1e293b',
     hairStyle: 'executive_boy',
     earType: 'bear',
-    eyeColor: '#78350f',
-    outfitColor: '#9333ea', // royal purple executive sweater
+    eyeColor: '#64748b',
+    outfitColor: '#334155', // Charcoal/Slate executive suit
     secondaryColor: '#ffffff',
-    bottomColor: '#1e293b', // charcoal executive trousers
+    bottomColor: '#1e293b',
     prop: 'glasses',
+    hasGlasses: true,
     hasTail: false,
-    defaultPose: 'sitting_lounge',
+    defaultPose: 'sitting_typing',
     sampleTask: 'Delegasi Eksekutif: 6 task cluster tersinkronisasi dengan Telegram Gateway Direktur.'
   }
 }
 
 /**
- * 3D Kemonomimi Animal Ears (Smooth Clay Finish)
+ * 3D Kemonomimi Animal Ears
  */
 function KemonomimiEars({ earType = 'bunny', isHovered }) {
   const leftEarRef = useRef()
@@ -141,335 +147,202 @@ function KemonomimiEars({ earType = 'bunny', isHovered }) {
     if (rightEarRef.current) rightEarRef.current.rotation.z = 0.14 - twitch
   })
 
-  switch (earType) {
-    case 'bunny':
-      return (
-        <group position={[0, 0.28, -0.02]}>
-          <group ref={leftEarRef} position={[-0.14, 0, 0]} rotation={[-0.08, 0, -0.14]}>
-            <mesh castShadow>
-              <cylinderGeometry args={[0.045, 0.055, 0.35, 16]} />
-              <meshStandardMaterial color="#ffffff" roughness={0.65} metalness={0.04} />
-            </mesh>
-            <mesh position={[0, 0, 0.022]}>
-              <cylinderGeometry args={[0.026, 0.038, 0.28, 16]} />
-              <meshStandardMaterial color="#fbcfe8" roughness={0.7} metalness={0.02} />
-            </mesh>
-          </group>
-          <group ref={rightEarRef} position={[0.14, 0, 0]} rotation={[-0.08, 0, 0.14]}>
-            <mesh castShadow>
-              <cylinderGeometry args={[0.045, 0.055, 0.35, 16]} />
-              <meshStandardMaterial color="#ffffff" roughness={0.65} metalness={0.04} />
-            </mesh>
-            <mesh position={[0, 0, 0.022]}>
-              <cylinderGeometry args={[0.026, 0.038, 0.28, 16]} />
-              <meshStandardMaterial color="#fbcfe8" roughness={0.7} metalness={0.02} />
-            </mesh>
-          </group>
-        </group>
-      )
-
-    case 'cat':
-      return (
-        <group position={[0, 0.26, -0.02]}>
-          <group ref={leftEarRef} position={[-0.16, 0, 0]} rotation={[0.08, 0.08, -0.24]}>
-            <mesh castShadow>
-              <coneGeometry args={[0.085, 0.17, 4]} />
-              <meshStandardMaterial color="#1e293b" roughness={0.65} metalness={0.04} />
-            </mesh>
-            <mesh position={[0, -0.01, 0.02]}>
-              <coneGeometry args={[0.055, 0.12, 4]} />
-              <meshStandardMaterial color="#f472b6" roughness={0.65} metalness={0.02} />
-            </mesh>
-          </group>
-          <group ref={rightEarRef} position={[0.16, 0, 0]} rotation={[0.08, -0.08, 0.24]}>
-            <mesh castShadow>
-              <coneGeometry args={[0.085, 0.17, 4]} />
-              <meshStandardMaterial color="#1e293b" roughness={0.65} metalness={0.04} />
-            </mesh>
-            <mesh position={[0, -0.01, 0.02]}>
-              <coneGeometry args={[0.055, 0.12, 4]} />
-              <meshStandardMaterial color="#f472b6" roughness={0.65} metalness={0.02} />
-            </mesh>
-          </group>
-        </group>
-      )
-
-    case 'fox':
-    case 'fox_red':
-      const outerColor = earType === 'fox_red' ? '#ef4444' : '#d97706'
-      return (
-        <group position={[0, 0.26, -0.02]}>
-          <group ref={leftEarRef} position={[-0.16, 0, 0]} rotation={[0.08, 0.06, -0.22]}>
-            <mesh castShadow>
-              <coneGeometry args={[0.09, 0.18, 4]} />
-              <meshStandardMaterial color={outerColor} roughness={0.65} metalness={0.04} />
-            </mesh>
-            <mesh position={[0, -0.01, 0.022]}>
-              <coneGeometry args={[0.055, 0.12, 4]} />
-              <meshStandardMaterial color="#fef3c7" roughness={0.7} metalness={0.02} />
-            </mesh>
-          </group>
-          <group ref={rightEarRef} position={[0.16, 0, 0]} rotation={[0.08, -0.06, 0.22]}>
-            <mesh castShadow>
-              <coneGeometry args={[0.09, 0.18, 4]} />
-              <meshStandardMaterial color={outerColor} roughness={0.65} metalness={0.04} />
-            </mesh>
-            <mesh position={[0, -0.01, 0.022]}>
-              <coneGeometry args={[0.055, 0.12, 4]} />
-              <meshStandardMaterial color="#fef3c7" roughness={0.7} metalness={0.02} />
-            </mesh>
-          </group>
-        </group>
-      )
-
-    case 'bear':
-      return (
-        <group position={[0, 0.25, -0.02]}>
-          <group ref={leftEarRef} position={[-0.18, 0, 0]}>
-            <mesh castShadow>
-              <sphereGeometry args={[0.075, 16, 16]} />
-              <meshStandardMaterial color="#451a03" roughness={0.65} metalness={0.04} />
-            </mesh>
-            <mesh position={[0, 0, 0.022]}>
-              <sphereGeometry args={[0.048, 12, 12]} />
-              <meshStandardMaterial color="#d6d3d1" roughness={0.7} metalness={0.02} />
-            </mesh>
-          </group>
-          <group ref={rightEarRef} position={[0.18, 0, 0]}>
-            <mesh castShadow>
-              <sphereGeometry args={[0.075, 16, 16]} />
-              <meshStandardMaterial color="#451a03" roughness={0.65} metalness={0.04} />
-            </mesh>
-            <mesh position={[0, 0, 0.022]}>
-              <sphereGeometry args={[0.048, 12, 12]} />
-              <meshStandardMaterial color="#d6d3d1" roughness={0.7} metalness={0.02} />
-            </mesh>
-          </group>
-        </group>
-      )
-
-    case 'radar':
-      return (
-        <group position={[0, 0.26, 0]}>
-          <group position={[-0.16, 0, 0]}>
-            <mesh castShadow>
-              <cylinderGeometry args={[0.06, 0.06, 0.06, 16]} />
-              <meshStandardMaterial color="#0284c7" roughness={0.5} />
-            </mesh>
-          </group>
-          <group position={[0.16, 0, 0]}>
-            <mesh castShadow>
-              <cylinderGeometry args={[0.06, 0.06, 0.06, 16]} />
-              <meshStandardMaterial color="#0284c7" roughness={0.5} />
-            </mesh>
-          </group>
-          <mesh position={[0, 0.09, 0]}>
-            <cylinderGeometry args={[0.012, 0.015, 0.18, 8]} />
-            <meshStandardMaterial color="#38bdf8" />
+  if (earType === 'bunny') {
+    return (
+      <group position={[0, 0.28, 0]}>
+        <group ref={leftEarRef} position={[-0.09, 0, 0]}>
+          <mesh castShadow>
+            <cylinderGeometry args={[0.035, 0.05, 0.38, 16]} />
+            <meshStandardMaterial color="#ffffff" roughness={0.6} />
           </mesh>
-          <mesh position={[0, 0.2, 0]}>
-            <sphereGeometry args={[0.035, 12, 12]} />
-            <meshStandardMaterial color="#00f0ff" emissive="#00f0ff" emissiveIntensity={2.2} />
+          <mesh position={[0, 0, 0.02]}>
+            <cylinderGeometry args={[0.018, 0.026, 0.3, 16]} />
+            <meshStandardMaterial color="#fca5a5" roughness={0.6} />
           </mesh>
         </group>
-      )
-
-    default:
-      return null
+        <group ref={rightEarRef} position={[0.09, 0, 0]}>
+          <mesh castShadow>
+            <cylinderGeometry args={[0.035, 0.05, 0.38, 16]} />
+            <meshStandardMaterial color="#ffffff" roughness={0.6} />
+          </mesh>
+          <mesh position={[0, 0, 0.02]}>
+            <cylinderGeometry args={[0.018, 0.026, 0.3, 16]} />
+            <meshStandardMaterial color="#fca5a5" roughness={0.6} />
+          </mesh>
+        </group>
+      </group>
+    )
   }
-}
 
-/**
- * Sculpted Voluminous Clay Hair (matching Clay 3D Toy style in reference image)
- */
-function SculptedClayHair({ hairStyle = 'boy_swept', hairColor = '#854d0e' }) {
-  const mat = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: hairColor, roughness: 0.65, metalness: 0.04 }),
-    [hairColor]
-  )
+  if (earType === 'cat') {
+    return (
+      <group position={[0, 0.24, 0]}>
+        <group ref={leftEarRef} position={[-0.14, 0, 0]} rotation={[0, 0, -0.2]}>
+          <mesh castShadow>
+            <coneGeometry args={[0.08, 0.14, 16]} />
+            <meshStandardMaterial color="#0f172a" roughness={0.5} />
+          </mesh>
+          <mesh position={[0, 0, 0.02]}>
+            <coneGeometry args={[0.045, 0.09, 16]} />
+            <meshStandardMaterial color="#bae6fd" roughness={0.5} />
+          </mesh>
+        </group>
+        <group ref={rightEarRef} position={[0.14, 0, 0]} rotation={[0, 0, 0.2]}>
+          <mesh castShadow>
+            <coneGeometry args={[0.08, 0.14, 16]} />
+            <meshStandardMaterial color="#0f172a" roughness={0.5} />
+          </mesh>
+          <mesh position={[0, 0, 0.02]}>
+            <coneGeometry args={[0.045, 0.09, 16]} />
+            <meshStandardMaterial color="#bae6fd" roughness={0.5} />
+          </mesh>
+        </group>
+      </group>
+    )
+  }
 
+  if (earType === 'fox' || earType === 'fox_red') {
+    const isRed = earType === 'fox_red'
+    const mainCol = isRed ? '#dc2626' : '#d97706'
+    return (
+      <group position={[0, 0.24, 0]}>
+        <group ref={leftEarRef} position={[-0.14, 0, 0]} rotation={[0, 0, -0.25]}>
+          <mesh castShadow>
+            <coneGeometry args={[0.085, 0.16, 16]} />
+            <meshStandardMaterial color={mainCol} roughness={0.5} />
+          </mesh>
+          <mesh position={[0, 0, 0.02]}>
+            <coneGeometry args={[0.045, 0.1, 16]} />
+            <meshStandardMaterial color="#fef08a" roughness={0.5} />
+          </mesh>
+        </group>
+        <group ref={rightEarRef} position={[0.14, 0, 0]} rotation={[0, 0, 0.25]}>
+          <mesh castShadow>
+            <coneGeometry args={[0.085, 0.16, 16]} />
+            <meshStandardMaterial color={mainCol} roughness={0.5} />
+          </mesh>
+          <mesh position={[0, 0, 0.02]}>
+            <coneGeometry args={[0.045, 0.1, 16]} />
+            <meshStandardMaterial color="#fef08a" roughness={0.5} />
+          </mesh>
+        </group>
+      </group>
+    )
+  }
+
+  if (earType === 'bear') {
+    return (
+      <group position={[0, 0.22, 0]}>
+        <group ref={leftEarRef} position={[-0.16, 0, 0]}>
+          <mesh castShadow>
+            <sphereGeometry args={[0.07, 16, 16]} />
+            <meshStandardMaterial color="#1e293b" roughness={0.6} />
+          </mesh>
+          <mesh position={[0, 0, 0.02]}>
+            <sphereGeometry args={[0.042, 16, 16]} />
+            <meshStandardMaterial color="#64748b" roughness={0.6} />
+          </mesh>
+        </group>
+        <group ref={rightEarRef} position={[0.16, 0, 0]}>
+          <mesh castShadow>
+            <sphereGeometry args={[0.07, 16, 16]} />
+            <meshStandardMaterial color="#1e293b" roughness={0.6} />
+          </mesh>
+          <mesh position={[0, 0, 0.02]}>
+            <sphereGeometry args={[0.042, 16, 16]} />
+            <meshStandardMaterial color="#64748b" roughness={0.6} />
+          </mesh>
+        </group>
+      </group>
+    )
+  }
+
+  // Radar Antenna for Nara
   return (
-    <group position={[0, 0.03, 0]}>
-      {/* Main Clay Cap */}
-      <mesh position={[0, 0.04, -0.03]} castShadow>
-        <sphereGeometry args={[0.29, 20, 20]} />
-        <primitive object={mat} attach="material" />
+    <group position={[0, 0.24, 0]}>
+      <mesh position={[-0.1, 0.08, 0]} rotation={[0, 0, -0.3]}>
+        <cylinderGeometry args={[0.008, 0.008, 0.16, 8]} />
+        <meshStandardMaterial color="#0284c7" metalness={0.7} />
       </mesh>
-
-      {/* Swept Boyish Hair (Sherloc) */}
-      {hairStyle === 'boy_swept' && (
-        <group position={[0, 0.16, 0.16]} rotation={[0.2, -0.15, 0]}>
-          <mesh position={[-0.1, 0, 0]} castShadow>
-            <sphereGeometry args={[0.09, 12, 12]} />
-            <primitive object={mat} attach="material" />
-          </mesh>
-          <mesh position={[0.02, 0.02, 0.03]} castShadow>
-            <sphereGeometry args={[0.085, 12, 12]} />
-            <primitive object={mat} attach="material" />
-          </mesh>
-          <mesh position={[0.13, -0.02, 0]} castShadow>
-            <sphereGeometry args={[0.075, 12, 12]} />
-            <primitive object={mat} attach="material" />
-          </mesh>
-        </group>
-      )}
-
-      {/* Wavy Spiky Clay (Watson - Miro in reference) */}
-      {hairStyle === 'spiky_clay' && (
-        <group position={[0, 0.15, 0]}>
-          {[
-            [-0.12, 0.08, 0.1, 0.1],
-            [0.02, 0.12, 0.08, 0.11],
-            [0.14, 0.06, 0.09, 0.095],
-            [-0.16, 0.02, -0.05, 0.1],
-            [0.16, 0.02, -0.05, 0.1],
-            [0, 0.14, -0.1, 0.12]
-          ].map(([px, py, pz, r], idx) => (
-            <mesh key={idx} position={[px, py, pz]} castShadow>
-              <sphereGeometry args={[r, 12, 12]} />
-              <primitive object={mat} attach="material" />
-            </mesh>
-          ))}
-        </group>
-      )}
-
-      {/* High Top-Knot Bun (Scout - Ara in reference) */}
-      {hairStyle === 'top_bun' && (
-        <>
-          <group position={[0, 0.32, -0.05]}>
-            <mesh castShadow>
-              <sphereGeometry args={[0.14, 16, 16]} />
-              <primitive object={mat} attach="material" />
-            </mesh>
-            <mesh position={[0, -0.08, 0]}>
-              <torusGeometry args={[0.09, 0.02, 8, 16]} />
-              <meshStandardMaterial color="#f43f5e" roughness={0.5} />
-            </mesh>
-          </group>
-          <group position={[0, 0.15, 0.18]} rotation={[0.2, 0, 0]}>
-            <mesh position={[-0.08, 0, 0]} castShadow>
-              <sphereGeometry args={[0.07, 10, 10]} />
-              <primitive object={mat} attach="material" />
-            </mesh>
-            <mesh position={[0.08, 0, 0]} castShadow>
-              <sphereGeometry args={[0.07, 10, 10]} />
-              <primitive object={mat} attach="material" />
-            </mesh>
-          </group>
-        </>
-      )}
-
-      {/* Long Flowing Wavy Hair (Velocia) */}
-      {hairStyle === 'long_wavy' && (
-        <>
-          <group position={[0, 0.15, 0.18]} rotation={[0.2, 0, 0]}>
-            <mesh position={[-0.07, 0, 0]} castShadow>
-              <sphereGeometry args={[0.075, 10, 10]} />
-              <primitive object={mat} attach="material" />
-            </mesh>
-            <mesh position={[0.07, 0, 0]} castShadow>
-              <sphereGeometry args={[0.075, 10, 10]} />
-              <primitive object={mat} attach="material" />
-            </mesh>
-          </group>
-          <mesh position={[-0.22, -0.2, -0.05]} rotation={[0.1, 0, 0.15]} castShadow>
-            <cylinderGeometry args={[0.07, 0.04, 0.42, 10]} />
-            <primitive object={mat} attach="material" />
-          </mesh>
-          <mesh position={[0.22, -0.2, -0.05]} rotation={[0.1, 0, -0.15]} castShadow>
-            <cylinderGeometry args={[0.07, 0.04, 0.42, 10]} />
-            <primitive object={mat} attach="material" />
-          </mesh>
-        </>
-      )}
-
-      {/* Executive Boy Hair (COO) */}
-      {hairStyle === 'executive_boy' && (
-        <group position={[0, 0.15, 0]}>
-          <mesh position={[0, 0.05, 0.08]} castShadow>
-            <sphereGeometry args={[0.12, 12, 12]} />
-            <primitive object={mat} attach="material" />
-          </mesh>
-        </group>
-      )}
-
-      {/* Cyber Bob Cut (Nara) */}
-      {hairStyle === 'bob_cut' && (
-        <group position={[0, 0, 0]}>
-          <mesh position={[0, 0.14, 0.16]} rotation={[0.25, 0, 0]} castShadow>
-            <boxGeometry args={[0.28, 0.08, 0.06]} />
-            <primitive object={mat} attach="material" />
-          </mesh>
-          <mesh position={[-0.22, -0.08, 0.02]} castShadow>
-            <cylinderGeometry args={[0.05, 0.035, 0.26, 8]} />
-            <primitive object={mat} attach="material" />
-          </mesh>
-          <mesh position={[0.22, -0.08, 0.02]} castShadow>
-            <cylinderGeometry args={[0.05, 0.035, 0.26, 8]} />
-            <primitive object={mat} attach="material" />
-          </mesh>
-        </group>
-      )}
+      <mesh position={[-0.14, 0.16, 0]}>
+        <sphereGeometry args={[0.024, 12, 12]} />
+        <meshStandardMaterial color="#38bdf8" emissive="#38bdf8" emissiveIntensity={2} />
+      </mesh>
     </group>
   )
 }
 
 /**
- * Animated Tail for Watson and Scout
+ * Procedural Sculpted Clay Hair
  */
-function AnimatedTail({ tailType = 'cat', isHovered }) {
-  const tailRef = useRef()
-
-  useFrame(({ clock }) => {
-    if (!tailRef.current) return
-    const t = clock.getElapsedTime()
-    const speed = isHovered ? 5.5 : 2.5
-    tailRef.current.rotation.y = Math.sin(t * speed) * 0.26
-    tailRef.current.rotation.z = Math.cos(t * speed * 0.8) * 0.14
-  })
-
-  if (tailType === 'cat') {
+function SculptedClayHair({ hairStyle = 'boy_swept', hairColor = '#854d0e' }) {
+  if (hairStyle === 'top_bun') {
     return (
-      <group ref={tailRef} position={[0, 0.38, -0.18]} rotation={[0.65, 0, 0]}>
+      <group position={[0, 0.12, -0.04]}>
         <mesh castShadow>
-          <cylinderGeometry args={[0.025, 0.035, 0.42, 10]} />
-          <meshStandardMaterial color="#1e293b" roughness={0.65} metalness={0.04} />
+          <sphereGeometry args={[0.27, 24, 24]} />
+          <meshStandardMaterial color={hairColor} roughness={0.55} />
         </mesh>
-        <mesh position={[0, 0.22, 0]} castShadow>
-          <sphereGeometry args={[0.035, 10, 10]} />
-          <meshStandardMaterial color="#ffffff" roughness={0.65} metalness={0.04} />
+        <mesh position={[0, 0.26, -0.02]} castShadow>
+          <sphereGeometry args={[0.13, 20, 20]} />
+          <meshStandardMaterial color={hairColor} roughness={0.55} />
         </mesh>
       </group>
     )
   }
 
-  if (tailType === 'fox') {
+  if (hairStyle === 'long_wavy') {
     return (
-      <group ref={tailRef} position={[0, 0.42, -0.22]} rotation={[0.8, 0, 0]}>
+      <group position={[0, 0.08, -0.06]}>
         <mesh castShadow>
-          <coneGeometry args={[0.13, 0.46, 12]} />
-          <meshStandardMaterial color="#d97706" roughness={0.7} metalness={0.04} />
+          <sphereGeometry args={[0.28, 24, 24]} />
+          <meshStandardMaterial color={hairColor} roughness={0.55} />
         </mesh>
-        <mesh position={[0, 0.24, 0]} castShadow>
-          <coneGeometry args={[0.085, 0.18, 12]} />
-          <meshStandardMaterial color="#ffffff" roughness={0.7} metalness={0.04} />
+        {[-0.18, 0.18].map((tx, idx) => (
+          <mesh key={idx} position={[tx, -0.22, 0]} castShadow>
+            <cylinderGeometry args={[0.06, 0.08, 0.44, 16]} />
+            <meshStandardMaterial color={hairColor} roughness={0.55} />
+          </mesh>
+        ))}
+      </group>
+    )
+  }
+
+  if (hairStyle === 'bob_cut') {
+    return (
+      <group position={[0, 0.08, -0.04]}>
+        <mesh castShadow>
+          <sphereGeometry args={[0.28, 24, 24]} />
+          <meshStandardMaterial color={hairColor} roughness={0.55} />
+        </mesh>
+        <mesh position={[0, -0.1, -0.06]} castShadow>
+          <cylinderGeometry args={[0.26, 0.28, 0.22, 16]} />
+          <meshStandardMaterial color={hairColor} roughness={0.55} />
         </mesh>
       </group>
     )
   }
 
-  return null
+  // Short neat / swept boy style (Watson, Sherloc, COO)
+  return (
+    <group position={[0, 0.1, -0.04]}>
+      <mesh castShadow>
+        <sphereGeometry args={[0.27, 24, 24]} />
+        <meshStandardMaterial color={hairColor} roughness={0.55} />
+      </mesh>
+      <mesh position={[0, 0.12, 0.16]} rotation={[0.4, 0, 0]} castShadow>
+        <boxGeometry args={[0.22, 0.08, 0.14]} />
+        <meshStandardMaterial color={hairColor} roughness={0.55} />
+      </mesh>
+    </group>
+  )
 }
 
 /**
- * Natural Posed Clay Chibi Character:
- * Poses:
- * - 'sitting_typing': sitting in office chair, hands over desk typing (Watson, Nara)
- * - 'standing_pointing': standing, right hand pointing at board (Velocia)
- * - 'sitting_meeting': sitting in round table chair, attentive (Sherloc)
- * - 'sitting_lounge': relaxed lounge sitting holding tablet (COO, Scout)
+ * Natural Posed Clay Chibi Character
  */
 function NaturalPosedCharacter({
+  agentId,
   preset,
   isHovered,
   isSelected,
@@ -487,7 +360,12 @@ function NaturalPosedCharacter({
     const t = clock.getElapsedTime()
 
     if (rootRef.current) {
-      rootRef.current.position.y = yOffset + Math.sin(t * 2.5) * 0.012
+      if (pose === 'walking') {
+        // Natural walking bounce
+        rootRef.current.position.y = Math.abs(Math.sin(t * 8)) * 0.05
+      } else {
+        rootRef.current.position.y = yOffset + Math.sin(t * 2.5) * 0.012
+      }
     }
 
     if (headRef.current) {
@@ -496,16 +374,13 @@ function NaturalPosedCharacter({
     }
 
     // Arm interactions
-    if (pose === 'sitting_typing') {
-      // Subtle typing finger bounce
+    if (pose === 'walking') {
+      if (rightArmRef.current) rightArmRef.current.rotation.x = Math.sin(t * 8) * 0.45
+      if (leftArmRef.current) leftArmRef.current.rotation.x = -Math.sin(t * 8) * 0.45
+    } else if (pose === 'sitting_typing') {
       if (rightArmRef.current) rightArmRef.current.rotation.x = 0.85 + Math.sin(t * 12) * 0.04
       if (leftArmRef.current) leftArmRef.current.rotation.x = 0.85 + Math.cos(t * 12) * 0.04
-    } else if (pose === 'standing_pointing') {
-      // Right arm raised pointing at presentation board
-      if (rightArmRef.current) rightArmRef.current.rotation.z = -1.35 + Math.sin(t * 2) * 0.06
-      if (rightArmRef.current) rightArmRef.current.rotation.x = 0.4
     } else if (isHovered || isSelected) {
-      // Wave happily on hover/select
       if (rightArmRef.current) {
         rightArmRef.current.rotation.z = -1.2 + Math.sin(t * 9) * 0.32
         rightArmRef.current.rotation.x = 0.5
@@ -572,26 +447,55 @@ function NaturalPosedCharacter({
           <meshBasicMaterial color="#f43f5e" />
         </mesh>
 
-        {/* Gold Glasses for COO */}
-        {preset.prop === 'glasses' && (
+        {/* Glasses for COO, Watson, and Scout */}
+        {(preset.hasGlasses || preset.prop === 'glasses') && (
           <group position={[0, 0.02, 0.26]}>
             <mesh position={[-0.09, 0, 0]}>
               <torusGeometry args={[0.055, 0.006, 8, 24]} />
-              <meshStandardMaterial color="#eab308" metalness={0.9} roughness={0.2} />
+              <meshStandardMaterial
+                color={agentId === 'coo' ? '#eab308' : agentId === 'watson' ? '#94a3b8' : '#d97706'}
+                metalness={0.8}
+                roughness={0.2}
+              />
             </mesh>
             <mesh position={[0.09, 0, 0]}>
               <torusGeometry args={[0.055, 0.006, 8, 24]} />
-              <meshStandardMaterial color="#eab308" metalness={0.9} roughness={0.2} />
+              <meshStandardMaterial
+                color={agentId === 'coo' ? '#eab308' : agentId === 'watson' ? '#94a3b8' : '#d97706'}
+                metalness={0.8}
+                roughness={0.2}
+              />
             </mesh>
             <mesh position={[0, 0.015, 0]}>
               <boxGeometry args={[0.05, 0.006, 0.006]} />
-              <meshStandardMaterial color="#eab308" metalness={0.9} />
+              <meshStandardMaterial
+                color={agentId === 'coo' ? '#eab308' : agentId === 'watson' ? '#94a3b8' : '#d97706'}
+                metalness={0.8}
+              />
+            </mesh>
+          </group>
+        )}
+
+        {/* CS Headset for Sherloc */}
+        {agentId === 'sherloc' && (
+          <group position={[0, -0.02, 0]}>
+            <mesh position={[0, -0.16, 0.04]} rotation={[0.4, 0, 0]}>
+              <torusGeometry args={[0.2, 0.025, 8, 24, Math.PI * 1.4]} />
+              <meshStandardMaterial color="#1e293b" metalness={0.6} />
+            </mesh>
+            <mesh position={[-0.24, -0.06, 0]} rotation={[0, 0, 0.2]}>
+              <cylinderGeometry args={[0.06, 0.06, 0.04, 16]} />
+              <meshStandardMaterial color="#d97706" />
+            </mesh>
+            <mesh position={[0.24, -0.06, 0]} rotation={[0, 0, -0.2]}>
+              <cylinderGeometry args={[0.06, 0.06, 0.04, 16]} />
+              <meshStandardMaterial color="#d97706" />
             </mesh>
           </group>
         )}
       </group>
 
-      {/* 2. TORSO / HOODIE */}
+      {/* 2. TORSO / OUTFIT */}
       <group position={[0, 0.46, 0]}>
         <mesh castShadow receiveShadow>
           <cylinderGeometry args={[0.16, 0.2, 0.36, 16]} />
@@ -603,31 +507,18 @@ function NaturalPosedCharacter({
           <meshStandardMaterial color={preset.secondaryColor} roughness={0.6} />
         </mesh>
 
-        {preset.gender === 'male' ? (
-          <mesh position={[0, -0.17, 0]} castShadow>
-            <cylinderGeometry args={[0.18, 0.2, 0.1, 16]} />
-            <meshStandardMaterial color={preset.bottomColor} roughness={0.65} metalness={0.04} />
-          </mesh>
-        ) : (
-          <mesh position={[0, -0.16, 0]} castShadow>
-            <cylinderGeometry args={[0.2, 0.25, 0.12, 16]} />
-            <meshStandardMaterial color={preset.bottomColor} roughness={0.65} />
-          </mesh>
-        )}
+        {/* Bottom Trousers/Skirt */}
+        <mesh position={[0, -0.17, 0]} castShadow>
+          <cylinderGeometry args={[0.18, 0.2, 0.1, 16]} />
+          <meshStandardMaterial color={preset.bottomColor} roughness={0.65} metalness={0.04} />
+        </mesh>
       </group>
 
       {/* 3. ARMS & HANDS */}
-      {/* Left Arm */}
       <group
         ref={leftArmRef}
         position={[-0.22, 0.52, 0]}
-        rotation={
-          pose === 'sitting_typing'
-            ? [0.85, 0.3, 0.1]
-            : pose === 'sitting_lounge'
-            ? [0.5, 0.4, -0.1]
-            : [0.2, 0, 0.25]
-        }
+        rotation={pose === 'sitting_typing' ? [0.85, 0.3, 0.1] : [0.2, 0, 0.25]}
       >
         <mesh castShadow>
           <cylinderGeometry args={[0.045, 0.04, 0.28, 10]} />
@@ -639,19 +530,10 @@ function NaturalPosedCharacter({
         </mesh>
       </group>
 
-      {/* Right Arm */}
       <group
         ref={rightArmRef}
         position={[0.22, 0.52, 0]}
-        rotation={
-          pose === 'sitting_typing'
-            ? [0.85, -0.3, -0.1]
-            : pose === 'standing_pointing'
-            ? [0.4, 0, -1.35]
-            : pose === 'sitting_lounge'
-            ? [0.5, -0.4, 0.1]
-            : [0.2, 0, -0.25]
-        }
+        rotation={pose === 'sitting_typing' ? [0.85, -0.3, -0.1] : [0.2, 0, -0.25]}
       >
         <mesh castShadow>
           <cylinderGeometry args={[0.045, 0.04, 0.28, 10]} />
@@ -661,118 +543,50 @@ function NaturalPosedCharacter({
           <sphereGeometry args={[0.048, 12, 12]} />
           <meshStandardMaterial color={preset.skinColor} roughness={0.6} />
         </mesh>
+
+        {/* Design Tablet in Scout's Hand */}
+        {preset.prop === 'tablet' && (
+          <group position={[0.06, -0.12, 0.08]} rotation={[-0.4, -0.3, 0.2]}>
+            <mesh castShadow>
+              <boxGeometry args={[0.16, 0.008, 0.22]} />
+              <meshStandardMaterial color="#0f172a" />
+            </mesh>
+            <mesh position={[0, 0.005, 0]}>
+              <planeGeometry args={[0.14, 0.2]} />
+              <meshBasicMaterial color="#fef08a" />
+            </mesh>
+          </group>
+        )}
       </group>
 
-      {/* Lounge Tablet Prop for COO & Scout */}
-      {pose === 'sitting_lounge' && (
-        <group position={[0, 0.38, 0.22]} rotation={[0.6, 0, 0]}>
-          <mesh castShadow>
-            <boxGeometry args={[0.2, 0.26, 0.012]} />
-            <meshStandardMaterial color="#0f172a" metalness={0.8} />
-          </mesh>
-          <mesh position={[0, 0, 0.008]}>
-            <planeGeometry args={[0.18, 0.24]} />
-            <meshBasicMaterial color="#38bdf8" />
-          </mesh>
-        </group>
-      )}
+      {/* 4. LEGS & SHOES */}
+      <group position={[-0.09, 0.14, isSitting ? 0.06 : 0]} rotation={[isSitting ? 1.3 : 0, 0, 0]}>
+        <mesh castShadow>
+          <cylinderGeometry args={[0.05, 0.045, 0.28, 12]} />
+          <meshStandardMaterial color={preset.bottomColor} roughness={0.65} />
+        </mesh>
+        <mesh position={[0, -0.16, 0.04]} castShadow>
+          <boxGeometry args={[0.09, 0.07, 0.16]} />
+          <meshStandardMaterial color="#ffffff" roughness={0.5} />
+        </mesh>
+      </group>
 
-      {/* 4. LEGS (Natural Sitting vs Standing) */}
-      {isSitting ? (
-        /* Sitting: Thighs forward horizontal, shins down */
-        <group position={[0, 0.32, 0]}>
-          {/* Left Thigh */}
-          <group position={[-0.09, 0, 0]} rotation={[Math.PI / 2.2, 0, 0]}>
-            <mesh castShadow>
-              <cylinderGeometry args={[0.048, 0.045, 0.26, 10]} />
-              <meshStandardMaterial
-                color={preset.gender === 'male' ? preset.bottomColor : preset.skinColor}
-                roughness={0.65}
-              />
-            </mesh>
-            {/* Left Shin down */}
-            <group position={[0, 0.14, 0]} rotation={[-Math.PI / 2.1, 0, 0]}>
-              <mesh position={[0, -0.1, 0]} castShadow>
-                <cylinderGeometry args={[0.045, 0.042, 0.22, 10]} />
-                <meshStandardMaterial
-                  color={preset.gender === 'male' ? preset.bottomColor : preset.skinColor}
-                  roughness={0.65}
-                />
-              </mesh>
-              {/* Sneaker */}
-              <mesh position={[0, -0.22, 0.05]} castShadow>
-                <boxGeometry args={[0.09, 0.065, 0.15]} />
-                <meshStandardMaterial color="#ffffff" roughness={0.4} />
-              </mesh>
-            </group>
-          </group>
-
-          {/* Right Thigh */}
-          <group position={[0.09, 0, 0]} rotation={[Math.PI / 2.2, 0, 0]}>
-            <mesh castShadow>
-              <cylinderGeometry args={[0.048, 0.045, 0.26, 10]} />
-              <meshStandardMaterial
-                color={preset.gender === 'male' ? preset.bottomColor : preset.skinColor}
-                roughness={0.65}
-              />
-            </mesh>
-            {/* Right Shin down */}
-            <group position={[0, 0.14, 0]} rotation={[-Math.PI / 2.1, 0, 0]}>
-              <mesh position={[0, -0.1, 0]} castShadow>
-                <cylinderGeometry args={[0.045, 0.042, 0.22, 10]} />
-                <meshStandardMaterial
-                  color={preset.gender === 'male' ? preset.bottomColor : preset.skinColor}
-                  roughness={0.65}
-                />
-              </mesh>
-              {/* Sneaker */}
-              <mesh position={[0, -0.22, 0.05]} castShadow>
-                <boxGeometry args={[0.09, 0.065, 0.15]} />
-                <meshStandardMaterial color="#ffffff" roughness={0.4} />
-              </mesh>
-            </group>
-          </group>
-        </group>
-      ) : (
-        /* Standing Upright */
-        <group position={[0, 0.16, 0]}>
-          <group position={[-0.09, 0, 0]}>
-            <mesh castShadow>
-              <cylinderGeometry args={[0.048, 0.045, 0.24, 10]} />
-              <meshStandardMaterial color={preset.skinColor} roughness={0.65} />
-            </mesh>
-            <mesh position={[0, -0.14, 0.03]} castShadow>
-              <boxGeometry args={[0.09, 0.07, 0.15]} />
-              <meshStandardMaterial color="#ffffff" roughness={0.4} />
-            </mesh>
-          </group>
-          <group position={[0.09, 0, 0]}>
-            <mesh castShadow>
-              <cylinderGeometry args={[0.048, 0.045, 0.24, 10]} />
-              <meshStandardMaterial color={preset.skinColor} roughness={0.65} />
-            </mesh>
-            <mesh position={[0, -0.14, 0.03]} castShadow>
-              <boxGeometry args={[0.09, 0.07, 0.15]} />
-              <meshStandardMaterial color="#ffffff" roughness={0.4} />
-            </mesh>
-          </group>
-        </group>
-      )}
-
-      {/* Animated Tail if present */}
-      {preset.hasTail && (
-        <AnimatedTail tailType={preset.hasTail} isHovered={isHovered || isSelected} />
-      )}
+      <group position={[0.09, 0.14, isSitting ? 0.06 : 0]} rotation={[isSitting ? 1.3 : 0, 0, 0]}>
+        <mesh castShadow>
+          <cylinderGeometry args={[0.05, 0.045, 0.28, 12]} />
+          <meshStandardMaterial color={preset.bottomColor} roughness={0.65} />
+        </mesh>
+        <mesh position={[0, -0.16, 0.04]} castShadow>
+          <boxGeometry args={[0.09, 0.07, 0.16]} />
+          <meshStandardMaterial color="#ffffff" roughness={0.5} />
+        </mesh>
+      </group>
     </group>
   )
 }
 
 /**
- * Main AgentAvatar Component:
- * - Clay Isometric Diorama Character
- * - Section 3: Floating Action Card with "NEEDS YOU", task summary, "Review first" and "Approve" buttons!
- * - Compact name pill when idle
- * - Natural sitting vs standing posture matching cluster
+ * Main AgentAvatar Component with Lively Routine & Floating Action Card
  */
 export default function AgentAvatar({
   agent,
@@ -786,8 +600,95 @@ export default function AgentAvatar({
   const [isApproved, setIsApproved] = useState(false)
   const preset = CHARACTER_PRESETS[agent.id] || CHARACTER_PRESETS.sherloc
 
-  // Expanded Floating Action Card ONLY appears when agent is selected or hovered
   const showActionCard = isSelected || hovered
+
+  // ========================================================
+  // LIVELY IDLE AGENT ROUTINE (Gather 2.0 Style Strolling)
+  // ========================================================
+  const groupRef = useRef()
+  const homePos = useMemo(() => new THREE.Vector3(...position), [position])
+  const homeRot = useMemo(() => (rotation ? rotation[1] : 0), [rotation])
+  const currentPos = useRef(new THREE.Vector3(...position))
+  const currentRot = useRef(rotation ? rotation[1] : 0)
+
+  // Social break destination per agent
+  const socialDestination = useMemo(() => {
+    switch (agent.id) {
+      case 'sherloc': return new THREE.Vector3(-5.8, 0.05, -3.2) // Pantry coffee
+      case 'watson':  return new THREE.Vector3(-6.8, 0.05, -2.0) // Aquarium fish
+      case 'nara':    return new THREE.Vector3(-5.2, 0.05, -3.2) // Pantry water
+      case 'velocia': return new THREE.Vector3(3.6, 0.05, 3.4)   // Lounge sofa
+      case 'scout':   return new THREE.Vector3(4.8, 0.05, 4.4)   // Lounge beanbag
+      case 'coo':     return new THREE.Vector3(-3.5, 0.05, 2.5)  // Frontline whiteboard
+      default:        return new THREE.Vector3(3.6, 0.05, 3.4)
+    }
+  }, [agent.id])
+
+  // Routine state: 'AT_DESK' | 'WALKING_TO_BREAK' | 'ON_BREAK' | 'WALKING_BACK'
+  const [routineState, setRoutineState] = useState('AT_DESK')
+  const nextBreakTimer = useRef(15 + ((agent.id.charCodeAt(0) * 11) % 30))
+  const breakDurationTimer = useRef(10)
+
+  useFrame((state, delta) => {
+    if (!groupRef.current) return
+
+    const isWorking = agent.status === 'working' || isSelected || hovered
+
+    if (isWorking) {
+      if (routineState !== 'AT_DESK' && routineState !== 'WALKING_BACK') {
+        setRoutineState('WALKING_BACK')
+      }
+    } else {
+      if (routineState === 'AT_DESK') {
+        nextBreakTimer.current -= delta
+        if (nextBreakTimer.current <= 0) {
+          setRoutineState('WALKING_TO_BREAK')
+          breakDurationTimer.current = 10 + Math.random() * 4
+        }
+      } else if (routineState === 'ON_BREAK') {
+        breakDurationTimer.current -= delta
+        if (breakDurationTimer.current <= 0) {
+          setRoutineState('WALKING_BACK')
+          nextBreakTimer.current = 35 + Math.random() * 25
+        }
+      }
+    }
+
+    // Physical movement during walking states
+    if (routineState === 'WALKING_TO_BREAK') {
+      const dist = currentPos.current.distanceTo(socialDestination)
+      if (dist < 0.15) {
+        setRoutineState('ON_BREAK')
+      } else {
+        const dir = new THREE.Vector3().subVectors(socialDestination, currentPos.current).normalize()
+        currentPos.current.addScaledVector(dir, 1.2 * delta)
+        const targetHeading = Math.atan2(dir.x, dir.z)
+        currentRot.current = THREE.MathUtils.lerp(currentRot.current, targetHeading, delta * 6)
+      }
+    } else if (routineState === 'WALKING_BACK') {
+      const dist = currentPos.current.distanceTo(homePos)
+      if (dist < 0.15) {
+        currentPos.current.copy(homePos)
+        currentRot.current = homeRot
+        setRoutineState('AT_DESK')
+      } else {
+        const dir = new THREE.Vector3().subVectors(homePos, currentPos.current).normalize()
+        currentPos.current.addScaledVector(dir, 1.3 * delta)
+        const targetHeading = Math.atan2(dir.x, dir.z)
+        currentRot.current = THREE.MathUtils.lerp(currentRot.current, targetHeading, delta * 6)
+      }
+    }
+
+    groupRef.current.position.copy(currentPos.current)
+    groupRef.current.rotation.y = currentRot.current
+  })
+
+  const activePose =
+    routineState === 'WALKING_TO_BREAK' || routineState === 'WALKING_BACK'
+      ? 'walking'
+      : routineState === 'ON_BREAK'
+      ? 'standing_pointing'
+      : preset.defaultPose
 
   const handleApprove = () => {
     setIsApproved(true)
@@ -795,14 +696,8 @@ export default function AgentAvatar({
   }
 
   return (
-    <group
-      position={position}
-      rotation={rotation}
-      name={`agent-avatar-${agent.id}`}
-    >
-      {/* ========================================================
-          SECTION 3: 3D FLOATING ACTION CARD (HERO UI ELEMENT)
-          ======================================================== */}
+    <group ref={groupRef} position={position} rotation={rotation} name={`agent-avatar-${agent.id}`}>
+      {/* 3D FLOATING ACTION CARD / COMPACT NAME PILL */}
       {!hideTooltip && (
         <Html
           position={[0, 1.45, 0]}
@@ -812,9 +707,7 @@ export default function AgentAvatar({
           style={{ pointerEvents: 'none' }}
         >
           {showActionCard ? (
-            /* --- EXPANDED FLOATING ACTION CARD (HERO UI CARD) --- */
             <div className="bg-white text-slate-900 border-2 border-slate-900 rounded-2xl shadow-2xl p-3.5 min-w-[250px] max-w-[280px] select-none text-left relative animate-in fade-in zoom-in-95 duration-200 pointer-events-auto">
-              {/* Header: [NEEDS YOU] • Agent Name     9m 58s Left */}
               <div className="flex items-center justify-between gap-2 w-full mb-2">
                 <div className="flex items-center gap-1.5">
                   <span className="bg-slate-950 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-md tracking-wider">
@@ -825,17 +718,13 @@ export default function AgentAvatar({
                     {agent.name}
                   </span>
                 </div>
-                <span className="text-[10px] font-semibold text-slate-400">
-                  9m 58s Left
-                </span>
+                <span className="text-[10px] font-semibold text-slate-400">9m 58s Left</span>
               </div>
 
-              {/* Body: Task summary */}
               <p className="text-[11px] leading-relaxed text-slate-600 font-medium mb-3 line-clamp-2">
                 {preset.sampleTask}
               </p>
 
-              {/* Footer: Action Buttons */}
               <div className="flex items-center justify-end gap-2 pt-1.5 border-t border-slate-100">
                 <button
                   onClick={(e) => {
@@ -861,18 +750,16 @@ export default function AgentAvatar({
                 </button>
               </div>
 
-              {/* Speech Bubble Downward Notch Pointer */}
               <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-x-6 border-x-transparent border-t-8 border-t-slate-900" />
               <div className="absolute -bottom-[6px] left-1/2 -translate-x-1/2 w-0 h-0 border-x-5 border-x-transparent border-t-7 border-t-white" />
             </div>
           ) : (
-            /* --- SLEEK COMPACT NAME PILL (Strictly Name & Mascot) --- */
             <div
               onClick={(e) => {
                 e.stopPropagation()
                 onSelect(agent)
               }}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 hover:bg-slate-950 text-white shadow-xl border border-white/20 backdrop-blur-sm select-none transition-transform duration-200 hover:scale-105 relative cursor-pointer whitespace-nowrap pointer-events-auto"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900/90 hover:bg-slate-950 text-white shadow-xl border border-white/20 backdrop-blur-sm select-none transition-transform duration-200 hover:scale-105 relative cursor-pointer whitespace-nowrap pointer-events-auto"
             >
               <span className="text-xs leading-none">{preset.emoji}</span>
               <span className="text-[11px] font-black text-white tracking-tight leading-none">
@@ -885,9 +772,7 @@ export default function AgentAvatar({
         </Html>
       )}
 
-      {/* ========================================================
-          GENEROUS 3D HITBOX VOLUME FOR CLICKING
-          ======================================================== */}
+      {/* Hitbox Volume for Easy Clicking */}
       <mesh
         position={[0, 0.65, 0]}
         onClick={(e) => {
@@ -908,7 +793,7 @@ export default function AgentAvatar({
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
 
-      {/* Interactive Selection Ring */}
+      {/* Selection Ring */}
       <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[0.38, 0.48, 32]} />
         <meshBasicMaterial
@@ -921,10 +806,11 @@ export default function AgentAvatar({
 
       {/* 3D Natural Posed Character */}
       <NaturalPosedCharacter
+        agentId={agent.id}
         preset={preset}
         isHovered={hovered}
         isSelected={isSelected}
-        pose={preset.defaultPose}
+        pose={activePose}
       />
     </group>
   )
