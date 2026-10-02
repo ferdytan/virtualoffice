@@ -14,12 +14,12 @@ import RoombaRobot from './RoombaRobot'
  * - Col 3 (Right): Reserved Desk 1 (Cyan)
  *
  * Row 2 (Middle):
- * - Col 1 (Left): Nara (Telemetry CS - Sky Blue)
- * - Col 2 (Center): Watson (Technical Bridge - Indigo/Purple)
+ * - Col 1 (Left): Sherloc (Frontline Voice - Joy Golden)
+ * - Col 2 (Center): Watson (Technical Bridge - Sadness Indigo)
  * - Col 3 (Right): Reserved Desk 2 (Emerald)
  *
  * Row 3 (Back, near Server Racks):
- * - Col 1 (Left): Sherloc (Frontline Support - Warm Gold)
+ * - Col 1 (Left): Nara (Telemetry CS & Server Diagnostics - Disgust Teal)
  * - Col 2 (Center): Reserved Desk 3 (Purple)
  * - Col 3 (Right): Reserved Desk 4 (Pink)
  *
@@ -48,7 +48,7 @@ export const WORKSTATION_ANCHORS = {
     seatPos: [-2.7, 0.05, 0.72],
     rotation: [0, 0, 0],
     role: 'Content Strategist',
-    color: '#f59e0b'
+    color: '#a855f7'
   },
   reserved_1: {
     id: 'reserved_1',
@@ -63,16 +63,16 @@ export const WORKSTATION_ANCHORS = {
   },
 
   // Row 2 (Middle)
-  nara: {
-    id: 'nara',
-    name: 'Nara',
+  sherloc: {
+    id: 'sherloc',
+    name: 'Sherloc',
     row: 2,
     col: 1,
     deskPos: [-5.2, 0, -1.2],
     seatPos: [-5.2, 0.05, -1.68],
     rotation: [0, 0, 0],
-    role: 'Telemetry CS',
-    color: '#38bdf8'
+    role: 'Frontline Support',
+    color: '#facc15'
   },
   watson: {
     id: 'watson',
@@ -98,16 +98,16 @@ export const WORKSTATION_ANCHORS = {
   },
 
   // Row 3 (Back, near Server Racks)
-  sherloc: {
-    id: 'sherloc',
-    name: 'Sherloc',
+  nara: {
+    id: 'nara',
+    name: 'Nara',
     row: 3,
     col: 1,
     deskPos: [-5.2, 0, -3.6],
     seatPos: [-5.2, 0.05, -4.08],
     rotation: [0, 0, 0],
-    role: 'Frontline Support',
-    color: '#d97706'
+    role: 'Telemetry CS & Server Diagnostics',
+    color: '#10b981'
   },
   reserved_3: {
     id: 'reserved_3',
@@ -407,13 +407,9 @@ function WorkstationDesk({
   monitorColor = '#38bdf8',
   hasDualMonitors = false,
   isReserved = false,
-  reservedLabel = 'Reserve Desk',
   chairPosition = [0, 0, -0.48],
   chairRotation = [0, 0, 0]
 }) {
-  const [hovered, setHovered] = useState(false)
-  const [clicked, setClicked] = useState(false)
-
   return (
     <group position={position} rotation={rotation}>
       {/* Desk Surface */}
@@ -437,7 +433,7 @@ function WorkstationDesk({
         </mesh>
         <mesh position={[0, 0, 0.012]}>
           <planeGeometry args={[0.47, 0.27]} />
-          <meshBasicMaterial color={monitorColor} />
+          <meshBasicMaterial color={isReserved ? '#334155' : monitorColor} />
         </mesh>
         {/* Stand */}
         <mesh position={[0, -0.18, 0]} castShadow>
@@ -455,7 +451,7 @@ function WorkstationDesk({
           </mesh>
           <mesh position={[0, 0, 0.012]}>
             <planeGeometry args={[0.45, 0.27]} />
-            <meshBasicMaterial color="#10b981" />
+            <meshBasicMaterial color={isReserved ? '#1e293b' : '#10b981'} />
           </mesh>
           <mesh position={[0, -0.18, 0]} castShadow>
             <cylinderGeometry args={[0.015, 0.015, 0.14, 8]} />
@@ -479,54 +475,6 @@ function WorkstationDesk({
         position={chairPosition}
         rotation={chairRotation}
       />
-
-      {/* Interactive Reserved Desk Hover/Click Tooltip */}
-      {isReserved && (
-        <>
-          <mesh
-            position={[0, 0.65, 0]}
-            onPointerOver={(e) => {
-              e.stopPropagation()
-              setHovered(true)
-              document.body.style.cursor = 'pointer'
-            }}
-            onPointerOut={() => {
-              setHovered(false)
-              document.body.style.cursor = 'auto'
-            }}
-            onClick={(e) => {
-              e.stopPropagation()
-              setClicked((prev) => !prev)
-            }}
-          >
-            <cylinderGeometry args={[0.85, 0.85, 1.4, 12]} />
-            <meshBasicMaterial transparent opacity={0} depthWrite={false} />
-          </mesh>
-
-          {(hovered || clicked) && (
-            <Html position={[0, 1.4, 0]} center distanceFactor={12} zIndexRange={[1, 20]} style={{ pointerEvents: 'none' }}>
-              <div className="bg-slate-900/95 text-white border-2 border-cyan-400/50 rounded-2xl shadow-2xl px-3.5 py-2.5 min-w-[220px] text-center select-none backdrop-blur-md animate-in fade-in zoom-in-95 duration-150">
-                <div className="flex items-center justify-center gap-1.5 mb-1">
-                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                  <span className="text-[10px] font-black tracking-wider uppercase text-cyan-300">
-                    {reservedLabel}
-                  </span>
-                </div>
-                <h4 className="text-xs font-bold text-white tracking-tight leading-snug">
-                  Reserved for Future Agent
-                </h4>
-                <p className="text-[10px] font-medium text-slate-300 leading-tight mt-0.5">
-                  Modular workstation ready for new agent deployment
-                </p>
-                <div className="mt-2 pt-1.5 border-t border-slate-700/60 flex items-center justify-center gap-1.5 text-[9px] text-slate-400 font-semibold">
-                  <span>Status:</span>
-                  <span className="text-emerald-400 font-bold">STANDBY • AVAILABLE</span>
-                </div>
-              </div>
-            </Html>
-          )}
-        </>
-      )}
     </group>
   )
 }
@@ -720,21 +668,30 @@ function OpenPlanStaffArea() {
         </mesh>
       </group>
 
-      {/* Row of Blinking Server Rack Towers against Back Wall (North) */}
-      <BlinkingServerRack position={[-5.8, 0, -5.8]} />
-      <BlinkingServerRack position={[-4.2, 0, -5.8]} />
-      <BlinkingServerRack position={[-2.6, 0, -5.8]} />
+      {/* Modular Server Rack Battery (Snapped together tightly without gaps) */}
+      <group name="modular-server-battery">
+        {/* Three tightly snapped server rack towers (width: 0.8 each, x_offset = 0.8) */}
+        <BlinkingServerRack position={[-6.0, 0, -5.8]} />
+        <BlinkingServerRack position={[-5.2, 0, -5.8]} />
+        <BlinkingServerRack position={[-4.4, 0, -5.8]} />
 
-      {/* Server Telemetry Status Terminal against Back Wall */}
-      <group position={[-0.8, 0, -5.8]}>
-        <mesh position={[0, 0.9, 0]} castShadow>
-          <boxGeometry args={[1.2, 1.8, 0.4]} />
-          <meshStandardMaterial color="#0f172a" roughness={0.4} />
+        {/* Top Connecting Header Cable Tray */}
+        <mesh position={[-5.2, 1.82, -5.8]} castShadow>
+          <boxGeometry args={[2.44, 0.05, 0.66]} />
+          <meshStandardMaterial color="#1e293b" metalness={0.7} roughness={0.4} />
         </mesh>
-        <mesh position={[0, 1.1, 0.21]}>
-          <planeGeometry args={[1.0, 0.6]} />
-          <meshBasicMaterial color="#38bdf8" />
-        </mesh>
+
+        {/* Server Telemetry Status Terminal adjacent to server battery */}
+        <group position={[-3.3, 0, -5.8]}>
+          <mesh position={[0, 0.9, 0]} castShadow>
+            <boxGeometry args={[1.2, 1.8, 0.4]} />
+            <meshStandardMaterial color="#0f172a" roughness={0.4} />
+          </mesh>
+          <mesh position={[0, 1.1, 0.21]}>
+            <planeGeometry args={[1.0, 0.6]} />
+            <meshBasicMaterial color="#10b981" />
+          </mesh>
+        </group>
       </group>
 
       {/* ========================================================
@@ -750,10 +707,10 @@ function OpenPlanStaffArea() {
         monitorColor="#ef4444"
         hasDualMonitors={false}
       />
-      {/* Meja 2: Scout (Content Strategist - Hijau/Golden) */}
+      {/* Meja 2: Scout (Content Strategist - Ungu Lilac) */}
       <WorkstationDesk
         position={WORKSTATION_ANCHORS.scout.deskPos}
-        monitorColor="#22c55e"
+        monitorColor="#a855f7"
         hasDualMonitors={false}
       />
       {/* Meja 3: Meja Kosong Cadangan 1 (Reserve Desk 1) */}
@@ -762,37 +719,14 @@ function OpenPlanStaffArea() {
         monitorColor="#06b6d4"
         hasDualMonitors={false}
         isReserved={true}
-        reservedLabel="Reserve Desk #1"
       />
 
-      {/* --- ROW 2 (MIDDLE): Nara, Watson, Reserved Desk 2 --- */}
-      {/* Meja 4: Nara (Telemetry - Biru Muda) */}
-      <WorkstationDesk
-        position={WORKSTATION_ANCHORS.nara.deskPos}
-        monitorColor="#38bdf8"
-        hasDualMonitors={true}
-      />
-      {/* Meja 5: Watson (Technical Bridge - Ungu/Indigo) */}
-      <WorkstationDesk
-        position={WORKSTATION_ANCHORS.watson.deskPos}
-        monitorColor="#6366f1"
-        hasDualMonitors={true}
-      />
-      {/* Meja 6: Meja Kosong Cadangan 2 (Reserve Desk 2) */}
-      <WorkstationDesk
-        position={WORKSTATION_ANCHORS.reserved_2.deskPos}
-        monitorColor="#10b981"
-        hasDualMonitors={false}
-        isReserved={true}
-        reservedLabel="Reserve Desk #2"
-      />
-
-      {/* --- ROW 3 (BACK, dekat Server): Sherloc, Reserved Desk 3, Reserved Desk 4 --- */}
-      {/* Meja 7: Sherloc (Frontline Support - Kuning Emas) */}
+      {/* --- ROW 2 (MIDDLE): Sherloc, Watson, Reserved Desk 2 --- */}
+      {/* Meja 4: Sherloc (Frontline Voice - Kuning Emas) */}
       <group position={WORKSTATION_ANCHORS.sherloc.deskPos}>
         <WorkstationDesk
           position={[0, 0, 0]}
-          monitorColor="#f59e0b"
+          monitorColor="#facc15"
           hasDualMonitors={true}
         />
         {/* Headset Prop on Desk */}
@@ -803,11 +737,11 @@ function OpenPlanStaffArea() {
           </mesh>
           <mesh position={[-0.08, 0, 0]} castShadow>
             <sphereGeometry args={[0.03, 10, 10]} />
-            <meshStandardMaterial color="#d97706" />
+            <meshStandardMaterial color="#facc15" />
           </mesh>
           <mesh position={[0.08, 0, 0]} castShadow>
             <sphereGeometry args={[0.03, 10, 10]} />
-            <meshStandardMaterial color="#d97706" />
+            <meshStandardMaterial color="#facc15" />
           </mesh>
         </group>
         {/* Standing Notification Lamp */}
@@ -822,11 +756,33 @@ function OpenPlanStaffArea() {
           </mesh>
           <mesh position={[0, 1.4, 0]}>
             <sphereGeometry args={[0.1, 16, 16]} />
-            <meshStandardMaterial color="#fbbf24" emissive="#fbbf24" emissiveIntensity={2.5} />
+            <meshStandardMaterial color="#facc15" emissive="#facc15" emissiveIntensity={2.5} />
           </mesh>
-          <pointLight position={[0, 1.4, 0]} color="#fbbf24" intensity={1.5} distance={3.5} />
+          <pointLight position={[0, 1.4, 0]} color="#facc15" intensity={1.5} distance={3.5} />
         </group>
       </group>
+
+      {/* Meja 5: Watson (Technical Bridge - Ungu/Indigo) */}
+      <WorkstationDesk
+        position={WORKSTATION_ANCHORS.watson.deskPos}
+        monitorColor="#1d4ed8"
+        hasDualMonitors={true}
+      />
+      {/* Meja 6: Meja Kosong Cadangan 2 (Reserve Desk 2) */}
+      <WorkstationDesk
+        position={WORKSTATION_ANCHORS.reserved_2.deskPos}
+        monitorColor="#10b981"
+        hasDualMonitors={false}
+        isReserved={true}
+      />
+
+      {/* --- ROW 3 (BACK, tepat di depan Server Racks): Nara, Reserved Desk 3, Reserved Desk 4 --- */}
+      {/* Meja 7: Nara (Telemetry CS & Server Diagnostics - Hijau Mint / Teal) */}
+      <WorkstationDesk
+        position={WORKSTATION_ANCHORS.nara.deskPos}
+        monitorColor="#10b981"
+        hasDualMonitors={true}
+      />
 
       {/* Meja 8: Meja Kosong Cadangan 3 (Reserve Desk 3) */}
       <WorkstationDesk
@@ -834,7 +790,6 @@ function OpenPlanStaffArea() {
         monitorColor="#8b5cf6"
         hasDualMonitors={false}
         isReserved={true}
-        reservedLabel="Reserve Desk #3"
       />
 
       {/* Meja 9: Meja Kosong Cadangan 4 (Reserve Desk 4) */}
@@ -843,7 +798,6 @@ function OpenPlanStaffArea() {
         monitorColor="#ec4899"
         hasDualMonitors={false}
         isReserved={true}
-        reservedLabel="Reserve Desk #4"
       />
     </group>
   )

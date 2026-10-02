@@ -42,8 +42,8 @@ const INITIAL_AGENTS = [
     role: 'Content Creator Manager & Strategic Copywriter',
     role_badge: 'CONTENT CREATOR (SCOUT)',
     status: 'available',
-    color: '#f59e0b',
-    color_name: 'Golden Amber',
+    color: '#a855f7',
+    color_name: 'Fear Lilac',
     position: [-2.7, 0.05, 0.72], // Open-Plan Grid Row 1 (Front-Center, Content Strategist)
     rotation: [0, 0, 0],
     model: 'gpt-4o-mini',
@@ -55,21 +55,22 @@ const INITIAL_AGENTS = [
     ]
   },
   {
-    id: 'nara',
-    name: 'Nara',
-    role: 'CS & Offline Unit Reminder',
-    role_badge: 'TELEMETRY CS (NARA)',
+    id: 'sherloc',
+    name: 'Sherloc',
+    role: 'Frontline WhatsApp & Customer Face',
+    role_badge: 'FRONTLINE CS (SHERLOC)',
     status: 'working',
-    color: '#38bdf8',
-    color_name: 'Sky Blue',
-    position: [-5.2, 0.05, -1.68], // Open-Plan Grid Row 2 (Middle-Left, Telemetry)
+    color: '#facc15',
+    color_name: 'Joy Golden',
+    position: [-5.2, 0.05, -1.68], // Open-Plan Grid Row 2 (Middle-Left, next to Watson)
     rotation: [0, 0, 0],
     model: 'gpt-4o-mini',
-    description: 'Bertanggung jawab memantau telemetri GPS offline secara real-time dari Server Datacenter dan broadcast pengingat aman anti-banned (jitter random 15-45s & typing status).',
+    description: 'Satu-satunya Frontline Voice & Face WhatsApp customer. Memvalidasi nomor telepon/email pengguna, menjawab FAQ, serta mendelegasikan issue GPS ke Nara dan eskalasi teknis ke Watson.',
     quick_prompts: [
-      'Cek unit offline yang membutuhkan eskalasi',
-      'Kirim safe group broadcast dengan anti-banned delay',
-      'Buat ringkasan status kesehatan unit hari ini'
+      'Simulasikan chat inbound WhatsApp pelanggan Orin',
+      'Validasi nomor telepon pelanggan baru dan cek paket langganan',
+      'Delegasikan pengecekan GPS offline ke Nara',
+      'Eskalasi issue firmware anomali ke Watson'
     ]
   },
   {
@@ -79,7 +80,7 @@ const INITIAL_AGENTS = [
     role_badge: 'TECH ANALYST (WATSON)',
     status: 'available',
     color: '#1d4ed8',
-    color_name: 'Deep Navy',
+    color_name: 'Sadness Indigo',
     position: [-2.7, 0.05, -1.68], // Open-Plan Grid Row 2 (Middle-Center, Technical Bridge)
     rotation: [0, 0, 0],
     model: 'gpt-4o-mini',
@@ -91,22 +92,21 @@ const INITIAL_AGENTS = [
     ]
   },
   {
-    id: 'sherloc',
-    name: 'Sherloc',
-    role: 'Frontline WhatsApp & Customer Face',
-    role_badge: 'FRONTLINE CS (SHERLOC)',
+    id: 'nara',
+    name: 'Nara',
+    role: 'CS & Offline Unit Reminder',
+    role_badge: 'TELEMETRY CS (NARA)',
     status: 'working',
-    color: '#d97706',
-    color_name: 'Warm Gold',
-    position: [-5.2, 0.05, -4.08], // Open-Plan Grid Row 3 (Back-Left, near Server Racks)
+    color: '#10b981',
+    color_name: 'Disgust Teal',
+    position: [-5.2, 0.05, -4.08], // Open-Plan Grid Row 3 (Back-Left, directly in front of Server Battery)
     rotation: [0, 0, 0],
     model: 'gpt-4o-mini',
-    description: 'Satu-satunya Frontline Voice & Face WhatsApp customer. Memvalidasi nomor telepon/email pengguna, menjawab FAQ, serta mendelegasikan issue GPS ke Nara dan eskalasi teknis ke Watson.',
+    description: 'Bertanggung jawab memantau telemetri GPS offline secara real-time dari Server Datacenter di baris belakang dan broadcast pengingat aman anti-banned (jitter random 15-45s & typing status).',
     quick_prompts: [
-      'Simulasikan chat inbound WhatsApp pelanggan Orin',
-      'Validasi nomor telepon pelanggan baru dan cek paket langganan',
-      'Delegasikan pengecekan GPS offline ke Nara',
-      'Eskalasi issue firmware anomali ke Watson'
+      'Cek unit offline yang membutuhkan eskalasi',
+      'Kirim safe group broadcast dengan anti-banned delay',
+      'Buat ringkasan status kesehatan unit hari ini'
     ]
   },
   {
