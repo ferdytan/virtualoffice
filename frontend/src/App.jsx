@@ -16,63 +16,8 @@ import {
   Bot
 } from 'lucide-react'
 
-// 5-Agent Collaborative Ecosystem: Frontline (Sherloc), Escalation (Watson), CS Telemetry (Nara), Marketing (Velocia), Research (Scout)
+// 5-Agent Collaborative Ecosystem: Frontline (Sherloc), Escalation (Watson), CS Telemetry (Nara), Marketing (Velocia), Research (Scout) + Victor COO
 const INITIAL_AGENTS = [
-  {
-    id: 'sherloc',
-    name: 'Sherloc',
-    role: 'Frontline WhatsApp & Customer Face',
-    role_badge: 'FRONTLINE CS (SHERLOC)',
-    status: 'working',
-    color: '#d97706',
-    color_name: 'Warm Gold',
-    position: [-6.0, 0.05, 3.32], // Frontline CS Office: Seated at CS desk facing dual monitors & typing
-    rotation: [0, 0, 0],
-    model: 'gpt-4o-mini',
-    description: 'Satu-satunya Frontline Voice & Face WhatsApp customer. Memvalidasi nomor telepon/email pengguna, menjawab FAQ, serta mendelegasikan issue GPS ke Nara dan eskalasi teknis ke Watson.',
-    quick_prompts: [
-      'Simulasikan chat inbound WhatsApp pelanggan Orin',
-      'Validasi nomor telepon pelanggan baru dan cek paket langganan',
-      'Delegasikan pengecekan GPS offline ke Nara',
-      'Eskalasi issue firmware anomali ke Watson'
-    ]
-  },
-  {
-    id: 'watson',
-    name: 'Watson',
-    role: 'Technical Escalation & Knowledge Loop',
-    role_badge: 'TECH ANALYST (WATSON)',
-    status: 'available',
-    color: '#1d4ed8',
-    color_name: 'Deep Navy',
-    position: [-1.2, 0.05, -4.68], // Tech Cubicle Bay: Seated at diagnostic desk facing monitors & typing
-    rotation: [0, 0, 0],
-    model: 'gpt-4o-mini',
-    description: 'Jembatan eskalasi teknis ke WhatsApp Group Tim Manajemen & Lead internal. Menerima solusi eskalasi dan secara otomatis memanen pasangan Q&A ke Knowledge Base / RAG.',
-    quick_prompts: [
-      'Tinjau tiket eskalasi menunggu respon tim manajemen',
-      'Simulasikan balasan manajemen grup dan injeksi ke Knowledge Base',
-      'Sinkronisasi knowledge base pasangan Q&A baru ke Sherloc'
-    ]
-  },
-  {
-    id: 'nara',
-    name: 'Nara',
-    role: 'CS & Offline Unit Reminder',
-    role_badge: 'TELEMETRY CS (NARA)',
-    status: 'working',
-    color: '#38bdf8',
-    color_name: 'Sky Blue',
-    position: [-5.8, 0.05, -4.42], // Datacenter Server Room: Seated facing North towards Server Racks & telemetry console
-    rotation: [0, Math.PI, 0],
-    model: 'gpt-4o-mini',
-    description: 'Bertanggung jawab memantau telemetri GPS offline secara real-time dari Server Datacenter dan broadcast pengingat aman anti-banned (jitter random 15-45s & typing status).',
-    quick_prompts: [
-      'Cek unit offline yang membutuhkan eskalasi',
-      'Kirim safe group broadcast dengan anti-banned delay',
-      'Buat ringkasan status kesehatan unit hari ini'
-    ]
-  },
   {
     id: 'velocia',
     name: 'Velocia',
@@ -81,7 +26,7 @@ const INITIAL_AGENTS = [
     status: 'available',
     color: '#ef4444',
     color_name: 'Solid Red',
-    position: [4.8, 0.05, 3.52], // Creative Workshop: Seated at strategy desk facing laptop & typing
+    position: [-5.2, 0.05, 0.72], // Open-Plan Grid Row 1 (Front-Left, Growth Strategy)
     rotation: [0, 0, 0],
     model: 'gpt-4o-mini',
     description: 'Menelan log chat selesai dari Sherloc, menganalisis tren permintaan pasar (fuel sensor, mini GPS, promo bundling), dan merancang strategi pertumbuhan di depan papan presentasi.',
@@ -99,7 +44,7 @@ const INITIAL_AGENTS = [
     status: 'available',
     color: '#f59e0b',
     color_name: 'Golden Amber',
-    position: [6.8, 0.05, 3.52], // Creative Workshop: Seated at creative desk with design tablet & typing
+    position: [-2.7, 0.05, 0.72], // Open-Plan Grid Row 1 (Front-Center, Content Strategist)
     rotation: [0, 0, 0],
     model: 'gpt-4o-mini',
     description: 'Content Creator Manager & Strategic Copywriter di ekosistem Orin. Meriset berita kriminalitas & logistik, menyusun strategi artikel konversi tinggi dengan tablet catatan kerja.',
@@ -110,6 +55,61 @@ const INITIAL_AGENTS = [
     ]
   },
   {
+    id: 'nara',
+    name: 'Nara',
+    role: 'CS & Offline Unit Reminder',
+    role_badge: 'TELEMETRY CS (NARA)',
+    status: 'working',
+    color: '#38bdf8',
+    color_name: 'Sky Blue',
+    position: [-5.2, 0.05, -1.68], // Open-Plan Grid Row 2 (Middle-Left, Telemetry)
+    rotation: [0, 0, 0],
+    model: 'gpt-4o-mini',
+    description: 'Bertanggung jawab memantau telemetri GPS offline secara real-time dari Server Datacenter dan broadcast pengingat aman anti-banned (jitter random 15-45s & typing status).',
+    quick_prompts: [
+      'Cek unit offline yang membutuhkan eskalasi',
+      'Kirim safe group broadcast dengan anti-banned delay',
+      'Buat ringkasan status kesehatan unit hari ini'
+    ]
+  },
+  {
+    id: 'watson',
+    name: 'Watson',
+    role: 'Technical Escalation & Knowledge Loop',
+    role_badge: 'TECH ANALYST (WATSON)',
+    status: 'available',
+    color: '#1d4ed8',
+    color_name: 'Deep Navy',
+    position: [-2.7, 0.05, -1.68], // Open-Plan Grid Row 2 (Middle-Center, Technical Bridge)
+    rotation: [0, 0, 0],
+    model: 'gpt-4o-mini',
+    description: 'Jembatan eskalasi teknis ke WhatsApp Group Tim Manajemen & Lead internal. Menerima solusi eskalasi dan secara otomatis memanen pasangan Q&A ke Knowledge Base / RAG.',
+    quick_prompts: [
+      'Tinjau tiket eskalasi menunggu respon tim manajemen',
+      'Simulasikan balasan manajemen grup dan injeksi ke Knowledge Base',
+      'Sinkronisasi knowledge base pasangan Q&A baru ke Sherloc'
+    ]
+  },
+  {
+    id: 'sherloc',
+    name: 'Sherloc',
+    role: 'Frontline WhatsApp & Customer Face',
+    role_badge: 'FRONTLINE CS (SHERLOC)',
+    status: 'working',
+    color: '#d97706',
+    color_name: 'Warm Gold',
+    position: [-5.2, 0.05, -4.08], // Open-Plan Grid Row 3 (Back-Left, near Server Racks)
+    rotation: [0, 0, 0],
+    model: 'gpt-4o-mini',
+    description: 'Satu-satunya Frontline Voice & Face WhatsApp customer. Memvalidasi nomor telepon/email pengguna, menjawab FAQ, serta mendelegasikan issue GPS ke Nara dan eskalasi teknis ke Watson.',
+    quick_prompts: [
+      'Simulasikan chat inbound WhatsApp pelanggan Orin',
+      'Validasi nomor telepon pelanggan baru dan cek paket langganan',
+      'Delegasikan pengecekan GPS offline ke Nara',
+      'Eskalasi issue firmware anomali ke Watson'
+    ]
+  },
+  {
     id: 'coo',
     name: 'COO',
     role: 'Chief Operating Officer & Executive Orchestrator',
@@ -117,7 +117,7 @@ const INITIAL_AGENTS = [
     status: 'working',
     color: '#334155',
     color_name: 'Slate Executive',
-    position: [6.0, 0.05, -4.68], // Executive Room: Seated inside private executive office at director desk & typing
+    position: [5.7, 0.05, -4.48], // Private Executive Glass Office (Victor COO)
     rotation: [0, 0, 0],
     model: 'gpt-4o-mini',
     description: 'Pimpinan operasional & master delegator Virtual Office Orin. Menerima instruksi Direktur via Telegram Bot pribadi, memecah tugas, mendelegasikannya ke spesialis, dan memantau dari ruang kerja eksekutif pribadinya.',
